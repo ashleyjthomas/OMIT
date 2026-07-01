@@ -1,0 +1,9 @@
+model,term,median,CI_low,CI_high,pct_in_ROPE,pd
+study1_circles_age_child,b_Intercept,2.84,2.49,3.19,0,1
+study1_circles_age_child,b_targetemo,0.04,-0.34,0.41,39.4,0.581
+study1_circles_age_child,b_emotionsad,-0.35,-0.72,0.03,8.6,0.967
+study1_circles_age_child,b_age_c,0.09,-0.25,0.44,38.7,0.706
+study1_circles_age_child,b_targetemo:emotionsad,0.37,-0.16,0.9,11.3,0.915
+study1_circles_age_child,b_targetemo:age_c,0.11,-0.25,0.47,35.9,0.732
+study1_circles_age_child,b_emotionsad:age_c,-0.19,-0.55,0.17,25.9,0.853
+study1_circles_age_child,b_targetemo:emotionsad:age_c,0.41,-0.1,0.92,9,0.944

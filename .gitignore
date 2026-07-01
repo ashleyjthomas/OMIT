@@ -1,0 +1,27 @@
+# ---- macOS ----
+.DS_Store
+
+# ---- R / RStudio session state ----
+.Rhistory
+.Rdata
+.RData
+.Ruserdata
+.Rproj.user/
+
+# ---- Quarto / knitr build artifacts ----
+/.quarto/
+*_files/
+*_cache/
+*.utf8.md
+*.knit.md
+
+# ---- stray R plot output ----
+Rplots.pdf
+
+# ---- Office temp / lock files ----
+~$*
+*.tmp
+
+# NOTE: model caches (5. Analysis/results/models/*.rds) are intentionally
+# NOT ignored -- they are kept in the repository so results reproduce
+# without refitting every model.

@@ -1,0 +1,451 @@
+---
+title: "Supplementary Materials"
+subtitle: "Children's Expectations of Emotional Intimacy in Close Relationships"
+date: today
+format:
+  html:
+    toc: true
+    number-sections: true
+  docx:
+    output-file: OMIT_supplement_rendered.docx
+    number-sections: true
+    reference-doc: apa-reference.docx
+  pdf:
+    output-file: OMIT_supplement.pdf
+    pdf-engine: xelatex
+    documentclass: article
+    geometry: margin=1in
+    fontsize: 11pt
+    mainfont: "Times New Roman"
+    number-sections: true
+    fig-pos: 'H'
+    colorlinks: true
+bibliography: references.bib
+csl: apa.csl
+fig-align: center
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r}
+#| label: setup
+#| include: false
+suppressMessages({ library(here); library(dplyr); library(readr); library(knitr) })
+
+# All tables/figures come from 5. Analysis/code/OMIT_CLEAN.R (run it first).
+res     <- here::here("5. Analysis", "results")
+fig_dir <- here::here("5. Analysis", "figures")
+diag_dir <- file.path(fig_dir, "diagnostics")
+
+D <- read_csv(file.path(res, "model_diagnostics.csv"), show_col_types = FALSE)
+M <- read_csv(file.path(res, "model_estimates.csv"),   show_col_types = FALSE)
+B <- read_csv(file.path(res, "binomial_BF.csv"),       show_col_types = FALSE) |>
+  mutate(cell = coalesce(relationship, measure))
+CM <- read_csv(file.path(res, "circles_means.csv"),     show_col_types = FALSE)
+CE <- read_csv(file.path(res, "circles_estimates.csv"), show_col_types = FALSE)
+CA <- read_csv(file.path(res, "circles_age_estimates.csv"), show_col_types = FALSE)
+SX <- read_csv(file.path(res, "gender_effects.csv"),    show_col_types = FALSE)
+
+# helper: posterior median + 95% CI for a circles model term
+# (model = study1_circles_child [default] or study1_circles_adult)
+circ <- function(term, model = "study1_circles_child") {
+  r <- dplyr::filter(CE, model == !!model, term == !!term)
+  sprintf("median = %.2f, 95%% CI [%.2f, %.2f]", r$median, r$CI_low, r$CI_high)
+}
+# same, for the circles developmental (age) model
+cage <- function(term) {
+  r <- dplyr::filter(CA, term == !!term)
+  sprintf("median = %.2f, 95%% CI [%.2f, %.2f]", r$median, r$CI_low, r$CI_high)
+}
+
+# pretty model labels
+mod_lab <- c(
+  study1_bf_child = "Study 1 — better friend (children)",     study1_bf_adult = "Study 1 — better friend (adults)",
+  study1_food_child = "Study 1 — food sharing (children)",    study1_food_adult = "Study 1 — food sharing (adults)",
+  study2_child = "Study 2 (children)", study2_adult = "Study 2 (adults)",
+  study4A_child = "Study 4A (children)", study4A_adult = "Study 4A (adults)",
+  study4B_child = "Study 4B (children)", study4B_adult = "Study 4B (adults)",
+  study1_cellmeans_child = "Study 1 cell-means (children)",
+  study1_cellmeans_adult = "Study 1 cell-means (adults)",
+  study3A_child = "Study 3A (children)", study3A_adult = "Study 3A (adults)",
+  study3B_child = "Study 3B (children)", study3B_adult = "Study 3B (adults)")
+
+# full posterior table for a set of models (terms, median, 95% CI, ROPE, pd)
+post_table <- function(models) {
+  M |>
+    filter(model %in% models) |>
+    mutate(Model = recode(model, !!!mod_lab),
+           Term  = gsub("^b_", "", term),
+           `95% CI` = sprintf("[%.2f, %.2f]", CI_low, CI_high)) |>
+    select(Model, Term, Median = median, `95% CI`, `% in ROPE` = pct_in_ROPE, pd)
+}
+```
+
+> This document is reproducible: every table and figure is produced by
+> `5. Analysis/code/OMIT_CLEAN.R` and read here via `here()`. Items
+> marked **`[PLACEHOLDER]`** need author input.
+
+# Supplementary Methods
+
+## Participants
+
+Full sample sizes and age/sex breakdowns are given in the main text.
+Briefly, the Set-A studies (Studies 1, 3A, 4A) tested 57 children (6--9
+years) and 47 adults; the Set-B/C studies (Studies 2, 3B, 4B) tested 105
+children and 49 adults.
+
+## Sample-size justification
+
+For the Set-B/C studies we pre-registered a target of 56 children,
+consistent with prior work that detected comparable effects [@woo2024].
+However after we had tested 56 children we analyzed the data and the
+results were inconclusive. Thus we decided to collect double the amount
+which is allowed when using bayesian analyses [@wagenmakers2019five ]
+Recruitment exceeded the target, yielding 105 children. Adult comparison
+samples (47 and 49) were collected via an online platform. As is
+standard for Bayesian mixed-effects models, sample size was justified by
+analogy to prior effects rather than a frequentist power calculation
+[see @vasishth2023sample].
+
+## Exclusion criteria
+
+Per the pre-registration, data were excluded for (a) consistent familial
+interference (e.g., a caregiver or sibling biasing the child's
+responses), (b) procedural error (deviation from the standard procedure
+such that the participant did not see all vignettes/trials), or (c)
+equipment failure (e.g., inadequate internet or device malfunction
+preventing completion).
+
+In the Set-A child sample, 2 of the 59 tested children were excluded
+(final *N* = 57). One was excluded for a stimulus mishap during the
+classmate trials (procedural error) and S043 because the child was
+colorblind and could not complete the color-based response task. Three
+further children were flagged for environmental issues (one zoom
+interruption, two loud environments) but were retained. In the Set-B/C
+child sample, 3 children excluded for refusing to answer any questions.
+A small number of individual items were left blank or uncodable because
+children did not answer questions, so the effective per-cell *N* is
+103--104. The adult samples comprised 47 (Set A) and 49 (Set B/C)
+complete responses.
+
+# Analytic approach
+
+Forced-choice responses were coded `chose_emotion` (1 = chose/was told
+the emotion; 0 = the fact). For each cell we pre-registered and
+conducted one-sided Bayesian binomial tests (JZS default prior) in the
+pre-registered direction of the hypothesis (emotion \> chance for
+Studies 1, 2, 4A, 3A, 3B; fact \> chance for Study 4B).
+
+For the mixed-effects analyses we fit Bayesian probit generalized linear
+mixed models with brms default priors. For children the model crossed
+the condition factor(s) with mean-centered continuous age and included a
+participant random intercept
+(`chose_emotion ~ condition * age + (1 | ID)`); for adults, age was not
+recorded, so the model was condition-only
+(`chose_emotion ~ condition + (1 | ID)`).
+
+**Inference criterion.** Following the pre-registration, an effect was
+taken as credible when the 95% credible interval excluded 0; we
+additionally report the percentage of the posterior within a region of
+practical equivalence (ROPE) of \[−0.1, 0.1\] and the probability of
+direction (pd).
+
+# Model diagnostics
+
+## Convergence, sampling, and fit
+
+All models were fit with 4 chains (4,000 iterations; 1,000 warmup). The
+table reports the maximum $\hat{R}$, minimum effective sample size
+(ESS), the number of divergent transitions, and Bayesian $R^2$ (with 95%
+CI) for each model. Convergence was good throughout: all
+$\hat{R} \le 1.01$ and all ESS well above typical thresholds.
+
+```{r}
+#| label: tbl-diag
+#| echo: false
+D |>
+  mutate(Model = recode(model, !!!mod_lab),
+         `Bayes R² [95% CI]` = sprintf("%.2f [%.2f, %.2f]", BayesR2, BayesR2_low, BayesR2_high)) |>
+  select(Model, `max R̂` = max_Rhat, `min ESS` = min_ESS,
+         `divergences` = n_divergent, `Bayes R² [95% CI]`) |>
+  kable(caption = "Table S1. Convergence and fit diagnostics for all models. Bayes R² is the Bayesian R² (proportion of variance explained) with its 95% credible interval [@gelman2019rsquared].")
+```
+
+A small number of divergent transitions occurred in two of the smaller
+adult models (`study1_bf_adult`, `study3B_adult`). These did not affect
+the conclusions; they can be eliminated by refitting with
+`control = list(adapt_delta = 0.99)`.
+
+## Posterior predictive checks
+
+For each model we compared the observed distribution of responses to
+draws from the posterior predictive distribution (`pp_check`, type =
+"dens_overlay"). Predicted and observed distributions align well across
+models.
+
+```{r}
+#| label: fig-ppc
+#| echo: false
+#| out-width: "100%"
+#| fig-cap: "Posterior predictive checks for all models (pp_check, type = \"dens_overlay\"). In each panel the dark line is the observed distribution and the light lines are 100 draws from the posterior predictive distribution; for the binary outcome the density is bimodal (mass near 0 = fact and 1 = emotion), with peak heights reflecting the proportion choosing each. Observed and predicted align well across models."
+knitr::include_graphics(file.path(diag_dir, "pp_all.png"))
+```
+
+# Full posterior estimates
+
+For each study we report the posterior median, 95% credible interval,
+percentage of the posterior in the ROPE, and probability of direction
+for every model term (child models on the probit scale, with age
+mean-centered so condition terms are evaluated at the mean age).
+
+```{r}
+#| label: tbl-s1
+#| echo: false
+post_table(c("study1_bf_child","study1_bf_adult",
+             "study1_food_child","study1_food_adult")) |>
+  kable(caption = "Table S2. Study 1 — full posterior estimates.")
+```
+
+```{r}
+#| label: tbl-s1cell
+#| echo: false
+post_table(c("study1_cellmeans_child","study1_cellmeans_adult")) |>
+  kable(caption = "Table S3. Study 1 food-sharing cell-means model (reference = happy/candy).")
+```
+
+```{r}
+#| label: tbl-s2
+#| echo: false
+post_table(c("study2_child","study2_adult")) |>
+  kable(caption = "Table S4. Study 2 (friend vs. best friend) — full posterior estimates.")
+```
+
+```{r}
+#| label: tbl-s3a
+#| echo: false
+post_table(c("study3A_child","study3A_adult")) |>
+  kable(caption = "Table S5. Study 3A — full posterior estimates.")
+```
+
+```{r}
+#| label: tbl-s3b
+#| echo: false
+post_table(c("study3B_child","study3B_adult")) |>
+  kable(caption = "Table S6. Study 3B — full posterior estimates.")
+```
+
+```{r}
+#| label: tbl-s4a
+#| echo: false
+post_table(c("study4A_child","study4A_adult")) |>
+  kable(caption = "Table S7. Study 4A (child → mom vs. friend's mom) — full posterior estimates.")
+```
+
+```{r}
+#| label: tbl-s4b
+#| echo: false
+post_table(c("study4B_child","study4B_adult")) |>
+  kable(caption = "Table S8. Study 4B (mom / friend's mom → child) — full posterior estimates.")
+```
+
+# One-sided binomial tests (all cells)
+
+```{r}
+#| label: tbl-binom
+#| echo: false
+B |>
+  mutate(Study = study,
+         Population = population,
+         Cell = recode(cell,
+           better_friend = "Better friend", ice_cream = "Ice cream", candy = "Candy",
+           mom = "Mom", friendmom = "Friend's mom", friend = "Friend",
+           bestfriend = "Best friend", create = "Create", deepen = "Deepen"),
+         Emotion = tools::toTitleCase(emotion),
+         `% emotion` = pct_emo,
+         Direction = direction) |>
+  select(Study, Population, Cell, Emotion, `% emotion`, Direction, BF10, BF01) |>
+  arrange(Study, Population, Cell, Emotion) |>
+  kable(caption = "Table S9. One-sided Bayesian binomial tests vs chance, in the pre-registered direction. BF10 favors the hypothesized direction; BF01 favors the null.")
+```
+
+# Social-closeness (circles) measure
+
+In addition to the binary forced-choice items, in Study 1
+(pre-registration Part 1) children and adults rated how close each
+character was to the protagonist on a six-step overlapping-circles scale
+(the Inclusion of Other in the Self measure; @aron1992inclusion). In the
+raw data the most-overlapping ("closest") option was coded 1 and the
+fully-separate ("least close") option 6; we reverse-scored the ratings
+(7 − rating) so that higher = closer in all analyses below. This was a
+pre-registered dependent variable for Study 1; we report it here because
+it was not included in the main text due to children seemingly
+insensitive to the measure in either pilot or the full sample.
+
+```{r}
+#| label: fig-circles-scale
+#| echo: false
+#| out-width: "40%"
+#| fig-cap: "The six-step social-closeness (circles) scale shown to children (the actual stimulus from the pre-registration), adapted from the Inclusion of Other in the Self measure [@aron1992inclusion]. Children chose the option whose two circles best represented how close two characters were, ranging from fully separate (least close) to almost fully overlapping (closest). In the raw data these extremes were coded 6 and 1, respectively; analyses below reverse-score the ratings so that higher = closer."
+knitr::include_graphics(file.path(fig_dir, "circles_measure.png"))
+```
+
+**Scale comprehension.** Two checks indicate children used the scale
+appropriately. First, on the three warm-up items they placed different
+relationships sensibly --- rating strangers as least close, a parent and
+child as closest, and friends in between. Second, and more directly
+relevant to the subtler classmate contrast, children's circle ratings
+tracked their own forced choices: the classmate they selected as the
+better friend (and as the ice-cream partner) received the closer circle
+rating. The circles thus reflect the same closeness judgement as the
+binary items. (The warm-ups, however, only calibrate gross relationship
+distinctions; they do not include a fine, same-tier contrast such as
+friend vs. best friend, so the graded results below are best read as
+suggestive support for the binary findings.)
+
+Following the pre-registration, we analyzed the (reverse-scored) ratings
+with a Bayesian linear mixed-effects model,
+`closeness ~ target * condition + (1 | ID)`, where *target* is the
+classmate who was told the emotion vs. the fact and *condition* is the
+happy vs. sad vignette. Descriptively, in the sad condition the
+emotion-classmate was rated closer than the fact-classmate, whereas in
+the happy condition the two were equivalent (Table S10) --- the same
+pattern as the "better friend" choice in the main text.
+
+```{r}
+#| label: tbl-circ-means
+#| echo: false
+CM |>
+  mutate(Population = recode(population, child = "Children", adult = "Adults"),
+         Condition = tools::toTitleCase(emotion),
+         `Character told` = recode(target, emo = "Emotion", fact = "Fact"),
+         `Mean closeness` = sprintf("%.2f", mean),
+         SD = sprintf("%.2f", sd), N = n) |>
+  select(Population, Condition, `Character told`, `Mean closeness`, SD, N) |>
+  arrange(desc(Population), Condition, desc(`Character told`)) |>
+  kable(caption = "Table S10. Mean social-closeness (circles) ratings (reverse-scored, higher = closer) by population, condition, and which character was told the emotion vs. the fact (children N = 57, adults N = 47).")
+```
+
+In the model, the target × condition interaction was in the predicted
+direction --- the emotion-classmate advantage was larger in the sad
+condition (`r circ("b_targetemo:emotionsad")`) --- although its 95%
+credible interval included zero; the two targets did not differ in the
+happy condition (`r circ("b_targetemo")`). Thus the graded measure
+points the same way as the binary "better friend" judgement, more
+weakly. Full estimates are in Table S11 and the means are plotted in
+@fig-circles.
+
+For adults, who completed the same circle scale, we could recover the
+emotion- vs. fact-target mapping because the adult study used a single
+fixed survey version: each character's name was perfectly confounded
+with the role it played, which we confirmed against adults'
+better-friend choices and free-text justifications. Coded this way,
+adults rated the emotion-character as markedly closer than the
+fact-character --- a credible main effect of target
+(`r circ("b_targetemo", "study1_circles_adult")`) --- in both the happy
+and sad conditions; the target × condition interaction was not credible
+(`r circ("b_targetemo:emotionsad", "study1_circles_adult")`). On the
+graded scale, then, adults showed the same emotion-disclosure →
+closeness inference as in their forced-choice judgements, and more
+clearly than children did.
+
+```{r}
+#| label: tbl-circ-est
+#| echo: false
+CE |>
+  mutate(Population = recode(model, study1_circles_child = "Children",
+                             study1_circles_adult = "Adults"),
+         Term = gsub("^b_", "", term),
+         `95% CI` = sprintf("[%.2f, %.2f]", CI_low, CI_high)) |>
+  select(Population, Term, Median = median, `95% CI`, `% in ROPE` = pct_in_ROPE, pd) |>
+  kable(caption = "Table S11. Social-closeness (circles) model: posterior estimates (linear model on the reverse-scored 1–6 scale, higher = closer; reference = fact-target, happy condition).")
+```
+
+```{r}
+#| label: fig-circles
+#| echo: false
+#| out-width: "95%"
+#| fig-cap: "Mean social-closeness (circles) ratings (reverse-scored; higher = closer) for the character who was told the emotion vs. the fact, by condition, for children and adults. Error bars = ±1 SE. Consistent with the binary 'better friend' choice, the emotion-character is rated closer (children: in the sad condition; adults: in both conditions)."
+knitr::include_graphics(file.path(fig_dir, "circles_study1.png"))
+```
+
+In short, the graded circles measure corroborates the binary results.
+For children, the emotion-character was rated closer (most clearly in
+the sad condition), mirroring their "better friend" choices, though the
+effect was suggestive rather than credible (its 95% credible interval
+included zero) --- plausibly because the warm-ups did not calibrate
+fine, same-tier distinctions. For adults, the emotion-character was
+rated credibly closer, converging with the forced-choice results.
+
+## Developmental change
+
+We refit the (reverse-scored) closeness model with mean-centred
+continuous age folded in,
+`closeness ~ target * emotion * age + (1 | ID)`. There was no credible
+developmental change: the main effect of age was null
+(`r cage("b_age_c")`), as were the age × target interaction
+(`r cage("b_targetemo:age_c")`) and the age × condition interaction
+(`r cage("b_emotionsad:age_c")`). The three-way target × condition × age
+interaction trended positive (`r cage("b_targetemo:emotionsad:age_c")`):
+descriptively, the tendency to rate the emotion-classmate as closer
+*specifically in the sad condition* strengthened with age
+(@fig-circles-age), but its 95% credible interval included zero, so we
+interpret it cautiously. This direction nonetheless mirrors the
+developmental pattern in Study 2, where the sad-emotion preference for a
+best friend also grew with age.
+
+```{r}
+#| label: fig-circles-age
+#| echo: false
+#| fig-cap: "Study 1 circles, developmental. Model-predicted closeness (reverse-scored; higher = closer) across age for the classmate told the emotion vs. the fact, by condition (children). Bands = 95% credible intervals; points = individual ratings (jittered)."
+knitr::include_graphics(file.path(fig_dir, "age_circles.png"))
+```
+
+# Gender effects
+
+As an exploratory, non-pre-registered check, we tested whether the
+child's gender moderated the results (gender was reported by the
+caregiver). For each study we refit the child probit model adding the
+child's gender and its interaction with emotion
+(`chose_emotion ~ emotion * gender + (1 | ID)`), collapsing across the
+relationship/measure factors so the test is uniform across studies.
+Models compare boys to girls (the reference); the single child whose
+caregiver reported a non-binary gender (Set B/C) was dropped because a
+one-child group cannot be estimated. As elsewhere, we treat a term as
+credible when its 95% credible interval excludes zero.
+
+```{r}
+#| label: gender-summary
+#| echo: false
+#| output: asis
+gx   <- dplyr::filter(SX, term %in% c("b_genderM", "b_emotionsad:genderM"))
+cred <- dplyr::filter(gx, CI_low > 0 | CI_high < 0)
+if (nrow(cred) == 0) {
+  cat(sprintf("Across the seven studies, **none** of the %d gender-related terms (a gender main effect and a gender × emotion interaction per study) had a 95%% credible interval excluding zero. We therefore found no evidence that boys and girls differed in their judgements.", nrow(gx)))
+} else {
+  labs <- gsub("_gender$", "", cred$model)
+  cat(sprintf("Across the seven studies, %d of the %d gender-related terms had a 95%% credible interval excluding zero (%s); the remainder were null. Given the number of terms tested, we interpret any isolated effect cautiously.",
+              nrow(cred), nrow(gx), paste(labs, collapse = ", ")))
+}
+```
+
+```{r}
+#| label: tbl-gender
+#| echo: false
+gender_lab <- c(study1_bf_gender = "Study 1 — better friend", study1_food_gender = "Study 1 — food sharing",
+             study2_gender = "Study 2", study3A_gender = "Study 3A", study3B_gender = "Study 3B",
+             study4A_gender = "Study 4A", study4B_gender = "Study 4B")
+SX |>
+  filter(term %in% c("b_genderM", "b_emotionsad:genderM")) |>
+  mutate(Study = recode(model, !!!gender_lab),
+         Term = recode(term, b_genderM = "Boys (vs. girls)",
+                       `b_emotionsad:genderM` = "Boys × sad"),
+         `95% CI` = sprintf("[%.2f, %.2f]", CI_low, CI_high)) |>
+  select(Study, Term, Median = median, `95% CI`, `% in ROPE` = pct_in_ROPE, pd) |>
+  kable(caption = "Table S12. Exploratory gender effects: posterior estimates for the child's gender and its interaction with emotion, by study (probit scale; reference = girls, happy condition).")
+```
+
+# References
+
+::: {#refs}
+:::

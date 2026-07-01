@@ -1,0 +1,1083 @@
+---
+title: "Children's Expectations of Emotional Intimacy in Close Relationships"
+author:
+  - name: "Megan Richardson"
+  - name: "Ashley J. Thomas"
+date: today
+abstract: |
+  Humans across cultures distinguish intimate, close, or family-like
+  relationships from those that are merely affiliative. Recent work suggests that
+  infants and children recognize one common cue of such relationships, physical
+  intimacy. The current studies investigate how children, ages 6 to 9 years, and
+  adults think about another hallmark of intimate relationships: emotional
+  intimacy. In Study 1, children used the disclosure of sad emotions, but not disclosure
+  facts or happy emotions, to infer who was 'best friends'. Adults used the disclosure of any emotion to infer who was 'best friends'. In Study 2, children and adults
+  generally expected that people in close social relationships would disclose sad
+  emotions over facts. In Study 3, neither children nor adults thought that
+  disclosing sad emotions was a way to create social relationships or deepen
+  them. In Study 4, children and adults expected a child to disclose sad emotions
+  to their mother but not a friend's mother, and did not expect mothers to
+  disclose sad emotions to children, revealing asymmetrical expectations about disclosure in
+  caregiving relationships. Together, these results suggest that by the age of six
+  years, children connect close social relationships with emotional intimacy, but
+  they don't see disclosure as a way to create intimacy.
+keywords: [social cognition, information sharing, emotional intimacy]
+bibliography: references.bib
+csl: apa.csl
+fig-align: center
+format:
+  html:
+    toc: true
+    number-sections: false
+  docx:
+    output-file: OMIT_manuscript_rendered.docx
+    reference-doc: apa-reference.docx
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r}
+#| label: setup
+#| include: false
+suppressMessages({ library(here); library(dplyr); library(readr) })
+
+res     <- here::here("5. Analysis", "results")
+fig_dir <- here::here("5. Analysis", "figures")
+
+B <- read_csv(file.path(res, "binomial_BF.csv"), show_col_types = FALSE) |>
+  mutate(cell = coalesce(relationship, measure))
+M <- read_csv(file.path(res, "model_estimates.csv"), show_col_types = FALSE)
+WG <- read_csv(file.path(res, "whole_group_estimates.csv"), show_col_types = FALSE)
+
+# % chose emotion for one cell
+pct <- function(study, pop, cell, emo) {
+  r <- dplyr::filter(B, study == !!study, population == pop, cell == !!cell, emotion == emo)
+  paste0(round(r$pct_emo), "%")
+}
+# format a Bayes factor: whole number (comma-grouped) when large (>= 10),
+# two decimals when small (< 10)
+fmt_bf <- function(x) if (x >= 10) formatC(round(x), format = "d", big.mark = ",") else sprintf("%.2f", x)
+# one-sided Bayes factor (BF10 if the hypothesised direction is supported, else BF01)
+bf <- function(study, pop, cell, emo) {
+  r <- dplyr::filter(B, study == !!study, population == pop, cell == !!cell, emotion == emo)
+  if (r$BF10 >= 1) sprintf("$BF_{10}$ = %s", fmt_bf(r$BF10))
+  else             sprintf("$BF_{01}$ = %s", fmt_bf(r$BF01))
+}
+# posterior median + 95% CI for a model term (model_estimates.csv: adults, age
+# interactions, cell-means)
+est <- function(model, term) {
+  r <- dplyr::filter(M, model == !!model, term == !!term)
+  sprintf("median = %.2f, 95%% CI [%.2f, %.2f]", r$median, r$CI_low, r$CI_high)
+}
+# whole-group (no-age) child condition effect (whole_group_estimates.csv)
+wg <- function(study, term) {
+  r <- dplyr::filter(WG, model == paste0(study, "_noage"), term == !!term)
+  sprintf("median = %.2f, 95%% CI [%.2f, %.2f]", r$median, r$CI_low, r$CI_high)
+}
+```
+
+**Word count:** approximately 8,100 (text and abstract; excludes title,
+author note, references, tables, and figure captions).
+
+# Public Significance Statement
+
+These studies show that by elementary school, children already grasp
+something adults take for granted---that confiding sadness, rather than
+sharing neutral facts or good news, is a mark of a close relationship.
+Across four studies, six- to nine-year-olds expected people to reveal
+their sad feelings to best friends and to their own mothers, but not to
+friends or a friend's parent, and they treated a child confiding in a
+parent as different from a parent confiding in a child. Yet neither
+children nor adults viewed opening up emotionally as a way to build a
+new friendship, suggesting that people intuitively treat emotional
+intimacy as belonging to relationships that are already close rather
+than as a tool for creating closeness. These insights may help explain
+why some children find it difficult to judge what to share, and with
+whom.
+
+# Introduction
+
+Humans in every culture distinguish 'thick' relationships (strong,
+intimate, close, or family-like relationships) from those that are
+'thin' (weak, affiliative, prosocial) [@clark1979; @fiske1992]. This
+distinction seems to be made as early as 4 months: infants expect that
+those who are physically intimate will respond to one another's distress
+[@thomasSaliva2022 **; Woo et al., under review**]. One hallmark of such
+relationships is emotional intimacy, which includes disclosing personal
+information. Emotional intimacy has been studied across several
+disciplines, such as Anthropology, Relationship Science
+[@finkenauer2015know; @willems2020role], and Sociology. Sociologists
+have long characterized relationships by the kind of information
+disclosed within them. More than a century ago, @simmel1906sociology
+argued that what and how much people reveal to one another is calibrated
+to the closeness of the relationship: acquaintances share outward,
+impersonal facts, whereas intimate bonds rest on the disclosure of one's
+inner life, including emotions. Contemporary network research
+operationalizes a version of this idea through the kinds of ties people
+report---weak ties are those to whom one turns for useful information,
+while thick ties are those to whom one discloses sensitive or personal
+matters [refer to @small2017, for a history].
+
+Yet, there have been few empirical studies that test whether people
+reason that close social relationships include emotional disclosure, nor
+how early in development this intuition may arise. In the present
+studies, we ask, do adults and U.S. American children, ages 6 to 9
+years, reason that emotional intimacy is part of close social
+relationships? We operationalize emotional intimacy as revealing sad
+emotions, as compared to happy emotions and facts. We reasoned that
+telling someone else about one's sadness may make one more vulnerable or
+may imply an expectation of support [e.g., @simmel1906sociology], which
+people may intuit is more diagnostic of close social relationships than
+sharing happy emotions or facts, which may be seen as generally
+prosocial and applicable in many positive social relationships.
+
+## Children's Intuitive Theories of Social Relationships
+
+A growing body of research suggests that children have rich intuitive
+theories of social relationships [@shutts2021; @thomsen2020] and that
+many of these intuitions may have their roots in infancy [@thomas2024].
+Children have rich intuitions about friendship for example, they expect
+friends to play together, to act prosocially toward one another, and to
+be more similar as opposed to non-friends [refer to @afshordi2021 for
+review]. However there has been less work investigating how children
+think about the distinction between intimate and less intimate social
+partners (e.g., best friends and friends; family versus friends).
+
+One study that investigated such a distinction found that while children
+expect that others will share more resources with friends compared to
+strangers and family compared to strangers, they do not reliably expect
+more resource sharing with family compared to friends
+[@thomasSaliva2022; @spokes2016], suggesting that they do not connect
+social closeness with increased prosociality. Children do, however,
+distinguish between family and friends when predicting who will be
+physically intimate---for example sharing a single ice cream cone or a
+single spoon---items that require saliva sharing[@thomasSaliva2022].
+Thus, children do not think that sharing resources is an indicator of
+close relationships but do think that physical intimacy is one. How
+might children think about emotional intimacy, and in particular
+disclosure within relationships? Do children distinguish between
+intimate and non-intimate disclosure in the same way that they
+distinguish between intimate and non-intimate sharing?
+
+## Intuitions about Relationships and Information Sharing
+
+Children do have some early developing intuitions about what kind of
+information is disclosed within relationships. For example, 6-year-old
+children recognize that information that may make someone look bad
+(e.g., that someone took something that wasn't theirs) is more likely to
+be kept as a secret and think that secret sharing is more likely to
+occur with friends than strangers [@anagnostaki2013]. Likewise, children
+also expect that those who disclose secrets are more likely to be
+friends than non-friends [@liberman2018].
+
+More generally, children seem to believe that people in close
+friendships will better know one another's minds: Children as young as 6
+years expect that those who display physical intimacy (by touching and
+dancing), compared to those who display affiliation (by dancing without
+touching), will better know one another's mental states, such as
+preferences, but not perceptually available attributes of the person.
+They also expect that those who know each other's emotional states are
+socially closer [@woo2024]. However this work does not tell us whether
+children expect the disclosure of sensitive information, like emotional
+states, is more likely to occur in close social relationships, or
+whether they see it as diagnostic of close relationships.
+
+Importantly, not all information disclosure should be equally indicative
+of a close social relationship. Just as disclosing a secret with someone
+may leave someone vulnerable, an individual's emotional state,
+especially when negative, may carry its own risks. For example it could
+lead to negative views of the discloser or imply that the listener is
+expected to help. This vulnerability is plausibly why emotional
+disclosure is reserved for close relationships where these risks are
+mitigated. Prior work does suggest people perceive disclosure as
+potentially costly. In one study, early adolescent girls, aged 10 to 13
+years, forfeited money to disclose personal facts to close friends, but
+gave up more money to disclose relatively superficial information (e.g.,
+liking reality TV) than intimate information (e.g., feeling
+self-conscious). They also shared intimate information less often
+[@vijayakumar2020]. The authors interpret this reluctance to share
+intimate information as adaptive: sharing highly personal information
+can be inappropriate or disadvantageous in newer or less close
+relationships even if it is central to very close ones. Consistent with
+it being central in close social relationships, self-disclosure patterns
+accounted for 72% of the variance in intimacy ratings among romantic
+couples [@chelune1984], and college students said they disclose personal
+information when they want to have close or trusting relationships or to
+increase intimacy [@derlega2008]. While this mapping is not perfect--at
+least in some contexts, people confide in 'thin' ties [@small2017]\--
+emotional disclosure is frequently observed in and theorized to create
+intimate relationships. In the current studies we focus on whether
+people intuit that sharing negative states is especially indicative of
+close social relationships, consistent with this literature, and whether
+children may think about the relationship between social intimacy and
+emotional disclosure.
+
+On the one hand, children may not connect emotional disclosure with
+intimacy. First, it is unclear how children think about the concept of
+private emotions, let alone that disclosing these emotions might be part
+of some but not all social relationships. While previous research
+suggests children recognize secrets, in one study the secret was not
+specified, and in another it involved something that a child could get
+in trouble for. Disclosing emotions makes people vulnerable in a less
+straightforward way, making it potentially less likely that children
+would recognize it as a cue for close social relationships. Moreover, in
+the current studies, we contrast disclosing emotions with disclosing
+information, which could be seen as potentially prosocial because it
+provides the other person with potentially useful information. According
+to some theories of social relationships, relationship strength is based
+on adopting another person's utility [@powell2022adopted], thus forgoing
+the disclosure of interesting facts may be seen as antisocial and
+indicative of *non close* relationships. We start with children aged 6
+to 9 years because children at this age are adept at understanding that
+others have thoughts, beliefs, and emotions that may differ from their
+own [@wellman2015] and previous studies have found that this older age
+group, but not younger children, believe that people in closer
+relationships better know the content of one another's minds.
+
+Importantly, this age range also reflects a transitional phase in
+children's social lives. As they move through elementary school,
+children broaden their social worlds, from primarily family-based
+interactions to peer relationships formed in classrooms,
+extracurriculars, and other group settings [@burke2022]. This expansion
+provides opportunities for children to have a broader array of
+relationships that vary in levels of intimacy and trust. Thus, children
+in this age group may be especially attuned to the significance of
+disclosing information.
+
+In the current studies, our goal was to understand whether children
+connect social closeness with disclosing information and whether their
+intuitions were different from or the same as adults. We investigated
+this kind of reasoning in four studies. In Study 1, we asked, do
+children and adults infer social closeness based on the type of
+information that someone discloses (emotions vs. facts and happy vs. sad
+emotions)? In Study 2, we asked, do children expect people in a close
+relationship (a best friend vs. a friend) to disclose sad emotions more
+than facts? In Study 3, we asked, given the desire to create or deepen a
+relationship, which type of information do children think will be
+disclosed? In Study 4, we asked how children reason about emotional
+disclosure in asymmetric (mother--child) relationships. @fig-overview
+provides an overview of the design of all four studies.
+
+```{r}
+#| label: fig-overview
+#| out-width: "100%"
+#| echo: false
+#| fig-cap: "Overview of the four studies. Each study probes the intuitive link between emotional disclosure (revealing a sad emotion rather than a neutral fact) and social closeness. Study 1 asks whether children and adults infer who is closer from what a character discloses to two others (and who the character would share a single ice cream cone or partitionable candy with). Study 2 asks, given a friend versus a best friend, who is expected to be told the emotion rather than the fact. Study 3 asks whether disclosing an emotion is seen as a way to create (3.A) or deepen (3.B) a friendship. Study 4 asks about an asymmetric caregiving relationship: whether a child is expected to disclose to their own mother versus a friend's mother (4.A), and whether a mother is expected to disclose to her child (4.B)."
+knitr::include_graphics(file.path(fig_dir, "study_overview.png"))
+```
+
+# General Methods
+
+## Participants
+
+One group of participants participated in Studies 1, 4.A, and 3.A, which
+occurred during the same session, and another group participated in
+Studies 2, 3.B, and 4.B in the same session. Across all studies, we
+counterbalanced the order of all relevant conditions.
+
+For studies 1, 3.A, and 4.A, 57 U.S. American children aged 6 to 9 years
+old (mean = 7.81 years, range = 6.04 to 9.88 years, S.D. = 1.05), were
+tested via online video call. All participants participated in all three
+studies during the same session. 36 parents reported their child was a
+boy, and 21 parents reported their child was a girl. Participants were
+recruited using a lab database, advertisements on social media, and
+Children Helping Science (lookit.mit.edu; @scott2017lookit). 45% of
+parents said their children were White or Caucasian, 26% reported Asian,
+3% reported Black or African American, 17% reported multiracial, 1%
+reported Middle Eastern, 1% reported South American, and 3% did not
+report a race for their child. 28% of caregivers reported having a
+Master's degree, 14% reported having a doctorate degree, 37% reported
+having a Bachelor's degree, 5% reported having an Associate's degree, 1%
+reported having completed elementary and high school, and 13% did not
+report an education level. For comparison, we also surveyed 47 U.S.
+American adult participants (mean age = 26.8 years old, 20 women, 27
+men) through Prolific, an online platform. The adult participants saw
+the same stories and questions as the children.
+
+For studies 2, 3.B, and 4.B, we tested 105 children aged 6 to 9 years
+old (mean = 7.81, range = 6.01 to 9.71 years, S.D. = 1.16); the first 75
+were tested online over video call and the remainder were collected
+asynchronously using the Children Helping Science website. All
+participants took part in all three studies. 55 children were reported
+to be girls, 49 were reported to be boys, and 1 non-binary. 50% of
+parents said their children were White or Caucasian, 23% reported Asian,
+19% reported multiracial, 4% reported Hispanic or Latine, 2% reported
+Black or African American, 1% reported Middle Eastern, and 2% did not
+report a race for their child. Across caregivers, the highest reported
+education level was a Master's degree for 33%, a Bachelor's degree for
+24%, a professional degree for 15%, a doctorate for 12%, an Associate's
+degree for 5%, some college for 2%, high school for 1%, and elementary
+for 1%; 7% did not report an education level. We also collected a sample
+of 49 adults (mean age = 23.5 years old, 21 women, 28 men) via an online
+survey platform. The adults saw all the vignettes and questions as the
+children.
+
+Unless otherwise noted, the studies' designs and primary analyses were
+pre-registered (Studies 1, 3.A, and 4.A: <https://osf.io/pv9gj/>;
+Studies 2, 3.B, and 4.B: <https://osf.io/sx37c/>).
+
+**General analyses.** We conducted one-sided Bayesian binomial tests
+with default priors, in the pre-registered direction of our hypotheses,
+to determine whether participants chose to share the emotion over the
+fact more often (or, for Study 4.B, less often) than expected by chance
+in the forced-choice questions. We also conducted Bayesian probit
+generalized linear mixed-effects models with default priors. For the
+child samples we fit the pre-registered model, in which the condition
+(happy/sad, and in relevant cases relationship type) was crossed with
+the child's age; for the adult samples, who have no comparable age
+variation, we fit a condition-only model. Participant ID was included as
+a random effect. Where the condition × age interaction was not credible,
+we refit the model without age and report the whole-group effect (full
+developmental analyses in the Supplement). We assessed effects by
+whether 0 fell within the 95% credible interval. We report additional
+analyses --- including analyses of child gender (all null) and the
+social-closeness (circles) measure --- in the Supplement.
+
+**Transparency and openness.** We report how we determined our sample
+sizes, all data exclusions, all manipulations, and all measures in the
+studies, and we follow the Journal Article Reporting Standards [JARS;
+@appelbaum2018jars]. Sample sizes were determined in advance: we
+pre-registered a target of 56 children per wave, based on prior work
+that detected comparable effects [@woo2024]; recruitment for the second
+wave exceeded this target (see Supplement). Analyses were conducted in R
+[@rcoreteam2025] using the brms package [@burkner2018brms]. All data,
+analysis code, and study materials are available on the Open Science
+Framework at \[OSF PROJECT URL\]; the pre-registrations are linked
+above.
+
+# Study 1: Inferences about social closeness based on information disclosure
+
+In Study 1, children and adults were told about two different
+protagonists at school. In one story, a protagonist learned an animal
+fact and also felt sad at school. In the other story, a different
+protagonist learned a different animal fact and felt happy at school
+(the animal facts were borrowed from @shields2024). In each story, the
+protagonist then encountered two classmates. The protagonists disclosed
+their emotions but withheld the fact from one classmate and disclosed
+the fact but withheld their emotions from the other classmate.
+
+After the stories, as an attention check, children and adults were asked
+to recall which character was told the fact and which character was told
+the emotion. We then measured intuitions about social closeness across
+two measures. Children and adults were asked which classmate they
+thought was best friends with the protagonist. Finally, we had two
+food-sharing items, one that required physical intimacy and one that did
+not: children and adults were asked to guess who the protagonist would
+want to share a single ice cream cone with, and who the protagonist
+would share partitionable candy with. Based on prior work in which
+children do not expect preferential sharing with family over friends,
+but do expect physical intimacy with family compared to friends. We
+reasoned that if children associate disclosing sad emotions with social
+closeness, they should expect the protagonist to share the single ice
+cream cone more often with the person they disclosed a sad emotion with,
+which requires physical intimacy. On the other hand, if children think
+that close social relationships are primarily about being more
+prosocial, they should expect more sharing of the partitionable candy
+with the person they inferred as closer. We also included a graded
+measure of social closeness, in which children chose from a series of
+circles that varied in how much they overlapped. Because its warm-up
+trials involved only grossly different relationships (a parent and
+child, friends, and strangers) rather than a finer, same-tier contrast
+(such as a friend vs. a best friend), this measure may not have been
+sensitive enough to detect the more subtle difference between the two
+classmates; the full analyses and discussion are in the supplementary
+materials. The design of Study 1, alongside the other three studies, is
+summarized in @fig-overview.
+
+## Results
+
+**Better Friend.** When asked who was better friends with the
+protagonist, children chose the person who learned about the
+protagonist's emotion more often in the sad condition
+(`r pct("study1","child","better_friend","sad")`,
+`r bf("study1","child","better_friend","sad")`), but not in the happy
+condition (`r pct("study1","child","better_friend","happy")`,
+`r bf("study1","child","better_friend","happy")`). We tested whether
+condition (happy/sad) affected children's answers using a Bayesian
+probit mixed-effects model. The condition affected children's responses
+(`r wg("study1_bf","b_emotionsad")`). Thus, children thought that
+sharing a sad emotion was indicative of social closeness. By contrast,
+adults chose the target of emotional disclosure across both the happy
+and sad conditions (sad condition:
+`r pct("study1","adult","better_friend","sad")`,
+`r bf("study1","adult","better_friend","sad")`; happy condition
+`r pct("study1","adult","better_friend","happy")`,
+`r bf("study1","adult","better_friend","happy")`). Adults did not differ
+across happy and sad conditions
+(`r est("study1_bf_adult","b_emotionsad")`).
+
+**Food sharing.** Next, we asked if children and adults used disclosing
+emotions to predict food-sharing behavior. For the ice cream trial, in
+the sad condition, children selected the character who was told the
+emotion more often than the character who was told a fact
+(`r pct("study1","child","ice_cream","sad")`,
+`r bf("study1","child","ice_cream","sad")`). However, they chose each
+character equally often in the happy condition
+(`r pct("study1","child","ice_cream","happy")`,
+`r bf("study1","child","ice_cream","happy")`). For the candy trials, we
+did not find evidence that children chose either character more
+frequently (sad condition: `r pct("study1","child","candy","sad")`,
+`r bf("study1","child","candy","sad")`; happy condition:
+`r pct("study1","child","candy","happy")`,
+`r bf("study1","child","candy","happy")`). Consistent with their
+inferences about who were 'best friends', adults selected the classmate
+who was told the emotion in the sad condition
+(`r pct("study1","adult","ice_cream","sad")`,
+`r bf("study1","adult","ice_cream","sad")`) and in the happy condition
+(`r pct("study1","adult","ice_cream","happy")`,
+`r bf("study1","adult","ice_cream","happy")`) more often than the
+classmate who was told the fact. Like children, adults were at chance in
+their predictions about sharing candy (sad:
+`r pct("study1","adult","candy","sad")`,
+`r bf("study1","adult","candy","sad")`; happy:
+`r pct("study1","adult","candy","happy")`,
+`r bf("study1","adult","candy","happy")`).
+
+We conducted Bayesian probit mixed-effects models to test an interaction
+between item type and condition. For children, there was no main effect
+of happy/sad conditions (`r wg("study1_food","b_emotionsad")`); nor of
+food item (`r wg("study1_food","b_measureice_cream")`). There was also
+no evidence of an interaction
+(`r wg("study1_food","b_emotionsad:measureice_cream")`). For the adults,
+there was no main effect of happy/sad conditions
+(`r est("study1_food_adult","b_emotionsad")`); however, there was a main
+effect of item (`r est("study1_food_adult","b_measureice_cream")`).
+There was no evidence of an interaction
+(`r est("study1_food_adult","b_emotionsad:measureice_cream")`).
+
+In an exploratory analysis, because we were underpowered to find an
+interaction, we fit a cell-means model treating each of the four
+food-sharing conditions separately, with the happy/candy condition as
+the reference. For children, the clearest departure from happy/candy was
+the sad/ice cream condition
+(`r est("study1_cellmeans_child","b_cond4sad_ice_cream")`), whereas
+sad/candy (`r est("study1_cellmeans_child","b_cond4sad_candy")`) and
+happy/ice cream
+(`r est("study1_cellmeans_child","b_cond4happy_ice_cream")`) were closer
+to the reference. For adults, both sad/ice cream
+(`r est("study1_cellmeans_adult","b_cond4sad_ice_cream")`) and happy/ice
+cream (`r est("study1_cellmeans_adult","b_cond4happy_ice_cream")`)
+departed from happy/candy, but sad/candy did not
+(`r est("study1_cellmeans_adult","b_cond4sad_candy")`). Refer to
+@fig-study1 (panel A).
+
+```{r}
+#| label: fig-study1
+#| echo: false
+#| out-width: "100%"
+#| fig-cap: "Study 1. (A) Proportion of judgments choosing the classmate who was told the emotion (vs. the fact), by emotion condition and measure, for children and adults; dashed line = chance; * BF₁₀ ≥ 3, ** ≥ 10, *** ≥ 100. (B) Predicted probability of choosing the emotion for the better-friend judgment across age, by condition. (C) Predicted probability of choosing the emotion for food sharing across age, by condition and item. In (B) and (C), solid lines are model estimates for children and dashed lines are adult observed means."
+knitr::include_graphics(file.path(fig_dir, "combined_study1.png"))
+```
+
+**Developmental change.** In the pre-registered probit model, the
+emotion × age interaction was uncertain for the better-friend judgment
+(`r est("study1_bf_child","b_emotionsad:age_c")`) and for food sharing
+(`r est("study1_food_child","b_emotionsad:age_c")`); see @fig-study1
+(panels B and C). Descriptively, for the single ice cream cone children
+chose the classmate told the sad emotion at consistently high rates
+across ages (about 70% from age 6 onward), whereas in the happy
+condition this preference was near chance among the youngest children
+and rose with age, approaching the sad pattern by age 9. This
+corresponds to a three-way emotion × item × age interaction that was not
+credible
+(`r est("study1_food_child","b_emotionsad:measureice_cream:age_c")`), so
+we interpret the difference cautiously.
+
+## Discussion
+
+In Study 1, we found evidence that children inferred closeness from
+emotional disclosure. When the protagonist disclosed that they were sad
+to one person and a piece of information to another, children said the
+person who they disclosed the sad emotion to was the better friend. They
+also connected emotional intimacy with physical intimacy, expecting this
+person to share a single ice cream cone. By contrast, when the
+protagonist disclosed a happy emotion, we did not find such effects.
+This suggests that children view disclosing sadness as potentially more
+vulnerable and indicative of social closeness. These findings provide
+evidence that children are cognizant of the type of information
+disclosed and can use that to infer social closeness. By contrast adults
+did not distinguish between disclosing sad and happy emotions, always
+choosing the classmate who was told the emotion over the fact as the
+best friend. Thus, adults seem to have a more general intuition that
+disclosing emotions is indicative of closeness, regardless of whether it
+is sad or happy.
+
+# Study 2: Using a close relationship to infer the type of information disclosed
+
+In Study 1, we asked whether children and adults used the types of
+information that protagonists disclose to infer social closeness. In
+Study 2, we asked, given a close social relationship, do children and
+adults predict that people would choose to disclose sad emotions? We
+reasoned that if children and adults have an intuitive theory that
+includes the connection between emotional disclosure and social
+closeness, they should reason both ways.
+
+In Study 2, children and adults learned about a protagonist who was
+feeling sad or happy and encountered their friend and their best friend
+separately. Participants were asked to choose if they thought the
+protagonist would share the fact or their emotion with them. This
+explores a type of close relationship that does not include family ties.
+
+## Results
+
+For children, we found moderate evidence that they expect the
+protagonist to disclose a sad emotion to their best friend more than to
+their friend (best friend: `r pct("study2","child","bestfriend","sad")`,
+`r bf("study2","child","bestfriend","sad")`; friend:
+`r pct("study2","child","friend","sad")`,
+`r bf("study2","child","friend","sad")`). In the happy condition,
+children were more likely than chance to expect the protagonist to
+disclose the fact rather than a happy emotion to a friend
+(`r pct("study2","child","friend","happy")`,
+`r bf("study2","child","friend","happy")`), but were at chance for the
+best friend (`r pct("study2","child","bestfriend","happy")`,
+`r bf("study2","child","bestfriend","happy")`). We found a credible
+effect of relationship (`r wg("study2","b_relationshipbestfriend")`):
+children expected more emotional disclosure to a best friend than to a
+friend. The effect of emotion condition trended in the expected
+direction (`r wg("study2","b_emotionsad")`), but the interaction was not
+credible (`r wg("study2","b_emotionsad:relationshipbestfriend")`).
+
+For adults, we found strong evidence that they expect the protagonist to
+disclose sad emotions over facts to a best friend
+(`r pct("study2","adult","bestfriend","sad")`,
+`r bf("study2","adult","bestfriend","sad")`). They did not have the same
+expectation for a friend (`r pct("study2","adult","friend","sad")`,
+`r bf("study2","adult","friend","sad")`). Conversely, adults seemed to
+think the protagonist would disclose facts to their best friend
+(`r pct("study2","adult","bestfriend","happy")`,
+`r bf("study2","adult","bestfriend","happy")`) and friend
+(`r pct("study2","adult","friend","happy")`,
+`r bf("study2","adult","friend","happy")`) in the happy condition. The
+model showed an effect of emotion condition
+(`r est("study2_adult","b_emotionsad")`) but not relationship
+(`r est("study2_adult","b_relationshipbestfriend")`). Refer to
+@fig-study2 (panel A).
+
+```{r}
+#| label: fig-study2
+#| echo: false
+#| out-width: "100%"
+#| fig-cap: "Study 2. (A) Proportion of judgments that the protagonist would disclose the emotion (vs. the fact) to a friend vs. a best friend, by emotion condition, for children and adults. (B) Predicted probability of choosing the emotion across age, by condition and relationship; solid lines are model estimates for children, dashed lines are adult observed means, and points are individual children."
+knitr::include_graphics(file.path(fig_dir, "combined_study2.png"))
+```
+
+**Developmental change.** The tendency to expect sad-emotion disclosure
+to a best friend (vs. a friend) strengthened with age (three-way emotion
+× relationship × age:
+`r est("study2_child","b_emotionsad:relationshipbestfriend:age_c")`;
+@fig-study2, panel B). By 9 years children strongly expected a sad
+emotion to be shared with the best friend, whereas at 6 years they
+showed little differentiation (see Supplement, Table S11).
+
+## Discussion
+
+In Study 2, children expected more emotional disclosure to a best friend
+than to a friend. This aligns with literature suggesting that children
+consider the relationship and use cues of social closeness when deciding
+what information will be disclosed [@anagnostaki2013]. The effect of
+emotion valence trended in the same direction as in Study 1---sad
+emotions disclosed more than happy---but was not credible on its own,
+though the per-age analysis showed the sad/best-friend preference
+emerging with age. Adults showed the same best-friend preference
+specifically for sad emotions, however unlike in Study 1 did
+differentiate between the sad and happy condition. Thus, during the
+period between 6 and 9 years children begin to differentiate a best
+friend from a friend in their expectations about emotional disclosure,
+looking more adult-like with age.
+
+# Study 3: Using emotional disclosure to create and advance social closeness
+
+## Study 3.A
+
+In Studies 1 and 2, children and adults connected close social
+relationships with emotional intimacy. It stood to reason, then, that
+children would be able to use this information when thinking about how
+another person might try to create a social relationship. This would
+speak to an intuitive theory of relationships that grants children and
+adults the opportunity to intervene in the world by using a causal model
+of how relationships and emotional intimacy coincide. In Study 3, we
+investigate this possibility.
+
+### Methods
+
+In Study 3.A, children and adults learned about a protagonist who wanted
+to become close friends with a character they met for the first time. We
+then asked the participants to choose whether the protagonist should
+disclose the fact or their emotional state to achieve this goal.
+
+### Results
+
+We found that the children were equally likely to say that the
+protagonist should disclose a fact compared to an emotion across both
+the sad condition (`r pct("study3A","child","create","sad")` chose
+emotion, `r bf("study3A","child","create","sad")`) and the happy
+condition (`r pct("study3A","child","create","happy")` chose emotion,
+`r bf("study3A","child","create","happy")`). Adults answered similarly
+across conditions (sad: `r pct("study3A","adult","create","sad")`,
+`r bf("study3A","adult","create","sad")`; happy:
+`r pct("study3A","adult","create","happy")`,
+`r bf("study3A","adult","create","happy")`). We also did not find
+evidence of effects of condition in our model for the children
+(`r wg("study3A","b_emotionsad")`) or for the adults
+(`r est("study3A_adult","b_emotionsad")`).
+
+**Developmental change.** The emotion × age interaction was not credible
+(`r est("study3A_child","b_emotionsad:age_c")`; @fig-study3-age, panel
+A).
+
+## Study 3.B
+
+In Study 3.B, children and adults learned that the protagonist has a
+friend with whom they want to become best friends. In order to achieve
+this, we asked the participants if the protagonist would tell about the
+fact or their emotion.
+
+### Results
+
+We pre-registered the hypothesis that people would disclose sad emotions
+in order to deepen an existing friendship, so the one-sided tests asked
+whether the emotion was chosen more than chance. Children did not show
+this pattern: in the sad condition they were no more likely than chance
+to choose the emotion over the fact
+(`r pct("study3B","child","deepen","sad")`,
+`r bf("study3B","child","deepen","sad")`), nor in the happy condition
+(`r pct("study3B","child","deepen","happy")`,
+`r bf("study3B","child","deepen","happy")`); the model showed no effect
+of emotion condition (`r wg("study3B","b_emotionsad")`). For adults, the
+evidence ran clearly against the hypothesis: they did not expect the
+protagonist to disclose sad emotions to become closer to a friend
+(`r pct("study3B","adult","deepen","sad")`,
+`r bf("study3B","adult","deepen","sad")`), nor happy emotions
+(`r pct("study3B","adult","deepen","happy")`,
+`r bf("study3B","adult","deepen","happy")`); the condition effect in the
+model was `r est("study3B_adult","b_emotionsad")`.
+
+**Developmental change.** The emotion × age interaction was not credible
+(`r est("study3B_child","b_emotionsad:age_c")`; @fig-study3-age, panel
+B).
+
+```{r}
+#| label: fig-study3-age
+#| echo: false
+#| out-width: "100%"
+#| fig-cap: "Study 3 developmental change. Predicted probability of choosing the emotion (vs. the fact) across age, by condition, for (A) Study 3.A (creating a new relationship) and (B) Study 3.B (deepening an existing friendship). Solid lines are model estimates for children; dashed lines are adult observed means."
+knitr::include_graphics(file.path(fig_dir, "combined_study3_age.png"))
+```
+
+## Discussion
+
+Study 3.A aimed to investigate whether children and adults thought that
+cultivating emotional intimacy was one way to create a relationship. We
+found that neither children nor adults had this intuition. This suggests
+that, while children and adults think revealing sad emotions occurs in
+established close relationships, it may not be a tool to create
+relationships.
+
+Similarly, in Study 3.B, children and adults did not have strong
+intuitions about disclosing sad or happy emotions for a previously
+established friendship to become closer. These results were a little
+surprising because we thought that the extra information about the
+relationship would lead the participants to infer that disclosing
+sensitive emotions and displaying vulnerability may be a way to deepen a
+relationship. In Study 4 we investigate how children reason about
+emotional disclosure in an intimate, but asymmetrical relationships, a
+parent child relationship [@thomas2025caregiving]
+
+# Study 4: Emotional disclosure in asymmetrical relationships
+
+One reason people may withhold sad emotions in some relationships is
+that disclosing sadness implies the listener should help or comfort the
+discloser. This implication is not only about closeness but about the
+structure of a relationship---it matters who is able or expected to
+provide care. The mother--child relationship offers a useful test of
+this idea, because it is unambiguously close yet asymmetric in
+caregiving: the mother is ordinarily the one who comforts a child
+(though see @steeleinpress, for potential evidence that younger children
+do not share this intuition), not the reverse. In Study 4 we examined
+emotional disclosure in this asymmetric relationship from both
+directions. In Study 4.A, we asked whether children expect a child to
+disclose sad emotions to their own mother, a close relationship, but not
+to a friend's mother, a more distant relationship. This comparison tests
+whether children expect emotional disclosure within close relationships,
+but it leaves open whether they treat emotional disclosure as a
+symmetric feature of closeness, something both partners do or as
+something that can also align with the caregiving structure of a
+relationship. In Study 4.B we therefore tested the reverse direction:
+whether children expect a mother to disclose her own sadness to her
+child. If children expect emotional disclosure simply because a
+relationship is close, they should expect a mother to disclose her
+sadness to her child, just as they expect a child to disclose to a
+mother. If instead children intuit that a mother disclosing sadness
+would imply that her young child ought to comfort her, inverting their
+roles, they should be less inclined to expect that a mother will share
+her sad emotion, even though the relationship is close.
+
+## Study 4.A
+
+### Methods
+
+As in Study 2, participants were told that a protagonist's mother and a
+friend's mother asked how the protagonist's day was at school. We then
+asked participants to predict whether the protagonist would disclose the
+fact or their emotional state across the happy and sad conditions.
+
+### Results
+
+In the sad condition, children predicted the protagonist would disclose
+the emotion more often than the fact with their mother
+(`r pct("study4A","child","mom","sad")`,
+`r bf("study4A","child","mom","sad")`). Children did not predict that
+the protagonist would disclose the sad emotion more often with the
+friend's mother (`r pct("study4A","child","friendmom","sad")` predicted
+the emotion, `r bf("study4A","child","friendmom","sad")`). In the happy
+condition, children were at chance in both relationship conditions
+(mother: `r pct("study4A","child","mom","happy")`,
+`r bf("study4A","child","mom","happy")`; friend's mother:
+`r pct("study4A","child","friendmom","happy")`,
+`r bf("study4A","child","friendmom","happy")`). Adults predicted the
+protagonist to disclose sad emotion with their mother more than the fact
+(`r pct("study4A","adult","mom","sad")`,
+`r bf("study4A","adult","mom","sad")`), but happy feelings were closer
+to chance (`r pct("study4A","adult","mom","happy")`,
+`r bf("study4A","adult","mom","happy")`). They did not expect the
+protagonist to disclose emotions with the friend's mom (sad:
+`r pct("study4A","adult","friendmom","sad")`,
+`r bf("study4A","adult","friendmom","sad")`; happy:
+`r pct("study4A","adult","friendmom","happy")`,
+`r bf("study4A","adult","friendmom","happy")`).
+
+We also conducted a Bayesian probit mixed-effects model. For children,
+the happy/sad condition interacted with relationship
+(`r wg("study4A","b_emotionsad:relationshipmom")`). In agreement with
+the results of Study 1, it seems that children expect that people
+disclose sad emotions more often in close relationships than in other
+positive relationships. They don't make the same inferences when the
+emotion is happy. For the adults, relationship affected responses
+(`r est("study4A_adult","b_relationshipmom")`), while emotional
+condition did not (`r est("study4A_adult","b_emotionsad")`), with mixed
+evidence for an interaction
+(`r est("study4A_adult","b_emotionsad:relationshipmom")`). Refer to
+@fig-study4a (panel A).
+
+```{r}
+#| label: fig-study4a
+#| echo: false
+#| out-width: "100%"
+#| fig-cap: "Study 4.A. (A) Proportion of judgments that the protagonist would disclose the emotion (vs. the fact) to their mother vs. a friend's mother, by emotion condition, for children and adults. (B) Predicted probability of choosing the emotion across age, by condition and relationship; solid lines are model estimates for children and dashed lines are adult observed means."
+knitr::include_graphics(file.path(fig_dir, "combined_study4A.png"))
+```
+
+**Developmental change.** We did not find evidence for age effects: the
+three-way emotion × relationship × age interaction was not credible
+(`r est("study4A_child","b_emotionsad:relationshipmom:age_c")`;
+@fig-study4a, panel B).
+
+## Study 4.B
+
+Study 4.B reversed the direction of disclosure used in Study 4.A.
+Participants were told that the protagonist's mother---and, separately,
+a friend's mother---had learned a fact at work and was feeling happy or
+sad, and that the protagonist asked how her day was. We then asked
+participants to predict whether the mother would disclose the fact or
+her emotional state.
+
+### Results
+
+Because we pre-registered that the mother would not share sad emotions
+with her child, the one-sided binomial tests in this study asked whether
+the fact was chosen more often than chance (i.e., evidence against
+emotional disclosure). For children, we found that they generally did
+not expect the protagonist's mother
+(`r pct("study4B","child","mom","sad")`,
+`r bf("study4B","child","mom","sad")`) or the friend's mother
+(`r pct("study4B","child","friendmom","sad")`,
+`r bf("study4B","child","friendmom","sad")`) to disclose sad emotions to
+the protagonist. Children also did not expect the protagonist's mother
+(`r pct("study4B","child","mom","happy")`,
+`r bf("study4B","child","mom","happy")`) or friend's mother
+(`r pct("study4B","child","friendmom","happy")`,
+`r bf("study4B","child","friendmom","happy")`) to disclose happy
+emotions. After running the model, we found no effect of emotion
+condition (`r wg("study4B","b_emotionsad")`) or relationship
+(`r wg("study4B","b_relationshipmom")`), with inconclusive evidence for
+the interaction (`r wg("study4B","b_emotionsad:relationshipmom")`).
+
+Adults had similar intuitions; there was inconclusive evidence that they
+expected the protagonist's mother to disclose sad emotions over facts
+(`r pct("study4B","adult","mom","sad")`,
+`r bf("study4B","adult","mom","sad")`). However, they expected the
+friend's mother to share facts over sad emotions
+(`r pct("study4B","adult","friendmom","sad")`,
+`r bf("study4B","adult","friendmom","sad")`). Similarly, there was
+inconclusive evidence whether adults expected the mother to disclose
+happy emotions (`r pct("study4B","adult","mom","happy")`,
+`r bf("study4B","adult","mom","happy")`), and they did not expect the
+friend's mother to disclose happy emotions
+(`r pct("study4B","adult","friendmom","happy")`,
+`r bf("study4B","adult","friendmom","happy")`). We found no effects of
+condition (`r est("study4B_adult","b_emotionsad")`) or relationship
+(`r est("study4B_adult","b_relationshipmom")`). Refer to @fig-study4b
+(panel A).
+
+```{r}
+#| label: fig-study4b
+#| echo: false
+#| out-width: "100%"
+#| fig-cap: "Study 4.B. (A) Proportion of judgments that the mother / friend's mother would disclose the emotion (vs. the fact) to the protagonist, by emotion condition, for children and adults. (B) Predicted probability of choosing the emotion across age, by condition and relationship; solid lines are model estimates for children and dashed lines are adult observed means."
+knitr::include_graphics(file.path(fig_dir, "combined_study4B.png"))
+```
+
+**Developmental change.** Older children were less likely to expect a
+parent to disclose sad emotions (emotion × age:
+`r est("study4B_child","b_emotionsad:age_c")`; @fig-study4b, panel B).
+
+## Discussion
+
+In Study 4.A, we found that children expected the protagonist to tell
+their mother that they felt sad at school over telling her about a fact.
+This was not true for a friend's mother. When the protagonist had been
+feeling happy, children did not seem to have clear expectations about
+what should be disclosed with whom. This supports the hypothesis that
+children recognize mother--child as a close relationship and expect
+emotional intimacy in this relationship. The adults had a similar
+pattern, but like Study 1 did not as strongly distinguish between happy
+and sad emotions. Like children, the adults also expected the
+protagonist to disclose sad emotions to their mother, but were trending
+toward saying that the child would also share happy emotions. In
+contrast to children, they strongly expected that children would be more
+likely to share facts than emotions, regardless of the emotion, with the
+friend's mother (
+
+However, in Study 4.B, children and adults did not expect that the
+protagonist's mother or a friend's mother would share emotions with the
+protagonist. In contrast to the results of Study 4.A, where participants
+expected the protagonist to disclose sad emotions to their mother, both
+children and adults seem to have intuitions that emotional disclosure
+does not go both ways in asymmetrical relationships, as they do not hold
+similar expectations when the roles are reversed.
+
+# General Discussion
+
+In four studies, we examined 6- to 9-year-old U.S. American children's
+and U.S. American adults' expectations about the connection between
+disclosing information and close relationships. In Study 1, the
+participants learned about a protagonist who disclosed a fact to one
+character and failed to disclose how they had been feeling at school.
+That same character disclosed an emotion they had been feeling to a
+different character but omitted the fact. We varied whether the emotion
+was happy or sad and found that children inferred that the character who
+was told about the sad emotion, as opposed to the fact, was better
+friends with the protagonist. This was not true when the character could
+have disclosed a happy emotion as opposed to a fact. Children and adults
+also connected emotional disclosure with physical intimacy: they
+expected that the protagonist would share a single ice cream cone, but
+not partitionable candy, with the character who had been told about the
+sad emotion. Thus, children seemed to use emotional intimacy as a cue of
+social closeness. By contrast, adults inferred that the characters who
+were told either emotion were better friends with the protagonist and
+were more likely to share physical intimacy with the protagonist.
+
+In Study 2, we asked if children and adults used relationships to make
+predictions about emotional disclosure. Children expected the
+protagonist to share emotions more often with best friends and to share
+more facts with friends, and this was especially pronounced in the sad
+condition. We also found a three-way interaction with age, suggesting
+that as children got older they became more likely to predict sharing a
+sad emotion with best friends over friends. Despite the results of Study
+1, where adults did not distinguish between sad and happy emotions, in
+Study 2 adults were more likely to predict disclosing a sad emotion to a
+best friend than a fact, but did not make the same predictions in the
+happy condition.
+
+In Study 3, we asked whether children and adults would use this
+knowledge to make predictions about how someone would act if they wanted
+to create or deepen a relationship. Here, contrary to our hypotheses,
+neither children nor adults made systematic predictions; if anything,
+they predicted that the protagonist would share facts as opposed to
+emotions.
+
+In Study 4, we asked how children think about emotional disclosure in
+asymmetric relationships. We compared participants' intuitions about
+sharing between the child protagonist and their mother, and the
+protagonist and their friend's mother. Children guessed that the
+protagonist would disclose sadness with their mother, but not happiness,
+and did not expect the protagonist to disclose emotions with their
+friend's mother. Like Study 2, and again in contrast to Study 1, adults
+distinguished between happy and sad emotions, expecting the protagonist
+to disclose sad emotions with their mother more than happy emotions.
+Like children, they did not expect the protagonist to share either
+emotion with a friend's mom. Next we investigated whether children and
+adults recognized that the asymmetric nature of these relationships
+would lead to different patterns of disclosure, asking whether the
+protagonist's mother and friend's mother would disclose emotions to the
+protagonist. Neither children nor adults expected them to. Together,
+this suggests that both adults' and children's intuitions about
+emotional disclosure are driven not only by closeness, but also by
+asymmetry in close social relationships.
+
+These studies provide insights into children's intuitive theories of
+social relationships and how disclosure may play into these theories.
+Importantly, across these studies, children compared different ways a
+person can talk about their day (either disclosing information they
+learned or disclosing an emotional experience they had). Interestingly,
+disclosing a fact could be framed as more prosocial, as it could benefit
+the recipient, while disclosing an emotion would not benefit the
+receiver. Yet children did not see disclosing a fact as oppposed to an
+emotion as indicative of close social relationships.
+
+These findings add to the growing literature that children distinguish
+between intimate, close or thick relationships from affiliative or thin
+relationships within the larger category of prosocial relationships.
+While the children in these studies had years of experience with
+different kinds of relationships, it is still striking that relatively
+young children recognize emotional intimacy. It seems unlikely that they
+have been explicitly taught that people only disclose sad or negative
+emotions with close others, nor that you can tell who is close based on
+what they disclose. Thus, it is an interesting question how children
+come to have this knowledge. Children may have learned it through more
+subtle cues (for example, social awkwardness can arise when someone
+'overshares') or they might have learned this association from
+situations where emotionally disclosing to close others meant that they
+provided empathy in a way that others cannot (refer to
+@crockett2025empathy). Children may intuit a process whereby they
+understand that disclosing negative emotions can make the discloser seem
+less desirable as a social partner or imply that the target of
+disclosure should help.
+
+This may be why neither adults nor children expected people to disclose
+negative emotions to create a new relationship nor to deepen an existing
+one. This pattern---that adults and children perceived emotional
+disclosure as a marker of existing closeness rather than a device for
+creating it---resonates with classical sociological accounts of how
+intimacy works. @simmel1906sociology held that self-disclosure is one
+way that close relationships develop but argued that intimacy
+simultaneously depends on reserve: too much disclosure can threaten
+social bonds. On this view, disclosing sad emotions to create a
+relationship would be premature, consistent with our finding that
+neither children nor adults treated disclosing sadness as a way to
+create a new friendship or to deepen one. Rather, the relationship may
+already need to feel close for people to intuit that one should disclose
+sad emotions. This past theory also agree with our results of Studies 2
+and 4, where emotional disclosure was expected within an already-close
+relationship (a mother / best friend) but not toward a more distant one
+(a friend's mother / friend). However, children did not strongly expect
+mothers to disclose sad emotions to their children. This agrees with
+past work theorizing that part of the risk of disclosing sad emotions is
+the implication that someone should help, which may be inappropriate in
+less close relations, or in caregiving relationships when one individual
+has the role of caregiver.
+
+One caveat to the current studies is that this intuition may be
+relatively later developing compared to other intuitions about social
+closeness, such as responses to apparent distress and physical intimacy
+that involves close physical contact [@thomasSaliva2022]. In some of our
+studies we found age effects and in others we did not. Our age effects,
+and overall findings agree with previous work in this domain, in which
+children inferred social closeness after learning that a character
+correctly predicted how their social partner would feel and expected
+close others to better know the preferences of their social partners
+[@woo2024]. The current studies suggest that at least one explanation
+for these previous findings is the intuition that people are more likely
+to share mental states, especially negative emotional states, with close
+social partners, and may even hide those mental states from less close
+social partners. However, children in those previous studies did not
+seem to systematically differentiate between sad and happy emotions.
+Thus, the current results are likely one piece of a larger puzzle about
+people's intuitions about knowledge of others and social closeness.
+
+It is also unclear why adults did not consistently differentiate between
+happy and sad conditions, while children did. First, it should be noted
+that we did not directly pit sad emotions against happy emotions. It is
+possible that while adults see all emotional disclosure as part of close
+relationships, they may expect that a person who was told about sadness,
+compared to a person told about happiness, would be the closer friend.
+For this reason, it is possible that both children and adults
+distinguish between disclosing sadness and happiness but that our
+studies were not designed well to find this contrast. Perhaps adults
+intuited that sharing a fun fact with anyone, but people who are not
+close may care less about one's inner life, where children may be less
+conscious of such differences.
+
+Future research could further investigate why adults and children
+differed in this regard and why children differentiate between happy and
+sad emotions. For example, do children intuit that a negative emotion
+could reflect badly on the discloser? Or could it be because disclosing
+a negative emotion can be unpleasant for the listener or imply an
+obligation to help? Perhaps, while it is sometimes unpleasant or
+draining to learn about other people's emotional states, in many close
+social relationships we either don't mind because we value the other
+person's emotional well-being, and/or because we simply want to know
+what is going on with our close social partners.
+
+One major limitation of these findings is the relatively homogeneous
+pool of participants in a particular cultural context. Future studies
+could investigate whether these expectations vary on demographics and
+culture. Cross-cultural work suggests that how readily people talk about
+others' mental states varies. For example, among the Ku Waru of highland
+Papua New Guinea parents and children spontaneously refer to specific
+beliefs and desires far less frequently than comparable North American
+parent--child pairs, this may lead children to learn that disclosing
+emotional states is not a reliable cue of social closeness, or may
+exacerbate it if it is done even more infrequently [@rumsey2013opacity].
+In some cultural contexts gender may play a role in whether and which
+emotions are discussed and with whom. It could also be fruitful to
+examine how children determine when a relationship is close enough to
+involve emotional intimacy. For example, we pitted disclosing emotions
+against facts, but what would happen if we investigated different
+person-specific mental states such as preferences? What other types of
+information disclosure might lead to inferences about social closeness?
+While many questions remain, the current series of studies is one step
+closer to understanding how children connect relationships to patterns
+of information disclosure.
+
+## Constraints on Generality
+
+We expect these results to generalize to U.S. American children between
+the ages of 6 and 9 years and to U.S. American adults, the populations
+from which our samples were drawn. Participants were recruited online
+through a laboratory database, social media, Children Helping Science,
+and Prolific; the child samples were predominantly White and drawn from
+relatively highly educated families, and the adult samples were young
+(mean ages of roughly 23 to 27 years). We have no strong reason to
+believe that the basic association between emotional disclosure and
+social closeness depends on these particular characteristics. However,
+the more specific patterns we observed---especially the reliance on sad
+emotions as the diagnostic cue, and the asymmetry we found in caregiving
+relationships---may depend on culturally specific norms about how, and
+how much, people discuss their inner states [@rumsey2013opacity]. We
+therefore do not assume that these findings extend to children or adults
+in cultural contexts with different conventions surrounding emotional
+expression, to children younger than those we tested, or to relationship
+types beyond those we examined (best friends, friends, and mother--child
+dyads). We see no reason to expect that the results depend on the
+specific experimenters, stimuli, or online testing platforms used,
+though this remains to be established.
+
+# Author Note
+
+Megan Richardson and Ashley J. Thomas, Department of Psychology, Harvard
+University.
+
+Megan Richardson supported by the Research Scholar Initiative program at
+Harvard University, funded by the National Science Foundation before it
+was cancelled due to it being an effort to increase diversity in
+Science. The authors declare no conflicts of interest. The studies'
+designs and primary analyses were pre-registered (Studies 1, 3.A, and
+4.A: https://osf.io/pv9gj/; Studies 2, 3.B, and 4.B:
+https://osf.io/sx37c/), and all data, analysis code, and study materials
+are available on the Open Science Framework at \[OSF PROJECT URL\].
+
+We thank the families who participated, the Harvard Laboratory for
+Developmental Studies for feedback, and ChildrenHelpingScience.com for
+support with recruitment.
+
+Correspondence concerning this article should be addressed to Ashley J.
+Thomas, Department of Psychology, Harvard University, Cambridge, MA
+02138. Email: ashley_thomas\@fas.harvard.edu
+
+# References
+
+::: {#refs}
+:::
