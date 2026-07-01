@@ -83,8 +83,7 @@ post_table <- function(models) {
 ```
 
 > This document is reproducible: every table and figure is produced by
-> `5. Analysis/code/OMIT_CLEAN.R` and read here via `here()`. Items
-> marked **`[PLACEHOLDER]`** need author input.
+> `5. Analysis/code/OMIT_CLEAN.R` and read here via `here()`.
 
 # Supplementary Methods
 
