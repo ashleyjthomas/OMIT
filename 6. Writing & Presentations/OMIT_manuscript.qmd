@@ -355,6 +355,13 @@ analysis code, and study materials are available at
 <https://anonymous.4open.science/r/OMIT-74BB/>. The studies' designs and
 primary analyses were pre-registered; the pre-registration documents are
 included in that repository (in the "Preregistration & Ethics" folder).
+In preparing this manuscript we used a generative AI assistant (Claude,
+Opus 4.8) [@anthropic2026claude] to assist with drafting and editing
+prose, formatting the manuscript, and writing and organizing the analysis
+code and figures. The authors reviewed, verified, and edited all
+AI-assisted output and take full responsibility for the content of the
+manuscript; generative AI was not used to collect, generate, or fabricate
+data or results.
 
 # Study 1: Inferences about social closeness based on information disclosure
 
