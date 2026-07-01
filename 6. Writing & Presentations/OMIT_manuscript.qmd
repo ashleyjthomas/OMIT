@@ -31,6 +31,18 @@ format:
   docx:
     output-file: OMIT_manuscript_rendered.docx
     reference-doc: apa-reference.docx
+  pdf:
+    output-file: OMIT_manuscript_rendered.pdf
+    pdf-engine: xelatex
+    mainfont: "Times New Roman"
+    fontsize: 12pt
+    geometry: margin=1in
+    linestretch: 2
+    fig-pos: H
+    include-in-header:
+      text: |
+        \usepackage{lineno}
+        \linenumbers
 editor:
   markdown:
     wrap: 72
@@ -82,18 +94,16 @@ author note, references, tables, and figure captions).
 # Public Significance Statement
 
 These studies show that by elementary school, children already grasp
-something adults take for granted---that confiding sadness, rather than
-sharing neutral facts or good news, is a mark of a close relationship.
-Across four studies, six- to nine-year-olds expected people to reveal
-their sad feelings to best friends and to their own mothers, but not to
-friends or a friend's parent, and they treated a child confiding in a
-parent as different from a parent confiding in a child. Yet neither
-children nor adults viewed opening up emotionally as a way to build a
-new friendship, suggesting that people intuitively treat emotional
-intimacy as belonging to relationships that are already close rather
-than as a tool for creating closeness. These insights may help explain
-why some children find it difficult to judge what to share, and with
-whom.
+something adults may take for granted---that confiding sadness, rather
+than sharing neutral facts or good news, is a mark of a close
+relationship. Across four studies, six- to nine-year-olds expected
+people to reveal their sad feelings to best friends and to their own
+mothers, but not to friends or a friend's mother, and they treated a
+child confiding in a mother as different from a mother confiding in a
+child. Yet neither children nor adults viewed opening up emotionally as
+a way to build a new friendship, suggesting that people intuitively
+treat emotional intimacy as belonging to relationships that are already
+close rather than as a tool for creating closeness.
 
 # Introduction
 
@@ -102,7 +112,7 @@ intimate, close, or family-like relationships) from those that are
 'thin' (weak, affiliative, prosocial) [@clark1979; @fiske1992]. This
 distinction seems to be made as early as 8 months: infants expect that
 those who are physically intimate will respond to one another's distress
-[@thomasSaliva2022 ]. One hallmark of such relationships is emotional
+[@thomasSaliva2022]. One hallmark of such relationships is emotional
 intimacy, which includes disclosing personal information. Emotional
 intimacy has been studied across several disciplines, such as
 Anthropology, Relationship Science [@finkenauer2015know;
@@ -935,17 +945,24 @@ young children recognize emotional intimacy. It seems unlikely that they
 have been explicitly taught that people only disclose sad or negative
 emotions with close others, nor that you can tell who is close based on
 what they disclose. Thus, it is an interesting question how children
-come to have this knowledge. Children may have learned it through more
-subtle cues (for example, social awkwardness can arise when someone
-'overshares') or they might have learned this association from
-situations where emotionally disclosing to close others meant that they
-provided empathy in a way that others cannot (refer to
-@crockett2025empathy). Children may intuit a process whereby they
+come to have this knowledge. Children may intuit a process whereby they
 understand that disclosing negative emotions can make the discloser seem
 less desirable as a social partner or imply that the target of
-disclosure should help.
+disclosure should help. Children may have learned it through more subtle
+cues (for example, social awkwardness can arise when someone
+'overshares') or they might have learned this association from
+situations where emotionally disclosing to close others meant that they
+provided empathy in a way that others cannot. This last point resonates
+with a recent distinction between "thin" and "thick" empathy
+[@crockett2025empathy]. Thick empathy draws on one's accumulated
+experiences with a specific person or experience with what they are
+going through, letting another grasp someone's inner state in a way that
+those without that shared history cannot. Emotional disclosure may
+therefore be diagnostic of closeness because revealing a sad emotion
+invites thick empathy, the understanding and support that a close
+partner is positioned to provide.
 
-This may be why neither adults nor children expected people to disclose
+Relatedly, neither adults nor children expected people to disclose
 negative emotions to create a new relationship nor to deepen an existing
 one. This pattern---that adults and children perceived emotional
 disclosure as a marker of existing closeness rather than a device for
