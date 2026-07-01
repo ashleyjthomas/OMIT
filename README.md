@@ -1,4 +1,4 @@
-# Children's Expectations of Emotional Intimacy in Close Relationships
+# Expectations of Emotional Intimacy in Close Relationships in Children and Adults
 
 Data, analysis code, materials, and manuscript source for a set of studies on how
 children (ages 6–9) and adults reason about the link between **emotional
