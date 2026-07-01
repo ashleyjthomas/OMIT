@@ -1,8 +1,7 @@
 ---
 title: "Children's Expectations of Emotional Intimacy in Close Relationships"
 author:
-  - name: "Megan Richardson"
-  - name: "Ashley J. Thomas"
+  - name: "[Author names removed for anonymous review]"
 date: today
 abstract: |
   Humans across cultures distinguish intimate, close, or family-like
@@ -1057,25 +1056,19 @@ though this remains to be established.
 
 # Author Note
 
-Megan Richardson and Ashley J. Thomas, Department of Psychology, Harvard
-University.
+[Author names and affiliations removed for anonymous review.]
 
-Megan Richardson supported by the Research Scholar Initiative program at
-Harvard University, funded by the National Science Foundation before it
-was cancelled due to it being an effort to increase diversity in
-Science. The authors declare no conflicts of interest. The studies'
-designs and primary analyses were pre-registered (Studies 1, 3.A, and
-4.A: https://osf.io/pv9gj/; Studies 2, 3.B, and 4.B:
-https://osf.io/sx37c/), and all data, analysis code, and study materials
-are available on the Open Science Framework at \[OSF PROJECT URL\].
+This research was supported by a research fellowship [funder details
+removed for anonymous review]. The authors declare no conflicts of
+interest. The studies' designs and primary analyses were pre-registered
+(Studies 1, 3.A, and 4.A: [pre-registration link removed for anonymous
+review]; Studies 2, 3.B, and 4.B: [pre-registration link removed for
+anonymous review]), and all data, analysis code, and study materials are
+available at [anonymized repository link].
 
-We thank the families who participated, the Harvard Laboratory for
-Developmental Studies for feedback, and ChildrenHelpingScience.com for
-support with recruitment.
+[Acknowledgments removed for anonymous review.]
 
-Correspondence concerning this article should be addressed to Ashley J.
-Thomas, Department of Psychology, Harvard University, Cambridge, MA
-02138. Email: ashley_thomas\@fas.harvard.edu
+[Correspondence information removed for anonymous review.]
 
 # References
 
