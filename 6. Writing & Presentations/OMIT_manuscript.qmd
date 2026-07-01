@@ -100,23 +100,23 @@ whom.
 Humans in every culture distinguish 'thick' relationships (strong,
 intimate, close, or family-like relationships) from those that are
 'thin' (weak, affiliative, prosocial) [@clark1979; @fiske1992]. This
-distinction seems to be made as early as 4 months: infants expect that
+distinction seems to be made as early as 8 months: infants expect that
 those who are physically intimate will respond to one another's distress
-[@thomasSaliva2022 **; Woo et al., under review**]. One hallmark of such
-relationships is emotional intimacy, which includes disclosing personal
-information. Emotional intimacy has been studied across several
-disciplines, such as Anthropology, Relationship Science
-[@finkenauer2015know; @willems2020role], and Sociology. Sociologists
-have long characterized relationships by the kind of information
-disclosed within them. More than a century ago, @simmel1906sociology
-argued that what and how much people reveal to one another is calibrated
-to the closeness of the relationship: acquaintances share outward,
-impersonal facts, whereas intimate bonds rest on the disclosure of one's
-inner life, including emotions. Contemporary network research
-operationalizes a version of this idea through the kinds of ties people
-report---weak ties are those to whom one turns for useful information,
-while thick ties are those to whom one discloses sensitive or personal
-matters [refer to @small2017, for a history].
+[@thomasSaliva2022 ]. One hallmark of such relationships is emotional
+intimacy, which includes disclosing personal information. Emotional
+intimacy has been studied across several disciplines, such as
+Anthropology, Relationship Science [@finkenauer2015know;
+@willems2020role], and Sociology. Sociologists have long characterized
+relationships by the kind of information disclosed within them. More
+than a century ago, @simmel1906sociology argued that what and how much
+people reveal to one another is calibrated to the closeness of the
+relationship: acquaintances share outward, impersonal facts, whereas
+intimate bonds rest on the disclosure of one's inner life, including
+emotions. Contemporary network research operationalizes a version of
+this idea through the kinds of ties people report---weak ties are those
+to whom one turns for useful information, while thick ties are those to
+whom one discloses sensitive or personal matters [refer to @small2017,
+for a history].
 
 Yet, there have been few empirical studies that test whether people
 reason that close social relationships include emotional disclosure, nor
@@ -692,26 +692,25 @@ discloser. This implication is not only about closeness but about the
 structure of a relationship---it matters who is able or expected to
 provide care. The mother--child relationship offers a useful test of
 this idea, because it is unambiguously close yet asymmetric in
-caregiving: the mother is ordinarily the one who comforts a child
-(though see @steeleinpress, for potential evidence that younger children
-do not share this intuition), not the reverse. In Study 4 we examined
-emotional disclosure in this asymmetric relationship from both
-directions. In Study 4.A, we asked whether children expect a child to
-disclose sad emotions to their own mother, a close relationship, but not
-to a friend's mother, a more distant relationship. This comparison tests
-whether children expect emotional disclosure within close relationships,
-but it leaves open whether they treat emotional disclosure as a
-symmetric feature of closeness, something both partners do or as
-something that can also align with the caregiving structure of a
-relationship. In Study 4.B we therefore tested the reverse direction:
-whether children expect a mother to disclose her own sadness to her
-child. If children expect emotional disclosure simply because a
-relationship is close, they should expect a mother to disclose her
-sadness to her child, just as they expect a child to disclose to a
-mother. If instead children intuit that a mother disclosing sadness
-would imply that her young child ought to comfort her, inverting their
-roles, they should be less inclined to expect that a mother will share
-her sad emotion, even though the relationship is close.
+caregiving: the mother is ordinarily the one who comforts a child, not
+the reverse. In Study 4 we examined emotional disclosure in this
+asymmetric relationship from both directions. In Study 4.A, we asked
+whether children expect a child to disclose sad emotions to their own
+mother, a close relationship, but not to a friend's mother, a more
+distant relationship. This comparison tests whether children expect
+emotional disclosure within close relationships, but it leaves open
+whether they treat emotional disclosure as a symmetric feature of
+closeness, something both partners do or as something that can also
+align with the caregiving structure of a relationship. In Study 4.B we
+therefore tested the reverse direction: whether children expect a mother
+to disclose her own sadness to her child. If children expect emotional
+disclosure simply because a relationship is close, they should expect a
+mother to disclose her sadness to her child, just as they expect a child
+to disclose to a mother. If instead children intuit that a mother
+disclosing sadness would imply that her young child ought to comfort
+her, inverting their roles, they should be less inclined to expect that
+a mother will share her sad emotion, even though the relationship is
+close.
 
 ## Study 4.A
 
@@ -1056,19 +1055,19 @@ though this remains to be established.
 
 # Author Note
 
-[Author names and affiliations removed for anonymous review.]
+\[Author names and affiliations removed for anonymous review.\]
 
-This research was supported by a research fellowship [funder details
-removed for anonymous review]. The authors declare no conflicts of
+This research was supported by a research fellowship \[funder details
+removed for anonymous review\]. The authors declare no conflicts of
 interest. The studies' designs and primary analyses were pre-registered
-(Studies 1, 3.A, and 4.A: [pre-registration link removed for anonymous
-review]; Studies 2, 3.B, and 4.B: [pre-registration link removed for
-anonymous review]), and all data, analysis code, and study materials are
-available at [anonymized repository link].
+(Studies 1, 3.A, and 4.A: \[pre-registration link removed for anonymous
+review\]; Studies 2, 3.B, and 4.B: \[pre-registration link removed for
+anonymous review\]), and all data, analysis code, and study materials
+are available at \[anonymized repository link\].
 
-[Acknowledgments removed for anonymous review.]
+\[Acknowledgments removed for anonymous review.\]
 
-[Correspondence information removed for anonymous review.]
+\[Correspondence information removed for anonymous review.\]
 
 # References
 
