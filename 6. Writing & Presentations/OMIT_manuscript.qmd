@@ -323,8 +323,7 @@ survey platform. The adults saw all the vignettes and questions as the
 children.
 
 Unless otherwise noted, the studies' designs and primary analyses were
-pre-registered (Studies 1, 3.A, and 4.A: <https://osf.io/pv9gj/>;
-Studies 2, 3.B, and 4.B: <https://osf.io/sx37c/>).
+pre-registered (Studies 1, 3.A, and 4.A: REDACTED IN GITHUB).
 
 **General analyses.** We conducted one-sided Bayesian binomial tests
 with default priors, in the pre-registered direction of our hypotheses,
@@ -357,11 +356,11 @@ primary analyses were pre-registered; the pre-registration documents are
 included in that repository (in the "Preregistration & Ethics" folder).
 In preparing this manuscript we used a generative AI assistant (Claude,
 Opus 4.8) [@anthropic2026claude] to assist with drafting and editing
-prose, formatting the manuscript, and writing and organizing the analysis
-code and figures. The authors reviewed, verified, and edited all
-AI-assisted output and take full responsibility for the content of the
-manuscript; generative AI was not used to collect, generate, or fabricate
-data or results.
+prose, formatting the manuscript, and writing and organizing the
+analysis code and figures. The authors reviewed, verified, and edited
+all AI-assisted output and take full responsibility for the content of
+the manuscript; generative AI was not used to collect, generate, or
+fabricate data or results.
 
 # Study 1: Inferences about social closeness based on information disclosure
 
@@ -669,7 +668,9 @@ protagonist to disclose sad emotions to become closer to a friend
 `r bf("study3B","adult","deepen","sad")`), nor happy emotions
 (`r pct("study3B","adult","deepen","happy")`,
 `r bf("study3B","adult","deepen","happy")`); the condition effect in the
-model was `r est("study3B_adult","b_emotionsad")`.
+model was credible `r est("study3B_adult","b_emotionsad")`, adults
+thought the protagonist would be less likely to share an emotion in the
+sad condition compared to the happy one.
 
 **Developmental change.** The emotion × age interaction was not credible
 (`r est("study3B_child","b_emotionsad:age_c")`; @fig-study3-age, panel
@@ -864,7 +865,7 @@ protagonist to disclose sad emotions to their mother, but were trending
 toward saying that the child would also share happy emotions. In
 contrast to children, they strongly expected that children would be more
 likely to share facts than emotions, regardless of the emotion, with the
-friend's mother (
+friend's mother.
 
 However, in Study 4.B, children and adults did not expect that the
 protagonist's mother or a friend's mother would share emotions with the
@@ -940,8 +941,8 @@ person can talk about their day (either disclosing information they
 learned or disclosing an emotional experience they had). Interestingly,
 disclosing a fact could be framed as more prosocial, as it could benefit
 the recipient, while disclosing an emotion would not benefit the
-receiver. Yet children did not see disclosing a fact as oppposed to an
-emotion as indicative of close social relationships.
+receiver. Yet children did not see disclosing a fact as opposed to
+disclosing an emotion as indicative of close social relationships.
 
 These findings add to the growing literature that children distinguish
 between intimate, close or thick relationships from affiliative or thin
