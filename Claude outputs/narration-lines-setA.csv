@@ -1,0 +1,89 @@
+line_id,section,text,note
+intro_01,Framing,Hi! Today I'm going to tell you some stories about kids and what happened at their school.,
+intro_02,Framing,"After each story I'll ask you a question. There are no right or wrong answers, I just want to know what you think.",
+prac_01,Practice,Let's try one for practice. This is Nico. Nico goes to school with Frankie and Ollie.,
+prac_02,Practice,"Frankie is wearing a red shirt, and Ollie is wearing a blue shirt. Can you click on the kid wearing the red shirt?",
+prac_03,Practice,"Great, that's how it works. Here's the first story.",
+outro_01,Framing,That's the end of the stories. Thank you so much for helping us!,
+T1_open,T1,This is Casey. I'm going to tell you a story about Casey.,
+T1_est_SE,T1,"This morning Casey felt sad, and Casey didn't know why.",
+T1_est_HE,T1,"And this afternoon Casey felt happy, and Casey didn't know why.",
+T1_meet_A1,T1,"After school, Casey saw a classmate named Morgan. Morgan said, ""Hi Casey! How was school today?""",classmate assignment A
+T1_disc_A1,T1,"Casey told Morgan about feeling sad today, but did not tell Morgan about feeling happy today.",classmate assignment A
+T1_meet_A2,T1,"Then, Casey saw a classmate named Blake. Blake said, ""Hi Casey! How was school today?""",classmate assignment A
+T1_disc_A2,T1,"Casey told Blake about feeling happy today, but did not tell Blake about feeling sad today.",classmate assignment A
+T1_meet_B1,T1,"After school, Casey saw a classmate named Blake. Blake said, ""Hi Casey! How was school today?""",classmate assignment B
+T1_disc_B1,T1,"Casey told Blake about feeling sad today, but did not tell Blake about feeling happy today.",classmate assignment B
+T1_meet_B2,T1,"Then, Casey saw a classmate named Morgan. Morgan said, ""Hi Casey! How was school today?""",classmate assignment B
+T1_disc_B2,T1,"Casey told Morgan about feeling happy today, but did not tell Morgan about feeling sad today.",classmate assignment B
+T1_mc,T1,Which classmate did Casey tell about feeling sad today?,memory check
+T1_dv,T1,Who do you think is a better friend to Casey?,PRIMARY DV
+T1_cone,T1,Who do you think Casey would want to share an ice cream cone with?,secondary
+T1_candy,T1,Who do you think Casey would want to share candy with?,secondary
+T2_open,T2,This is Rowan. I'm going to tell you a story about Rowan.,
+T2_est_SE,T2,"Rowan feels sad today, and Rowan doesn't know why.",
+T2_est_PF,T2,"In school today, Rowan learned that they really love rabbits.",
+T2_meet_A1,T2,"After school, Rowan saw a classmate named Jesse. Jesse said, ""Hi Rowan! How was school today?""",classmate assignment A
+T2_disc_A1,T2,"Rowan told Jesse about feeling sad today, but did not tell Jesse about loving rabbits.",classmate assignment A
+T2_meet_A2,T2,"Then, Rowan saw a classmate named Kai. Kai said, ""Hi Rowan! How was school today?""",classmate assignment A
+T2_disc_A2,T2,"Rowan told Kai about loving rabbits, but did not tell Kai about feeling sad today.",classmate assignment A
+T2_meet_B1,T2,"After school, Rowan saw a classmate named Kai. Kai said, ""Hi Rowan! How was school today?""",classmate assignment B
+T2_disc_B1,T2,"Rowan told Kai about feeling sad today, but did not tell Kai about loving rabbits.",classmate assignment B
+T2_meet_B2,T2,"Then, Rowan saw a classmate named Jesse. Jesse said, ""Hi Rowan! How was school today?""",classmate assignment B
+T2_disc_B2,T2,"Rowan told Jesse about loving rabbits, but did not tell Jesse about feeling sad today.",classmate assignment B
+T2_mc,T2,Which classmate did Rowan tell about feeling sad today?,memory check
+T2_dv,T2,Who do you think is a better friend to Rowan?,PRIMARY DV
+T2_cone,T2,Who do you think Rowan would want to share an ice cream cone with?,secondary
+T2_candy,T2,Who do you think Rowan would want to share candy with?,secondary
+T3_open,T3,This is Avery. I'm going to tell you a story about Avery.,
+T3_est_SE,T3,"Avery feels sad today, and Avery doesn't know why.",
+T3_est_IF,T3,"In school today, Avery learned that foxes move without making any sound.",
+T3_meet_A1,T3,"After school, Avery saw a classmate named Toby. Toby said, ""Hi Avery! How was school today?""",classmate assignment A
+T3_disc_A1,T3,"Avery told Toby about feeling sad today, but did not tell Toby about the foxes.",classmate assignment A
+T3_meet_A2,T3,"Then, Avery saw a classmate named Sam. Sam said, ""Hi Avery! How was school today?""",classmate assignment A
+T3_disc_A2,T3,"Avery told Sam about the foxes, but did not tell Sam about feeling sad today.",classmate assignment A
+T3_meet_B1,T3,"After school, Avery saw a classmate named Sam. Sam said, ""Hi Avery! How was school today?""",classmate assignment B
+T3_disc_B1,T3,"Avery told Sam about feeling sad today, but did not tell Sam about the foxes.",classmate assignment B
+T3_meet_B2,T3,"Then, Avery saw a classmate named Toby. Toby said, ""Hi Avery! How was school today?""",classmate assignment B
+T3_disc_B2,T3,"Avery told Toby about the foxes, but did not tell Toby about feeling sad today.",classmate assignment B
+T3_mc,T3,Which classmate did Avery tell about feeling sad today?,memory check
+T3_dv,T3,Who do you think is a better friend to Avery?,PRIMARY DV
+T4_open,T4,This is Devon. I'm going to tell you a story about Devon.,
+T4_est_HE,T4,"Devon feels happy today, and Devon doesn't know why.",
+T4_est_PF,T4,"In school today, Devon learned that they really love rabbits.",
+T4_meet_A1,T4,"After school, Devon saw a classmate named Harper. Harper said, ""Hi Devon! How was school today?""",classmate assignment A
+T4_disc_A1,T4,"Devon told Harper about feeling happy today, but did not tell Harper about loving rabbits.",classmate assignment A
+T4_meet_A2,T4,"Then, Devon saw a classmate named Quinn. Quinn said, ""Hi Devon! How was school today?""",classmate assignment A
+T4_disc_A2,T4,"Devon told Quinn about loving rabbits, but did not tell Quinn about feeling happy today.",classmate assignment A
+T4_meet_B1,T4,"After school, Devon saw a classmate named Quinn. Quinn said, ""Hi Devon! How was school today?""",classmate assignment B
+T4_disc_B1,T4,"Devon told Quinn about feeling happy today, but did not tell Quinn about loving rabbits.",classmate assignment B
+T4_meet_B2,T4,"Then, Devon saw a classmate named Harper. Harper said, ""Hi Devon! How was school today?""",classmate assignment B
+T4_disc_B2,T4,"Devon told Harper about loving rabbits, but did not tell Harper about feeling happy today.",classmate assignment B
+T4_mc,T4,Which classmate did Devon tell about feeling happy today?,memory check
+T4_dv,T4,Who do you think is a better friend to Devon?,PRIMARY DV
+T5_open,T5,This is Logan. I'm going to tell you a story about Logan.,
+T5_est_HE,T5,"Logan feels happy today, and Logan doesn't know why.",
+T5_est_IF,T5,"In school today, Logan learned that foxes move without making any sound.",
+T5_meet_A1,T5,"After school, Logan saw a classmate named Bailey. Bailey said, ""Hi Logan! How was school today?""",classmate assignment A
+T5_disc_A1,T5,"Logan told Bailey about feeling happy today, but did not tell Bailey about the foxes.",classmate assignment A
+T5_meet_A2,T5,"Then, Logan saw a classmate named Reese. Reese said, ""Hi Logan! How was school today?""",classmate assignment A
+T5_disc_A2,T5,"Logan told Reese about the foxes, but did not tell Reese about feeling happy today.",classmate assignment A
+T5_meet_B1,T5,"After school, Logan saw a classmate named Reese. Reese said, ""Hi Logan! How was school today?""",classmate assignment B
+T5_disc_B1,T5,"Logan told Reese about feeling happy today, but did not tell Reese about the foxes.",classmate assignment B
+T5_meet_B2,T5,"Then, Logan saw a classmate named Bailey. Bailey said, ""Hi Logan! How was school today?""",classmate assignment B
+T5_disc_B2,T5,"Logan told Bailey about the foxes, but did not tell Bailey about feeling happy today.",classmate assignment B
+T5_mc,T5,Which classmate did Logan tell about feeling happy today?,memory check
+T5_dv,T5,Who do you think is a better friend to Logan?,PRIMARY DV
+T6_open,T6,This is Jamie. I'm going to tell you a story about Jamie.,
+T6_est_PF,T6,"In school today, Jamie learned that they really love rabbits.",
+T6_est_IF,T6,"In school today, Jamie learned that foxes move without making any sound.",
+T6_meet_A1,T6,"After school, Jamie saw a classmate named Elliot. Elliot said, ""Hi Jamie! How was school today?""",classmate assignment A
+T6_disc_A1,T6,"Jamie told Elliot about loving rabbits, but did not tell Elliot about the foxes.",classmate assignment A
+T6_meet_A2,T6,"Then, Jamie saw a classmate named Parker. Parker said, ""Hi Jamie! How was school today?""",classmate assignment A
+T6_disc_A2,T6,"Jamie told Parker about the foxes, but did not tell Parker about loving rabbits.",classmate assignment A
+T6_meet_B1,T6,"After school, Jamie saw a classmate named Parker. Parker said, ""Hi Jamie! How was school today?""",classmate assignment B
+T6_disc_B1,T6,"Jamie told Parker about loving rabbits, but did not tell Parker about the foxes.",classmate assignment B
+T6_meet_B2,T6,"Then, Jamie saw a classmate named Elliot. Elliot said, ""Hi Jamie! How was school today?""",classmate assignment B
+T6_disc_B2,T6,"Jamie told Elliot about the foxes, but did not tell Elliot about loving rabbits.",classmate assignment B
+T6_mc,T6,Which classmate did Jamie tell about loving rabbits?,memory check
+T6_dv,T6,Who do you think is a better friend to Jamie?,PRIMARY DV

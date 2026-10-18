@@ -1,0 +1,5 @@
+model,term,median,CI_low,CI_high,pct_in_ROPE,pd
+crosstask_circles_sad,b_Intercept,-1,-1.68,-0.32,0.3,0.998
+crosstask_circles_sad,b_better_friend_sad,1.81,1.04,2.6,0,1
+crosstask_circles_happy,b_Intercept,-0.24,-0.68,0.21,20.1,0.859
+crosstask_circles_happy,b_better_friend_happy,0.56,-0.08,1.2,5.8,0.955

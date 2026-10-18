@@ -1,0 +1,21 @@
+set,task1,task2,n,r,CI_low,CI_high,r_partial_age,BF10
+Set A,better_friend,ice_cream,57,0.337,0.084,0.55,0.31,6.05
+Set A,better_friend,candy,57,0.323,0.068,0.538,0.343,4.6
+Set A,candy,mom,57,0.185,-0.079,0.425,0.187,0.71
+Set A,mom,friendmom,57,0.164,-0.101,0.407,0.206,0.59
+Set A,better_friend,mom,57,0.153,-0.112,0.398,0.064,0.54
+Set A,better_friend,friendmom,57,-0.136,-0.383,0.129,-0.091,0.48
+Set A,ice_cream,friendmom,57,0.075,-0.19,0.329,0.095,0.34
+Set A,candy,friendmom,57,0.026,-0.236,0.285,0.028,0.3
+Set A,ice_cream,mom,57,0.024,-0.238,0.282,-0.011,0.3
+Set A,ice_cream,candy,57,0.02,-0.242,0.279,0.018,0.3
+Set B/C,bestfriend,mom,102,0.45,0.28,0.593,0.422,9907.69
+Set B/C,friend,friendmom,102,0.373,0.192,0.529,0.389,264.06
+Set B/C,deepen,mom,102,0.269,0.079,0.44,0.289,7.89
+Set B/C,bestfriend,friendmom,102,0.255,0.063,0.428,0.26,5.39
+Set B/C,mom,friendmom,102,0.237,0.044,0.412,0.241,3.47
+Set B/C,friend,bestfriend,102,0.156,-0.039,0.341,0.231,0.73
+Set B/C,deepen,friendmom,102,0.094,-0.103,0.283,0.094,0.34
+Set B/C,bestfriend,deepen,102,0.071,-0.125,0.262,0.087,0.29
+Set B/C,friend,mom,102,0.024,-0.171,0.218,0.089,0.23
+Set B/C,friend,deepen,102,0.002,-0.193,0.196,-0.015,0.23

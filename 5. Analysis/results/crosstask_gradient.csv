@@ -1,0 +1,2 @@
+set,comparison,n,r,CI_low,CI_high,BF10
+Set B/C,peer gradient (BF - F) ~ parent gradient (mom - friend's mom),102,0.341,0.156,0.502,76.74

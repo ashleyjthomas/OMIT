@@ -929,6 +929,283 @@ readr::write_csv(dplyr::bind_rows(gender_est), file.path(results_dir, "gender_ef
 message("Gender robustness analysis written: gender_effects.csv")
 
 
+# CROSS-TASK RELATIONS WITHIN EACH CHILD SAMPLE ----
+# Exploratory (not pre-registered). Every child completed ALL of the studies in
+# their set (Set A: Studies 1, 3A, 4A; Set B/C: Studies 2, 3B, 4B), so we can
+# ask how a child's answers relate ACROSS tasks. Three questions:
+#   (1) Is there stable child-level variance that spans tasks? A pooled probit
+#       model over every binary item in a set, with ITEM fixed effects (these
+#       absorb each task's own difficulty, so sd(ID) is only the tendency that
+#       carries ACROSS tasks) and (1 | ID). Refit with mean-centred age to
+#       check the shared variance is not simply age, and compared by LOO
+#       against the same model with no child term.
+#   (2) Which task pairs hang together? Per-child task score = number of
+#       emotion choices across that task's sad + happy trials (0-2); Pearson r
+#       with JZS Bayes factors, plus the same r with age partialled out.
+#   (3) Set B/C: is the structure graded by TARGET CLOSENESS rather than a
+#       blanket "pick the emotion" response bias? Contrast the closeness-
+#       MATCHED pairs (best friend ~ own mom; friend ~ friend's mom) against
+#       the CROSS-level pairs (best friend ~ friend's mom; friend ~ own mom),
+#       bootstrapped over children; and test whether the within-child closeness
+#       GRADIENT transfers from the peer domain (best friend - friend) to the
+#       parent domain (own mom - friend's mom).
+# Plus a Set-A convergent-validity check: does the continuous circles closeness
+# rating line up with the binary better-friend choice made on the same trial?
+# Consumed by the Supplement -> results/crosstask_*.csv, figures/crosstask.png
+
+## Per-child item matrices ----
+# One column per binary item (task x emotion condition), one row per child.
+ct_A <- chA %>% transmute(
+  ID = as.character(ID), age,
+  better_friend_sad = as01(Better_Friend_sad), better_friend_happy = as01(Better_Friend_happy),
+  ice_cream_sad     = as01(Ice_Cream_sad),     ice_cream_happy     = as01(Ice_Cream_happy),
+  candy_sad         = as01(Candy_sad),         candy_happy         = as01(Candy_happy),
+  create_sad        = as01(New_Friend_sad),    create_happy        = as01(New_Friend_happy),
+  mom_sad           = as01(Mom_sad),           mom_happy           = as01(Mom_happy),
+  friendmom_sad     = as01(FriendMom_sad),     friendmom_happy     = as01(FriendMom_happy))
+
+ct_B <- chB %>% transmute(
+  ID = as.character(ID), age,
+  friend_sad     = recode_emo_text(Sad_Friend),    friend_happy     = recode_emo_text(Happy_Friend),
+  bestfriend_sad = recode_emo_text(Sad_BF),        bestfriend_happy = recode_emo_text(Happy_BF),
+  deepen_sad     = recode_emo_text(Sad_NF),        deepen_happy     = recode_emo_text(Happy_NF),
+  mom_sad        = recode_emo_text(Sad_Mom),       mom_happy        = recode_emo_text(Happy_Mom),
+  friendmom_sad  = recode_emo_text(Sad_FriendMom), friendmom_happy  = recode_emo_text(Happy_FriendMom))
+
+# Study 3.A ("create") is left out of the Set A cross-task analyses: it asks
+# about disclosing to someone who is NOT yet a friend, whereas every other Set A
+# measure asks about an already-existing tie, which is what the closeness
+# hypothesis is about. Study 3.B ("deepen") is kept in Set B/C because it asks
+# about an existing friendship the protagonist wants to grow closer to.
+ct_tasks_A <- c("better_friend", "ice_cream", "candy", "mom", "friendmom")
+ct_tasks_B <- c("friend", "bestfriend", "deepen", "mom", "friendmom")
+
+# task score = emotion choices across that task's sad + happy trials (0-2);
+# NA if either trial is missing
+ct_scores <- function(W, tasks) {
+  out <- W["ID"]
+  for (tk in tasks) out[[tk]] <- rowSums(W[, paste0(tk, c("_sad", "_happy"))])
+  out$age <- W$age
+  out
+}
+ctS_A <- ct_scores(ct_A, ct_tasks_A)
+ctS_B <- ct_scores(ct_B, ct_tasks_B)
+
+## (1) Pooled model: stable child-level variance across tasks ----
+ct_long <- function(W, tasks) {
+  items <- as.vector(t(outer(tasks, c("_sad", "_happy"), paste0)))
+  W %>%
+    tidyr::pivot_longer(dplyr::all_of(items), names_to = "item", values_to = "chose_emotion") %>%
+    dplyr::filter(!is.na(chose_emotion)) %>%
+    dplyr::mutate(item  = factor(item, levels = items),
+                  ID    = factor(ID),
+                  age_c = age - mean(age, na.rm = TRUE))
+}
+ctL_A <- ct_long(ct_A, ct_tasks_A)
+ctL_B <- ct_long(ct_B, ct_tasks_B)
+
+xfit_ct_pool_A     <- fit_or_load("OMIT_crosstask_pool_A.rds",
+                                  function() brm_std(chose_emotion ~ item + (1 | ID), ctL_A, 0.95))
+xfit_ct_pool_B     <- fit_or_load("OMIT_crosstask_pool_B.rds",
+                                  function() brm_std(chose_emotion ~ item + (1 | ID), ctL_B, 0.95))
+xfit_ct_pool_A_age <- fit_or_load("OMIT_crosstask_pool_A_age.rds",
+                                  function() brm_std(chose_emotion ~ item + age_c + (1 | ID), ctL_A, 0.95))
+xfit_ct_pool_B_age <- fit_or_load("OMIT_crosstask_pool_B_age.rds",
+                                  function() brm_std(chose_emotion ~ item + age_c + (1 | ID), ctL_B, 0.95))
+xfit_ct_noid_A     <- fit_or_load("OMIT_crosstask_noid_A.rds",
+                                  function() brm_std(chose_emotion ~ item, ctL_A))
+xfit_ct_noid_B     <- fit_or_load("OMIT_crosstask_noid_B.rds",
+                                  function() brm_std(chose_emotion ~ item, ctL_B))
+
+# posterior for sd(ID) and the implied ICC (probit: residual variance = 1)
+ct_sd_row <- function(m, set, model) {
+  s   <- as.numeric(as_draws_df(m)[["sd_ID__Intercept"]])
+  icc <- s^2 / (s^2 + 1)
+  np  <- brms::nuts_params(m)
+  # ESS straight from the stanfit summary: diagnostic_posterior() returns ESS
+  # only for the fixed effects here, which leaves min() with nothing to take.
+  ss  <- posterior::summarise_draws(as_draws_df(m), "rhat", "ess_bulk")
+  ss  <- ss[!is.na(ss$ess_bulk) & ss$variable != "lprior", ]
+  data.frame(
+    set = set, model = model,
+    sd_child      = round(median(s), 3),
+    sd_CI_low     = round(quantile(s, .025), 3),
+    sd_CI_high    = round(quantile(s, .975), 3),
+    ICC           = round(median(icc), 3),
+    ICC_CI_low    = round(quantile(icc, .025), 3),
+    ICC_CI_high   = round(quantile(icc, .975), 3),
+    max_Rhat      = round(max(ss$rhat, na.rm = TRUE), 3),
+    min_ESS       = round(min(ss$ess_bulk, na.rm = TRUE)),
+    n_divergent   = sum(np$Value[np$Parameter == "divergent__"]),
+    row.names = NULL)
+}
+# LOO: does the child term earn its keep? elpd_gain is the predictive advantage
+# of the (1 | ID) model over the same model with no child term (positive =
+# the child term helps).
+ct_loo_row <- function(m, m0, set) {
+  l1 <- suppressWarnings(loo(m)); l0 <- suppressWarnings(loo(m0))
+  cmp <- suppressWarnings(loo_compare(l1, l0))
+  # decide the winner from the elpd values themselves; loo_compare()'s rownames
+  # depend on how the objects were passed in and are not reliable here
+  e1 <- l1$estimates["elpd_loo", "Estimate"]
+  e0 <- l0$estimates["elpd_loo", "Estimate"]
+  data.frame(set = set,
+             elpd_gain = round(abs(cmp[2, "elpd_diff"]), 1),
+             se_diff   = round(cmp[2, "se_diff"], 1),
+             favours   = if (e1 > e0) "item + (1|ID)" else "item only",
+             row.names = NULL)
+}
+
+ct_pool_tbl <- dplyr::bind_rows(
+  ct_sd_row(xfit_ct_pool_A,     "Set A",   "item + (1|ID)"),
+  ct_sd_row(xfit_ct_pool_A_age, "Set A",   "item + age + (1|ID)"),
+  ct_sd_row(xfit_ct_pool_B,     "Set B/C", "item + (1|ID)"),
+  ct_sd_row(xfit_ct_pool_B_age, "Set B/C", "item + age + (1|ID)"))
+ct_loo_tbl <- dplyr::bind_rows(
+  ct_loo_row(xfit_ct_pool_A, xfit_ct_noid_A, "Set A"),
+  ct_loo_row(xfit_ct_pool_B, xfit_ct_noid_B, "Set B/C"))
+
+readr::write_csv(ct_pool_tbl, file.path(results_dir, "crosstask_consistency.csv"))
+readr::write_csv(ct_loo_tbl,  file.path(results_dir, "crosstask_loo.csv"))
+
+## (2) Pairwise task-task correlations ----
+# Pearson r on the 0-2 task scores with a JZS Bayes factor, plus the partial r
+# holding age constant (age is shared by every task and could induce covariance
+# on its own).
+ct_cor <- function(S, t1, t2, set) {
+  d  <- S[stats::complete.cases(S[[t1]], S[[t2]], S$age), ]
+  x  <- d[[t1]]; y <- d[[t2]]
+  bf <- BayesFactor::extractBF(BayesFactor::correlationBF(x, y))$bf
+  ht <- stats::cor.test(x, y)
+  pr <- stats::cor(stats::resid(stats::lm(x ~ d$age)), stats::resid(stats::lm(y ~ d$age)))
+  data.frame(set = set, task1 = t1, task2 = t2, n = nrow(d),
+             r = round(ht$estimate, 3),
+             CI_low  = round(ht$conf.int[1], 3),
+             CI_high = round(ht$conf.int[2], 3),
+             r_partial_age = round(pr, 3),
+             BF10 = round(bf, 2), row.names = NULL)
+}
+ct_all_pairs <- function(S, tasks, set) {
+  cmb <- utils::combn(tasks, 2)
+  dplyr::bind_rows(lapply(seq_len(ncol(cmb)),
+                          function(i) ct_cor(S, cmb[1, i], cmb[2, i], set)))
+}
+set.seed(123)
+ct_cor_tbl <- dplyr::bind_rows(
+  ct_all_pairs(ctS_A, ct_tasks_A, "Set A"),
+  ct_all_pairs(ctS_B, ct_tasks_B, "Set B/C")) %>%
+  dplyr::arrange(set, dplyr::desc(abs(r)))
+readr::write_csv(ct_cor_tbl, file.path(results_dir, "crosstask_correlations.csv"))
+
+## (3) Set B/C: closeness-graded structure, not a blanket response bias ----
+# closeness-MATCHED pairs vs CROSS-level pairs, bootstrapped over children
+ct_S <- ctS_B[stats::complete.cases(ctS_B[, c("friend", "bestfriend", "mom", "friendmom")]), ]
+ct_contrast <- function(S) {
+  matched <- mean(c(stats::cor(S$bestfriend, S$mom), stats::cor(S$friend, S$friendmom)))
+  crossed <- mean(c(stats::cor(S$bestfriend, S$friendmom), stats::cor(S$friend, S$mom)))
+  c(matched = matched, crossed = crossed, diff = matched - crossed)
+}
+set.seed(123)
+ct_obs  <- ct_contrast(ct_S)
+ct_boot <- t(replicate(5000, ct_contrast(ct_S[sample(nrow(ct_S), replace = TRUE), ])))
+ct_struct_tbl <- data.frame(
+  set = "Set B/C", n = nrow(ct_S),
+  r_closeness_matched = round(ct_obs["matched"], 3),
+  r_cross_level       = round(ct_obs["crossed"], 3),
+  difference          = round(ct_obs["diff"], 3),
+  boot_CI_low         = round(quantile(ct_boot[, "diff"], .025), 3),
+  boot_CI_high        = round(quantile(ct_boot[, "diff"], .975), 3),
+  p_diff_gt_0         = round(mean(ct_boot[, "diff"] > 0), 3), row.names = NULL)
+
+# does the within-child closeness GRADIENT transfer across domains?
+ct_grad <- ct_S %>%
+  dplyr::mutate(peer_gradient = bestfriend - friend, parent_gradient = mom - friendmom)
+ct_grad_bf <- BayesFactor::extractBF(
+  BayesFactor::correlationBF(ct_grad$peer_gradient, ct_grad$parent_gradient))$bf
+ct_grad_ht <- stats::cor.test(ct_grad$peer_gradient, ct_grad$parent_gradient)
+ct_grad_tbl <- data.frame(
+  set = "Set B/C", comparison = "peer gradient (BF - F) ~ parent gradient (mom - friend's mom)",
+  n = nrow(ct_grad), r = round(ct_grad_ht$estimate, 3),
+  CI_low = round(ct_grad_ht$conf.int[1], 3), CI_high = round(ct_grad_ht$conf.int[2], 3),
+  BF10 = round(ct_grad_bf, 2), row.names = NULL)
+
+readr::write_csv(ct_struct_tbl, file.path(results_dir, "crosstask_structure.csv"))
+readr::write_csv(ct_grad_tbl,   file.path(results_dir, "crosstask_gradient.csv"))
+
+## (4) Set A convergent validity: circles rating vs. better-friend choice ----
+# Same trial, two different response formats. circ_diff = closeness given to the
+# classmate told the EMOTION minus the classmate told the FACT (reverse-scored
+# so higher = closer, as in the circles section above).
+ct_circ <- chA %>% transmute(
+  ID = as.character(ID),
+  circ_diff_sad   = (7 - as01(Circles_emo_s)) - (7 - as01(Circles_fact_s)),
+  circ_diff_happy = (7 - as01(Circles_emo_h)) - (7 - as01(Circles_fact_h))) %>%
+  dplyr::left_join(dplyr::select(ct_A, ID, better_friend_sad, better_friend_happy), by = "ID")
+
+xfit_ct_circ_sad <- fit_or_load("OMIT_crosstask_circles_sad.rds", function()
+  brm(circ_diff_sad ~ better_friend_sad, data = ct_circ, family = gaussian(),
+      save_pars = save_pars(all = TRUE), iter = 4000, warmup = 1000, chains = 4,
+      cores = 4, seed = 123, refresh = 0))
+xfit_ct_circ_happy <- fit_or_load("OMIT_crosstask_circles_happy.rds", function()
+  brm(circ_diff_happy ~ better_friend_happy, data = ct_circ, family = gaussian(),
+      save_pars = save_pars(all = TRUE), iter = 4000, warmup = 1000, chains = 4,
+      cores = 4, seed = 123, refresh = 0))
+
+ct_circ_tbl <- dplyr::bind_rows(
+  tidy_post(xfit_ct_circ_sad,   "crosstask_circles_sad"),
+  tidy_post(xfit_ct_circ_happy, "crosstask_circles_happy"))
+readr::write_csv(ct_circ_tbl, file.path(results_dir, "crosstask_circles.csv"))
+
+## Cross-task figure ----
+# Lower-triangle correlation matrix of the task scores, one panel per set.
+ct_lab <- c(better_friend = "Better friend\n(S1)", ice_cream = "Ice cream\n(S1)",
+            candy = "Candy\n(S1)", create = "Create\n(S3A)",
+            friend = "Friend\n(S2)", bestfriend = "Best friend\n(S2)",
+            deepen = "Deepen\n(S3B)", mom = "Own mom", friendmom = "Friend's mom")
+
+ct_cor_panel <- function(S, tasks, title) {
+  M  <- stats::cor(S[, tasks], use = "pairwise.complete.obs")
+  df <- as.data.frame(as.table(M)) %>%
+    stats::setNames(c("t1", "t2", "r")) %>%
+    dplyr::mutate(i = match(t1, tasks), j = match(t2, tasks)) %>%
+    dplyr::filter(i > j) %>%
+    dplyr::mutate(t1 = factor(ct_lab[as.character(t1)], levels = ct_lab[tasks]),
+                  t2 = factor(ct_lab[as.character(t2)], levels = ct_lab[tasks]))
+  ggplot(df, aes(t2, t1, fill = r)) +
+    geom_tile(colour = "white", linewidth = 1.2) +
+    geom_text(aes(label = sprintf("%.2f", r), colour = abs(r) > 0.3),
+              size = 4.6, fontface = "bold", family = "Avenir Next") +
+    scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = "grey25"), guide = "none") +
+    scale_fill_gradient2(low = cond_cols[["Sad"]], mid = "white",
+                         high = cond_cols[["Happy"]], midpoint = 0,
+                         limits = c(-0.5, 0.5), breaks = c(-0.4, 0, 0.4),
+                         name = "Correlation (r)") +
+    coord_fixed() + labs(title = title) + theme_study() +
+    theme(axis.title = element_blank(),
+          axis.text  = element_text(size = 11, face = "bold"),
+          axis.line  = element_blank(), axis.ticks = element_blank(),
+          legend.key.width = unit(2.4, "lines"))
+}
+
+ct_fig <- cowplot::plot_grid(
+  ct_cor_panel(ctS_A, ct_tasks_A, "A. Set A (Studies 1, 3.A, 4.A)") +
+    theme(legend.position = "none"),
+  ct_cor_panel(ctS_B, ct_tasks_B, "B. Set B/C (Studies 2, 3.B, 4.B)") +
+    theme(legend.position = "none"),
+  nrow = 1, rel_widths = c(1, 1))
+ct_fig <- cowplot::plot_grid(
+  ct_fig,
+  cowplot::get_legend(ct_cor_panel(ctS_B, ct_tasks_B, "") +
+                        theme(legend.position = "bottom")),
+  ncol = 1, rel_heights = c(1, 0.12))
+ggsave(file.path(fig_dir, "crosstask.png"), ct_fig,
+       width = 15, height = 8, dpi = 300, bg = "white")
+
+message("Cross-task analyses written: crosstask_consistency.csv, crosstask_loo.csv, ",
+        "crosstask_correlations.csv, crosstask_structure.csv, crosstask_gradient.csv, ",
+        "crosstask_circles.csv, figures/crosstask.png")
+
+
 # SUPPLEMENT: MODEL DIAGNOSTICS ----
 # Convergence (Rhat, ESS), divergences, Bayesian R2, and posterior predictive
 # checks for every model. Consumed by OMIT_supplement.qmd.

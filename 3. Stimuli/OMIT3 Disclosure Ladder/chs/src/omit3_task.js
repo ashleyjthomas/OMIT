@@ -1,0 +1,370 @@
+/* OMIT3 — four-trial disclosure study, jsPsych 7 task module.
+ * Built for Children Helping Science (lookit-jspsych). The same file runs standalone
+ * (index.html) for testing. OMIT3_DESIGN (contents, trials, versions, narration) and
+ * OMIT3_ICON_SIZES are injected above this block by build/build.py.
+ */
+(function (global) {
+  'use strict';
+
+  const D = global.OMIT3_DESIGN;
+  const ICON = global.OMIT3_ICON_SIZES; // {name: [w,h]}
+
+  // ---------------------------------------------------------------- geometry (inches on a 10 x 5.625 slide)
+  const SW = 10, SH = 5.625;
+  const px = (x) => (100 * x / SW).toFixed(3) + '%';
+  const py = (y) => (100 * y / SH).toFixed(3) + '%';
+  const G = {
+    protoIntro: [3.98, 1.99, 1.94, 2.37],
+    protoEst: [3.84, 2.14, 2.16, 2.64],
+    desk: [3.98, 3.70, 1.97, 1.97],
+    chalkboard: [0.18, 0.15, 3.66, 2.15],
+    lunchroom: [0.18, 0.25, 7.93, 4.24],
+    playground: [0.29, 0.15, 6.77, 4.24],
+    cloudSlot: { cx: 6.07, cy: 2.27, w: 1.00, h: 0.78 },
+    houseL: [0.68, 0.45, 2.64, 2.64],
+    houseR: [6.43, 0.54, 2.64, 2.64],
+    protoEnc: [2.80, 2.57, 1.57, 1.92],
+    mateEnc: [5.40, 2.60, 1.57, 1.92],
+    balloonSlot: { cx: 4.53, cy: 2.51, w: 1.00, h: 0.80 },
+    noSymbol: 0.58,
+    narrator: [8.30, 3.40, 1.52, 2.14],   // bottom-right corner, clear of every scene element
+    figL: [2.23, 2.28, 1.54, 1.88],
+    figR: [5.51, 2.28, 1.54, 1.88],
+    figLmem: [2.23, 2.95, 1.54, 1.88],
+    figRmem: [5.51, 2.95, 1.54, 1.88],
+    qmark: [4.30, 0.10, 1.40, 1.40],
+    memSlot: { cx: 5.00, cy: 2.15, w: 1.60, h: 1.10 },
+    text: [2.55, 1.01, 4.49, 0.50],
+    icecream: [3.77, 3.03, 1.76, 1.76],
+    candy: [4.01, 2.57, 1.42, 1.42],
+    prop: [3.77, 3.03, 1.76, 1.76],
+    ball: [0.72, 0.72],
+    prTrio: { mid: [4.03, 1.85, 1.54, 1.88], left: [1.65, 2.28, 1.54, 1.88], right: [6.41, 2.28, 1.54, 1.88] },
+  };
+
+  let BASE = '';
+  const asset = (p) => BASE + 'assets/' + p;
+  const audioUrl = (key) => BASE + 'audio/' + key + '.mp3';
+
+  function img(src, r, extra) {
+    extra = extra || {};
+    const cls = extra.cls ? ' class="' + extra.cls + '"' : '';
+    const dat = extra.choice ? ' data-choice="' + extra.choice + '"' : '';
+    return '<img src="' + src + '"' + cls + dat + ' draggable="false" style="position:absolute;left:' + px(r[0]) + ';top:' + py(r[1]) +
+      ';width:' + px(r[2]) + ';height:' + py(r[3]) + ';">';
+  }
+  function layer(name) {
+    return '<img src="' + asset('layers/' + name + '.png') + '" draggable="false" style="position:absolute;left:0;top:0;width:100%;height:100%;">';
+  }
+  function fitRect(iconName, slot) {
+    const s = ICON[iconName]; const ar = s[0] / s[1];
+    let w = slot.w, h = w / ar;
+    if (h > slot.h) { h = slot.h; w = h * ar; }
+    return [slot.cx - w / 2, slot.cy - h / 2, w, h];
+  }
+  const charImg = (name, r, extra) => img(asset('characters/' + name.toLowerCase() + '.png'), r, extra);
+  const iconFile = (content, prot) => D.contents[content].kind === 'emotion' ? prot.toLowerCase() + '_' + content : D.contents[content].icon;
+
+  // ---------------------------------------------------------------- scenes
+  const SC = {
+    intro: (P) => charImg(P, G.protoIntro),
+    establish: (P, content, scene) => {
+      const c = D.contents[content]; let h = '';
+      if (scene === 'lunch room') h += img(asset('bg/lunchroom.png'), G.lunchroom);
+      else if (scene === 'playground') h += img(asset('bg/playground.png'), G.playground);
+      else h += img(asset('bg/chalkboard.png'), G.chalkboard);
+      h += layer('cloud');
+      h += charImg(P, G.protoEst);
+      if (c.kind !== 'emotion') h += img(asset('bg/desk.png'), G.desk);
+      h += img(asset('icons/' + iconFile(content, P) + '.png'), fitRect(iconFile(content, P), G.cloudSlot));
+      return h;
+    },
+    encounter: (P, C, content, told) => {
+      let h = img(asset('bg/houses.png'), G.houseL) + img(asset('bg/houses.png'), G.houseR);
+      h += charImg(P, G.protoEnc) + charImg(C, G.mateEnc) + layer('balloon');
+      const ic = iconFile(content, P); const r = fitRect(ic, G.balloonSlot);
+      h += img(asset('icons/' + ic + '.png'), r);
+      if (!told) {
+        const n = G.noSymbol; h += img(asset('layers/nosymbol.png'), [r[0] + r[2] / 2 - n / 2 - 0.22, r[1] + r[3] / 2 - n / 2, n, n]);
+      }
+      return h;
+    },
+    memcheck: (P, content, left, right) => {
+      const ic = iconFile(content, P);
+      return img(asset('bg/question.png'), G.qmark) + img(asset('icons/' + ic + '.png'), fitRect(ic, G.memSlot)) +
+        charImg(left, G.figLmem, { cls: 'zone', choice: 'left' }) + charImg(right, G.figRmem, { cls: 'zone', choice: 'right' });
+    },
+    dv: (left, right, prop, text) => {
+      let h = '';
+      if (text) h += '<div class="qtext" style="position:absolute;left:' + px(G.text[0]) + ';top:' + py(G.text[1]) + ';width:' + px(G.text[2]) + ';">' + text + '</div>';
+      if (prop === 'icecream') h += img(asset('bg/icecream.png'), G.icecream);
+      else if (prop === 'candy') h += img(asset('bg/candy.png'), G.candy);
+      else if (prop) h += img(asset('bg/' + prop + '.png'), G.prop);
+      h += charImg(left, G.figL, { cls: 'zone', choice: 'left' }) + charImg(right, G.figR, { cls: 'zone', choice: 'right' });
+      return h;
+    },
+    practiceTrio: (P, left, right) => charImg(P, G.prTrio.mid) + charImg(left, G.prTrio.left) + charImg(right, G.prTrio.right),
+    ball: (left, right, holder, text) => {
+      let h = SC.dv(left, right, null, text);
+      const f = holder === 'left' ? G.figL : G.figR;
+      h += img(asset('bg/ball.png'), [f[0] - 0.25, f[1] + 1.15, G.ball[0], G.ball[1]]);
+      return h;
+    },
+    frame: (name) => img(asset('frames/' + name + '.png'), [0, 0, SW, SH]),
+  };
+
+
+  // ---------------------------------------------------------------- narrator (lip-flap driven by audio level)
+  const Narrator = (() => {
+    const FR = ['rest', 'small', 'open', 'oh', 'grin', 'blink'];
+    const src = {}; FR.forEach((f) => { src[f] = asset('narrator/' + f + '.png'); });
+    let ctx = null, analyser = null, buf = null, connected = new WeakSet();
+    function ensureCtx() {
+      if (ctx) return true;
+      try { const AC = window.AudioContext || window.webkitAudioContext; ctx = new AC(); analyser = ctx.createAnalyser(); analyser.fftSize = 512; analyser.connect(ctx.destination); buf = new Uint8Array(analyser.fftSize); return true; }
+      catch (e) { ctx = null; return false; }
+    }
+    function attach(el) {
+      const api = { el, raf: null, blinkT: null, mode: 'idle', fallbackT: null, gotSignal: false, grinUntil: 0 };
+      if (!el) { return { talk() {}, silent() {}, react() {}, stop() {} }; }
+      const show = (f) => { if (el.dataset.f !== f) { el.dataset.f = f; el.src = src[f]; } };
+      const blink = () => { if (api.mode === 'stopped') return; const cur = el.dataset.f || 'rest'; if (cur === 'rest') { show('blink'); setTimeout(() => { if (el.dataset.f === 'blink') show('rest'); }, 140); } api.blinkT = setTimeout(blink, 2200 + Math.random() * 2800); };
+      api.blinkT = setTimeout(blink, 1500 + Math.random() * 2000);
+      let level = 0, last = 0;
+      const pick = (v) => (v < 0.02 ? 'rest' : v < 0.06 ? 'small' : v < 0.12 ? 'open' : 'oh');
+      const loop = (t) => {
+        if (api.mode !== 'talk') return;
+        if (t - last > 70) {
+          last = t;
+          let v = 0;
+          if (analyser && api.el) { analyser.getByteTimeDomainData(buf); let s = 0; for (let i = 0; i < buf.length; i += 4) { const d = (buf[i] - 128) / 128; s += d * d; } v = Math.sqrt(s / (buf.length / 4)); if (v > 0.01) api.gotSignal = true; }
+          if (!api.gotSignal && t - api.talkStart > 700) v = [0.01, 0.04, 0.09, 0.15][Math.floor(Math.random() * 4)];   // no analyser signal (CORS/autoplay) -> random flap
+          level = level * 0.4 + v * 0.6;
+          if (t < api.grinUntil) show('grin'); else if (el.dataset.f !== 'blink') show(pick(level));
+        }
+        api.raf = requestAnimationFrame(loop);
+      };
+      api.talk = (audio) => {
+        api.mode = 'talk'; api.talkStart = performance.now(); api.gotSignal = false;
+        if (ensureCtx()) { try { if (ctx.state === 'suspended') ctx.resume(); if (!connected.has(audio)) { ctx.createMediaElementSource(audio).connect(analyser); connected.add(audio); } } catch (e) { /* fall back to random flap */ } }
+        if (api.raf) cancelAnimationFrame(api.raf); api.raf = requestAnimationFrame(loop);
+      };
+      api.silent = () => { api.mode = 'idle'; if (api.raf) cancelAnimationFrame(api.raf); api.raf = null; show('rest'); };
+      api.react = () => { api.grinUntil = performance.now() + 1200; show('grin'); setTimeout(() => { if (api.mode !== 'talk' && el.dataset.f === 'grin') show('rest'); }, 1200); };
+      api.stop = () => { api.mode = 'stopped'; if (api.raf) cancelAnimationFrame(api.raf); if (api.blinkT) clearTimeout(api.blinkT); };
+      return api;
+    }
+    return { attach, frames: FR };
+  })();
+
+  // ---------------------------------------------------------------- plugin
+  const CSS = `
+  .omit3-stage{position:relative;background:#fff;width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;margin:0 auto;overflow:hidden;container-type:inline-size;user-select:none;}
+  .omit3-wrap{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;}
+  .omit3-stage .qtext{font-family:Arial,Helvetica,sans-serif;font-size:2.5cqw;color:#333;line-height:1.15;}
+  .omit3-stage .zone{opacity:1;transition:transform .12s;}
+  .omit3-stage.ready .zone{cursor:pointer;}
+  .omit3-stage.ready .zone:hover{transform:scale(1.06);}
+  .omit3-stage .zone.chosen{outline:0.6cqw solid #f5b400;outline-offset:0.4cqw;border-radius:1cqw;}
+  .omit3-stage .zone.dim{opacity:.35;}
+  .omit3-narrator{position:absolute;pointer-events:none;}
+  .omit3-next{position:absolute;right:18cqw;bottom:2cqw;font:600 2.4cqw Arial,sans-serif;padding:.9cqw 2.4cqw;border-radius:1.2cqw;border:0;background:#2f6fd6;color:#fff;cursor:pointer;display:none;}
+  .omit3-replay{position:absolute;left:2cqw;bottom:2cqw;font:2cqw Arial,sans-serif;padding:.6cqw 1.4cqw;border-radius:1cqw;border:1px solid #bbb;background:#fff;color:#555;cursor:pointer;display:none;}
+  `;
+  let cssInjected = false;
+
+  class Omit3ScenePlugin {
+    static info = {
+      name: 'omit3-scene',
+      parameters: {
+        scene: { type: 'STRING', default: '' },
+        audio: { type: 'STRING', default: null },        // narration key
+        choices: { type: 'BOOL', default: false },        // left/right zones in the scene
+        correct: { type: 'STRING', default: null },       // 'left' | 'right' for training items
+        wrong_audio: { type: 'STRING', default: null },
+        right_audio: { type: 'STRING', default: null },
+        why: { type: 'BOOL', default: false },
+        why_audio: { type: 'STRING', default: 'why' },
+        auto_advance_ms: { type: 'INT', default: 900 },
+        show_next: { type: 'BOOL', default: false },      // parent must press Next (no choices)
+        min_ms: { type: 'INT', default: 0 },
+        narrator: { type: 'BOOL', default: true },
+      },
+    };
+    constructor(jsPsych) { this.jsPsych = jsPsych; }
+    trial(display, trial) {
+      const jsPsych = this.jsPsych;
+      if (!cssInjected) { const s = document.createElement('style'); s.textContent = CSS; document.head.appendChild(s); cssInjected = true; }
+      const narrHtml = trial.narrator ? '<img class="omit3-narrator" src="' + asset('narrator/rest.png') + '" style="left:' + px(G.narrator[0]) + ';top:' + py(G.narrator[1]) + ';width:' + px(G.narrator[2]) + ';height:' + py(G.narrator[3]) + ';">' : '';
+      display.innerHTML = '<div class="omit3-wrap"><div class="omit3-stage">' + trial.scene + narrHtml +
+        '<button class="omit3-replay">&#9654; hear again</button><button class="omit3-next">Next &#8250;</button></div></div>';
+      const narr = Narrator.attach(display.querySelector('.omit3-narrator'));
+      const stage = display.querySelector('.omit3-stage');
+      const nextBtn = display.querySelector('.omit3-next');
+      const replayBtn = display.querySelector('.omit3-replay');
+      const t0 = performance.now();
+      const data = { choice: null, rt: null, attempts: 0, audio_ok: null, audio_key: trial.audio };
+      let readyAt = null, finished = false, audio = null, timer = null;
+
+      const finish = () => {
+        if (finished) return; finished = true;
+        if (audio) { audio.pause(); audio = null; }
+        if (timer) clearTimeout(timer);
+        narr.stop();
+        display.innerHTML = '';
+        jsPsych.finishTrial(data);
+      };
+      const play = (key, onEnd) => {
+        if (audio) { audio.pause(); }
+        if (!key) { onEnd && onEnd(); return; }
+        audio = new Audio(); audio.crossOrigin = 'anonymous'; audio.src = audioUrl(key);
+        let done = false;
+        const end = (ok) => { if (done) return; done = true; narr.silent(); if (data.audio_ok === null) data.audio_ok = ok; onEnd && onEnd(ok); };
+        narr.talk(audio);
+        audio.addEventListener('ended', () => end(true));
+        audio.addEventListener('error', () => end(false));
+        const p = audio.play();
+        if (p && p.catch) p.catch(() => end(false));
+      };
+      const afterNarration = (ok) => {
+        replayBtn.style.display = 'block';
+        if (trial.choices) {
+          stage.classList.add('ready'); readyAt = performance.now();
+        } else if (trial.show_next || !ok) {
+          nextBtn.style.display = 'block';
+        } else {
+          const wait = Math.max(trial.auto_advance_ms, trial.min_ms - (performance.now() - t0));
+          timer = setTimeout(finish, wait);
+        }
+      };
+      replayBtn.addEventListener('click', () => { if (trial.audio) play(trial.audio, () => {}); });
+      nextBtn.addEventListener('click', finish);
+
+      if (trial.choices) {
+        stage.querySelectorAll('.zone').forEach((z) => {
+          z.addEventListener('click', () => {
+            if (!stage.classList.contains('ready') || finished) return;
+            const side = z.dataset.choice;
+            data.attempts += 1;
+            if (trial.correct && side !== trial.correct) {
+              data.wrong_first = data.wrong_first || side;
+              if (data.attempts >= 3) { data.choice = side; data.rt = Math.round(performance.now() - readyAt); finish(); return; }
+              stage.classList.remove('ready');
+              play(trial.wrong_audio, () => { stage.classList.add('ready'); });
+              return;
+            }
+            data.choice = side; data.rt = Math.round(performance.now() - readyAt);
+            stage.classList.remove('ready');
+            stage.querySelectorAll('.zone').forEach((o) => o.classList.add(o === z ? 'chosen' : 'dim'));
+            narr.react();
+            const after = () => { if (trial.why) { play(trial.why_audio, () => { nextBtn.style.display = 'block'; }); } else { timer = setTimeout(finish, 600); } };
+            if (trial.correct && trial.right_audio) play(trial.right_audio, after); else after();
+          });
+        });
+      }
+      // small delay so images paint before narration starts
+      setTimeout(() => play(trial.audio, afterNarration), 350);
+    }
+  }
+
+  // ---------------------------------------------------------------- timeline
+  function buildTimeline(jsPsych, opts) {
+    opts = opts || {};
+    BASE = opts.baseUrl || '';
+    const vkey = opts.version || jsPsych.randomization.sampleWithoutReplacement(Object.keys(D.versions), 1)[0];
+    const V = D.versions[vkey];
+    const why = opts.why !== undefined ? opts.why : true;   // ask Why? on the three DVs
+    const T = [];
+    const common = { version: vkey };
+
+    const scene = (p) => Object.assign({ type: Omit3ScenePlugin }, p, { data: Object.assign({}, common, p.data || {}) });
+
+    // framing
+    T.push(scene({ scene: SC.frame('welcome'), audio: 'fr_welcome', show_next: true, data: { item: 'welcome' } }));
+
+    // practice
+    const PR = D.practice;
+    const bestLeft = V.practice_best_side === 'left';
+    const pL = bestLeft ? PR.best : PR.friend, pR = bestLeft ? PR.friend : PR.best;
+    const ballSide = (V.practice_ball === 'friend') === bestLeft ? 'right' : 'left';
+    const prData = (item) => ({ block: 'practice', item: item, left: pL, right: pR, best_side: bestLeft ? 'left' : 'right' });
+    T.push(scene({ scene: SC.intro(PR.prot), audio: 'pr_intro', data: prData('intro') }));
+    T.push(scene({ scene: SC.practiceTrio(PR.prot, pL, pR), audio: bestLeft ? 'pr_friends_bestleft' : 'pr_friends_bestright', data: prData('friends') }));
+    T.push(scene({ scene: SC.ball(pL, pR, ballSide, 'Which one is holding a ball?'), audio: 'pr_ball', choices: true,
+      correct: ballSide, wrong_audio: 'pr_ball_wrong', right_audio: 'pr_ball_right', data: Object.assign(prData('ball'), { correct_side: ballSide }) }));
+    T.push(scene({ scene: SC.dv(pL, pR, 'juicebox', 'Who would ' + PR.prot + ' want to share a juice box with one straw with?'), audio: 'pr_juice', choices: true, why: why, data: prData('juice') }));
+    T.push(scene({ scene: SC.dv(pL, pR, 'cookies', 'Who would ' + PR.prot + ' want to share cookies with?'), audio: 'pr_cookies', choices: true, why: why, data: prData('cookies') }));
+    T.push(scene({ scene: SC.frame('start'), audio: 'fr_start', data: { item: 'start' } }));
+
+    // four trials
+    V.order.forEach((t, idx) => {
+      const d = D.trials[t]; const P = d.prot;
+      let hi = d.hi, lo = d.lo;
+      if (t === 'PF') { hi = V.pf_fav === 'owl' ? 'owl_fav' : 'rabbit_fav'; lo = V.pf_fav === 'owl' ? 'rabbit' : 'owl'; }
+      const hiTo = V.hi_to[t];                       // 1 or 2
+      const hiName = hiTo === 1 ? d.c1 : d.c2;
+      const base = { block: 'trial', position: idx + 1, trial: t, protagonist: P, left: d.c1, right: d.c2,
+        hi_content: hi, lo_content: lo, hi_told_to: hiTo, hi_classmate: hiName, recording: hiTo === 1 ? 'A' : 'B' };
+      const tr = (p, item, extra) => scene(Object.assign(p, { data: Object.assign({ item: item }, base, extra || {}) }));
+
+      T.push(tr({ scene: SC.intro(P), audio: t + '_intro' }, 'intro'));
+      // establishing
+      let estOrder = [hi, lo];
+      let sceneOf = {};
+      if (t === 'SH') {
+        estOrder = V.sh_emotion_first === 'sad' ? ['sad', 'happy'] : ['happy', 'sad'];
+        sceneOf = { sad: V.sh_sad_scene, happy: V.sh_sad_scene === 'lunch room' ? 'playground' : 'lunch room' };
+      }
+      estOrder.forEach((c) => {
+        const key = t === 'SH' ? t + '_est_' + c + '_' + (sceneOf[c] === 'lunch room' ? 'lunch' : 'recess') : t + '_est_' + c;
+        T.push(tr({ scene: SC.establish(P, c, sceneOf[c] || 'school'), audio: key }, 'establish_' + (c === hi ? 'hi' : 'lo'),
+          { content: c, scene: sceneOf[c] || 'school' }));
+      });
+      // encounters: classmate 1 then classmate 2; told first, then not told
+      [[1, d.c1], [2, d.c2]].forEach(([ci, C]) => {
+        const told = hiTo === ci ? hi : lo, not = hiTo === ci ? lo : hi;
+        T.push(tr({ scene: SC.encounter(P, C, told, true), audio: t + '_enc' + ci + '_told_' + told }, 'enc' + ci + '_told', { classmate: C, content: told }));
+        T.push(tr({ scene: SC.encounter(P, C, not, false), audio: t + '_enc' + ci + '_nottold_' + not }, 'enc' + ci + '_nottold', { classmate: C, content: not }));
+      });
+      // memory checks: higher rung first, then lower
+      T.push(tr({ scene: SC.memcheck(P, hi, d.c1, d.c2), audio: t + '_mem_' + hi, choices: true }, 'mem_hi', { content: hi, correct_side: hiTo === 1 ? 'left' : 'right' }));
+      T.push(tr({ scene: SC.memcheck(P, lo, d.c1, d.c2), audio: t + '_mem_' + lo, choices: true }, 'mem_lo', { content: lo, correct_side: hiTo === 1 ? 'right' : 'left' }));
+      // DVs
+      T.push(tr({ scene: SC.dv(d.c1, d.c2, null, 'Who do you think ' + P + ' is better friends with?'), audio: t + '_dv_friend', choices: true, why: why }, 'friend'));
+      T.push(tr({ scene: SC.dv(d.c1, d.c2, 'icecream', null), audio: t + '_dv_icecream', choices: true, why: why }, 'icecream'));
+      T.push(tr({ scene: SC.dv(d.c1, d.c2, 'candy', null), audio: t + '_dv_candy', choices: true, why: why }, 'candy'));
+    });
+
+    T.push(scene({ scene: SC.frame('alldone'), audio: 'fr_done', show_next: true, data: { item: 'done' } }));
+
+    // derived fields on every choice trial
+    T.forEach((tr) => {
+      if (!tr.choices) return;
+      tr.on_finish = (data) => {
+        if (data.choice) {
+          data.choice_name = data.choice === 'left' ? data.left : data.right;
+          if (data.hi_classmate) data.chose_hi = data.choice_name === data.hi_classmate ? 1 : 0;
+          if (data.best_side) data.chose_best = data.choice === data.best_side ? 1 : 0;
+          if (data.correct_side) data.correct = data.choice === data.correct_side ? 1 : 0;
+        }
+      };
+    });
+    return { timeline: T, version: vkey };
+  }
+
+  // asset lists for preloading
+  function assetLists() {
+    const imgs = [];
+    const add = (p) => imgs.push(asset(p));
+    ['casey', 'percy', 'kendall', 'jamie', 'sam', 'blake', 'morgan', 'avery', 'orin', 'riley', 'cameron', 'elliot', 'parker', 'quinn', 'rowan'].forEach((c) => add('characters/' + c + '.png'));
+    Object.keys(ICON).forEach((i) => add('icons/' + i + '.png'));
+    ['lunchroom', 'playground', 'chalkboard', 'desk', 'houses', 'question', 'icecream', 'candy', 'ball', 'juicebox', 'cookies'].forEach((b) => add('bg/' + b + '.png'));
+    ['welcome', 'about', 'start', 'alldone'].forEach((f) => add('frames/' + f + '.png'));
+    ['cloud', 'balloon', 'nosymbol'].forEach((l) => add('layers/' + l + '.png'));
+    Narrator.frames.forEach((f) => add('narrator/' + f + '.png'));
+    const audio = Object.keys(D.narration).map(audioUrl);
+    return { images: imgs, audio: audio };
+  }
+
+  global.OMIT3 = { buildTimeline, assetLists, Omit3ScenePlugin, scenes: SC, setBase: (b) => { BASE = b; } };
+})(typeof window !== 'undefined' ? window : globalThis);

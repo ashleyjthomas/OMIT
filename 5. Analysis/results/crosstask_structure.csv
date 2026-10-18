@@ -1,0 +1,2 @@
+set,n,r_closeness_matched,r_cross_level,difference,boot_CI_low,boot_CI_high,p_diff_gt_0
+Set B/C,102,0.411,0.14,0.272,0.103,0.451,0.999

@@ -444,6 +444,212 @@ SX |>
   kable(caption = "Table S12. Exploratory gender effects: posterior estimates for the child's gender and its interaction with emotion, by study (probit scale; reference = girls, happy condition).")
 ```
 
+# Cross-task relations within each sample
+
+```{r}
+#| label: setup-crosstask
+#| include: false
+CTC <- read_csv(file.path(res, "crosstask_consistency.csv"),  show_col_types = FALSE)
+CTL <- read_csv(file.path(res, "crosstask_loo.csv"),          show_col_types = FALSE)
+CTR <- read_csv(file.path(res, "crosstask_correlations.csv"), show_col_types = FALSE)
+CTS <- read_csv(file.path(res, "crosstask_structure.csv"),    show_col_types = FALSE)
+CTG <- read_csv(file.path(res, "crosstask_gradient.csv"),     show_col_types = FALSE)
+CTI <- read_csv(file.path(res, "crosstask_circles.csv"),      show_col_types = FALSE)
+
+# format a Bayes factor: whole number (comma-grouped) when large (>= 10),
+# two decimals when small (matches fmt_bf() in OMIT_manuscript.qmd)
+fbf <- function(x) if (x >= 10) formatC(round(x), format = "d", big.mark = ",") else sprintf("%.2f", x)
+
+ct_task_lab <- c(better_friend = "better friend (S1)", ice_cream = "ice cream (S1)",
+                 candy = "candy (S1)", create = "create (S3A)", friend = "friend (S2)",
+                 bestfriend = "best friend (S2)", deepen = "deepen (S3B)",
+                 mom = "own mother", friendmom = "friend's mother")
+
+# sd(ID) / ICC for one row of crosstask_consistency.csv
+ct_sd <- function(st, mod = "item + (1|ID)") {
+  r <- dplyr::filter(CTC, set == st, model == mod)
+  sprintf("*SD* = %.2f, 95%% CI [%.2f, %.2f]; ICC = %.2f, 95%% CI [%.2f, %.2f]",
+          r$sd_child, r$sd_CI_low, r$sd_CI_high, r$ICC, r$ICC_CI_low, r$ICC_CI_high)
+}
+# r, CI and BF for one task pair
+ct_r <- function(st, a, b) {
+  r <- dplyr::filter(CTR, set == st,
+                     (task1 == a & task2 == b) | (task1 == b & task2 == a))
+  sprintf("*r* = %.2f, 95%% CI [%.2f, %.2f], BF~10~ = %s",
+          r$r, r$CI_low, r$CI_high, fbf(r$BF10))
+}
+ct_loo <- function(st) {
+  r <- dplyr::filter(CTL, set == st)
+  sprintf("$\\Delta$elpd = %.1f, *SE* = %.1f", r$elpd_gain, r$se_diff)
+}
+```
+
+Because every child completed all of the studies in their set (Set A:
+Studies 1, 3.A, and 4.A; Set B/C: Studies 2, 3.B, and 4.B), we can ask
+how an individual child's answers relate *across* tasks. These analyses
+were not pre-registered and we report them as exploratory. Two features
+of the design limit their precision: each task contributes only two
+trials per child (one in the sad and one in the happy condition), so
+task-level scores are measured with substantial error and the
+correlations below are attenuated lower bounds; and the analyses are
+restricted to children, since only the child samples completed a full
+set of tasks in one session.
+
+The hypothesis these analyses bear on is that disclosing sadness signals
+an already-close relationship. We therefore restrict the Set A analyses
+to the five measures that ask about an existing tie (the three Study 1
+measures and the two Study 4.A relationships) and set Study 3.A aside,
+because it asks about disclosure to someone who is not yet a friend.
+Study 3.B is retained in Set B/C: it also concerns relationship
+formation, but about an existing friendship the protagonist wants to
+grow closer to, which makes its relation to the established-tie measures
+informative rather than off-topic. This is a decision about which
+constructs belong together, taken on the same grounds as the main text's
+framing and not from inspecting the correlations.
+
+## A stable child-level tendency spans the tasks
+
+We first asked whether there is any reliable child-level variation that
+carries across tasks. For each sample we fit a probit mixed model over
+every binary item in the set, with an intercept for each item and a
+participant random intercept (`chose_emotion ~ item + (1 | ID)`). The
+item intercepts absorb each task's own difficulty, so the estimated
+`sd(ID)` reflects only the tendency that generalises across tasks
+(because the residual variance of a probit model is fixed at 1, the
+implied intraclass correlation is $SD^2 / (SD^2 + 1)$).
+
+In both samples this variance was clearly greater than zero --- Set A:
+`r ct_sd("Set A")`; Set B/C: `r ct_sd("Set B/C")`. Leave-one-out
+cross-validation preferred the model with the participant term over an
+otherwise identical model without it in both samples (Set A:
+`r ct_loo("Set A")`; Set B/C: `r ct_loo("Set B/C")`). Adding mean-centred
+age left the estimate essentially unchanged (Set A:
+`r ct_sd("Set A", "item + age + (1|ID)")`; Set B/C:
+`r ct_sd("Set B/C", "item + age + (1|ID)")`), so this is not simply a
+by-product of the age range. Children therefore differ reliably from one
+another in a way that is not specific to a single task.
+
+```{r}
+#| label: tbl-ct-consistency
+#| echo: false
+CTC |>
+  mutate(Sample = set, Model = model,
+         `SD (child)` = sprintf("%.2f [%.2f, %.2f]", sd_child, sd_CI_low, sd_CI_high),
+         ICC = sprintf("%.2f [%.2f, %.2f]", ICC, ICC_CI_low, ICC_CI_high),
+         `Max R-hat` = max_Rhat, `Min ESS` = min_ESS, Divergences = n_divergent) |>
+  select(Sample, Model, `SD (child)`, ICC, `Max R-hat`, `Min ESS`, Divergences) |>
+  kable(caption = "Table S13. Cross-task consistency: posterior median and 95% credible interval for the participant-level SD (probit scale) and the implied intraclass correlation, from models that include a separate intercept for every item.")
+```
+
+## The consistency is graded by relationship closeness
+
+A single cross-task tendency could simply mean that some children like
+to pick the emotion whatever they are asked. The pattern of pairwise
+correlations argues against that reading (@fig-crosstask; Table S14).
+Set B/C contains four relationship items: a protagonist disclosing to a
+best friend or to a friend (Study 2), and a mother or a friend's mother
+disclosing to the protagonist (Study 4.B). The direction of disclosure
+differs between the two studies, but two of the four items concern a
+close relationship (best friend, own mother) and two concern a more
+distant one (friend, friend's mother).
+
+What predicted a child's answer about one item was how close that
+*relationship* was, not which study the question came from. The two
+close relationships went together --- a child who expected the best
+friend to be told the emotion also expected the mother to tell her own
+child (`r ct_r("Set B/C", "bestfriend", "mom")`) --- as did the two more
+distant ones (friend and friend's mother,
+`r ct_r("Set B/C", "friend", "friendmom")`), whereas a
+closeness-mismatched pair was unrelated (friend and own mother,
+`r ct_r("Set B/C", "friend", "mom")`). Averaging the two
+closeness-matched correlations against the two mismatched ones, the
+difference was `r sprintf("%.2f", CTS$difference)`, bootstrap 95% CI
+[`r sprintf("%.2f", CTS$boot_CI_low)`,
+`r sprintf("%.2f", CTS$boot_CI_high)`]. The individual difference is
+therefore better described as a view about how close a relationship has
+to be before emotions are shared than as a preference for the emotion
+option as such.
+
+This is a gradient rather than a categorical split: the other mismatched
+pair (best friend and friend's mother,
+`r ct_r("Set B/C", "bestfriend", "friendmom")`) was not flat. It is also
+a single result, which can equivalently be written as the correlation
+between the steepness of each child's peer gradient (best friend minus
+friend) and of their parent gradient (own mother minus friend's mother),
+`r sprintf("r = %.2f, 95%% CI [%.2f, %.2f], BF~10~ = %s", CTG$r, CTG$CI_low, CTG$CI_high, fbf(CTG$BF10))`.
+That correlation is algebraically the same quantity as the contrast
+above --- the covariance of the two difference scores expands to exactly
+the matched minus the mismatched covariances --- so the two are one
+finding in two forms, not independent evidence for it.
+
+Consistent with the main text's conclusion that emotional disclosure
+marks *existing* closeness rather than builds it, Study 3.B --- the one
+task about growing closer to a friend rather than reading an established
+tie --- sat apart from Study 2: a child's deepen response was unrelated
+to their best-friend response (`r ct_r("Set B/C", "deepen", "bestfriend")`).
+
+Relations in Set A were weaker throughout, as expected with the smaller
+sample. The clearest were the two Study 1 measures that bear most
+directly on the hypothesis: children who chose the emotion-told
+classmate as the better friend also chose that classmate to share the
+single ice cream cone with
+(`r ct_r("Set A", "better_friend", "ice_cream")`), the item that requires
+physical intimacy, and to share the partitionable candy with
+(`r ct_r("Set A", "better_friend", "candy")`). Notably, the two
+food-sharing items were themselves unrelated
+(`r ct_r("Set A", "ice_cream", "candy")`), so each tracked the closeness
+judgement independently of the other rather than forming a single
+sharing factor.
+
+```{r}
+#| label: fig-crosstask
+#| echo: false
+#| out-width: "100%"
+#| fig-cap: "Pairwise Pearson correlations among per-child task scores (number of emotion choices across a task's sad and happy trials, 0–2), within each child sample. Warm cells are positive, cool cells negative. In Set B/C the strongest relations link targets that are matched on closeness (best friend with own mother; friend with friend's mother) rather than tasks that came from the same study."
+knitr::include_graphics(file.path(fig_dir, "crosstask.png"))
+```
+
+```{r}
+#| label: tbl-ct-cor
+#| echo: false
+CTR |>
+  mutate(Sample = set,
+         `Task 1` = recode(task1, !!!ct_task_lab),
+         `Task 2` = recode(task2, !!!ct_task_lab),
+         r = sprintf("%.2f [%.2f, %.2f]", r, CI_low, CI_high),
+         `r (age partialled)` = sprintf("%.2f", r_partial_age),
+         BF10 = sapply(BF10, fbf)) |>
+  select(Sample, `Task 1`, `Task 2`, n, r, `r (age partialled)`, BF10) |>
+  kable(caption = "Table S14. Pairwise correlations among per-child task scores within each sample, ordered by absolute size. Bayes factors are JZS default-prior BF10 for a non-zero correlation. Partial correlations hold mean-centred age constant.")
+```
+
+## Convergent validity of the Study 1 measures
+
+Set A also lets us check the two Study 1 response formats against each
+other on the same trial. After hearing which classmate was told the
+emotion, children both chose a better friend (binary) and rated each
+classmate's closeness on the six-step circles scale. The two agreed: in
+the sad condition, children who picked the emotion-told classmate as the
+better friend also gave that classmate a closeness rating
+`r sprintf("%.2f points higher, 95%% CI [%.2f, %.2f]", CTI$median[CTI$model == "crosstask_circles_sad" & CTI$term == "b_better_friend_sad"], CTI$CI_low[CTI$model == "crosstask_circles_sad" & CTI$term == "b_better_friend_sad"], CTI$CI_high[CTI$model == "crosstask_circles_sad" & CTI$term == "b_better_friend_sad"])`
+on the reverse-scored circles scale. In the happy condition the estimate
+was in the same direction but smaller and not credible by our criterion,
+`r sprintf("%.2f, 95%% CI [%.2f, %.2f]", CTI$median[CTI$model == "crosstask_circles_happy" & CTI$term == "b_better_friend_happy"], CTI$CI_low[CTI$model == "crosstask_circles_happy" & CTI$term == "b_better_friend_happy"], CTI$CI_high[CTI$model == "crosstask_circles_happy" & CTI$term == "b_better_friend_happy"])`.
+Within the sad condition, then, two very different response formats
+tracked the same underlying judgement within a child --- the same
+condition in which the group-level Study 1 effect is found.
+
+```{r}
+#| label: tbl-ct-circles
+#| echo: false
+CTI |>
+  filter(grepl("^b_better_friend", term)) |>
+  mutate(Condition = ifelse(grepl("sad", model), "Sad", "Happy"),
+         `95% CI` = sprintf("[%.2f, %.2f]", CI_low, CI_high)) |>
+  select(Condition, Median = median, `95% CI`, `% in ROPE` = pct_in_ROPE, pd) |>
+  kable(caption = "Table S15. Set A convergent validity: difference in the circles closeness rating (emotion-told minus fact-told classmate, reverse-scored so higher = closer) between children who did and did not choose the emotion-told classmate as the better friend, by condition.")
+```
+
 # References
 
 ::: {#refs}

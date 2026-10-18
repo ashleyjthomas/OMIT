@@ -1,0 +1,3 @@
+set,elpd_gain,se_diff,favours
+Set A,10.5,5,item + (1|ID)
+Set B/C,40.2,8.8,item + (1|ID)

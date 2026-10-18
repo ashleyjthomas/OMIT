@@ -1,0 +1,5 @@
+set,model,sd_child,sd_CI_low,sd_CI_high,ICC,ICC_CI_low,ICC_CI_high,max_Rhat,min_ESS,n_divergent
+Set A,item + (1|ID),0.434,0.265,0.638,0.159,0.065,0.289,1.001,2679,0
+Set A,item + age + (1|ID),0.422,0.236,0.622,0.151,0.053,0.279,1.001,2649,0
+Set B/C,item + (1|ID),0.538,0.41,0.686,0.225,0.144,0.32,1.001,2644,0
+Set B/C,item + age + (1|ID),0.544,0.413,0.696,0.229,0.146,0.326,1.002,2367,0
