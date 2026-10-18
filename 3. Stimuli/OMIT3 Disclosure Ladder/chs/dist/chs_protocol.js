@@ -424,7 +424,7 @@ const timeline = [];
 
 // ── STUDY PARAMETERS ──────────────────────────────────────────────────
 // Stimuli are served from the lab GitHub (raw). Change BASE_URL if hosting moves.
-const BASE_URL = "https://raw.githubusercontent.com/ashleyjthomas/OMIT3-CHS/main/";
+const BASE_URL = "https://raw.githubusercontent.com/ashleyjthomas/OMIT/main/3.%20Stimuli/OMIT3%20Disclosure%20Ladder/chs/";
 const chsid = new URLSearchParams(window.location.search).get('response_uuid') || '';
 
 // Version V1–V8 drawn at random for each session (see OMIT3_counterbalance_spec.md).
