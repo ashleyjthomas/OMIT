@@ -21,40 +21,45 @@
     lunchroom: [0.18, 0.25, 7.93, 4.24],
     playground: [0.29, 0.15, 6.77, 4.24],
     cloudSlot: { cx: 6.07, cy: 2.27, w: 1.00, h: 0.78 },
-    houseL: [0.68, 0.45, 2.64, 2.64],
-    houseR: [6.43, 0.54, 2.64, 2.64],
-    protoEnc: [2.80, 2.57, 1.57, 1.92],
-    mateEnc: [5.40, 2.60, 1.57, 1.92],
-    balloonSlot: { cx: 4.53, cy: 2.51, w: 1.00, h: 0.80 },
+    houseL: [0.80, 0.45, 2.64, 2.64],
+    houseR: [6.55, 0.54, 2.64, 2.64],
+    protoEnc: [2.92, 2.57, 1.57, 1.92],
+    mateEnc: [5.52, 2.60, 1.57, 1.92],
+    balloonSlot: { cx: 4.65, cy: 2.51, w: 1.00, h: 0.80 },
     noSymbol: 0.58,
     narrator: [8.30, 3.40, 1.52, 2.14],   // bottom-right corner, clear of every scene element
-    figL: [2.23, 2.28, 1.54, 1.88],
-    figR: [5.51, 2.28, 1.54, 1.88],
-    figLmem: [2.23, 2.95, 1.54, 1.88],
-    figRmem: [5.51, 2.95, 1.54, 1.88],
+    figL: [2.59, 2.28, 1.54, 1.88],
+    figR: [5.87, 2.28, 1.54, 1.88],
+    figLmem: [2.59, 2.95, 1.54, 1.88],
+    figRmem: [5.87, 2.95, 1.54, 1.88],
     qmark: [4.30, 0.10, 1.40, 1.40],
     memSlot: { cx: 5.00, cy: 2.15, w: 1.60, h: 1.10 },
-    text: [2.55, 1.01, 4.49, 0.50],
-    icecream: [3.77, 3.03, 1.76, 1.76],
-    candy: [4.01, 2.57, 1.42, 1.42],
-    prop: [3.77, 3.03, 1.76, 1.76],
+    text: [1.50, 0.95, 7.00, 0.50],
+    icecream: [4.12, 3.03, 1.76, 1.76],
+    candy: [4.29, 2.57, 1.42, 1.42],
+    prop: [4.12, 3.03, 1.76, 1.76],
     ball: [0.72, 0.72],
-    prTrio: { mid: [4.03, 1.85, 1.54, 1.88], left: [1.65, 2.28, 1.54, 1.88], right: [6.41, 2.28, 1.54, 1.88] },
+    prTrio: { mid: [4.23, 1.85, 1.54, 1.88], left: [1.85, 2.28, 1.54, 1.88], right: [6.61, 2.28, 1.54, 1.88] },
   };
 
   let BASE = '';
   const asset = (p) => BASE + 'assets/' + p;
   const audioUrl = (key) => BASE + 'audio/' + key + '.mp3';
 
+  // Every element carries a key (asset + slot). On a new page, elements whose key was not on the
+  // previous page animate in (characters slide, bubbles/icons pop, backgrounds fade); unchanged ones stay put.
   function img(src, r, extra) {
     extra = extra || {};
     const cls = extra.cls ? ' class="' + extra.cls + '"' : '';
     const dat = extra.choice ? ' data-choice="' + extra.choice + '"' : '';
-    return '<img src="' + src + '"' + cls + dat + ' draggable="false" style="position:absolute;left:' + px(r[0]) + ';top:' + py(r[1]) +
+    const kind = extra.kind || (src.indexOf('/characters/') >= 0 ? 'char' : src.indexOf('/icons/') >= 0 || src.indexOf('nosymbol') >= 0 ? 'pop' : 'fade');
+    const key = src.replace(/^.*assets\//, '') + '@' + r[0].toFixed(2) + ',' + r[1].toFixed(2);
+    return '<img src="' + src + '"' + cls + dat + ' data-k="' + key + '" data-kind="' + kind + '" draggable="false" style="position:absolute;left:' + px(r[0]) + ';top:' + py(r[1]) +
       ';width:' + px(r[2]) + ';height:' + py(r[3]) + ';">';
   }
   function layer(name) {
-    return '<img src="' + asset('layers/' + name + '.png') + '" draggable="false" style="position:absolute;left:0;top:0;width:100%;height:100%;">';
+    const dx = name === 'balloon' ? px(0.12) : '0';
+    return '<img src="' + asset('layers/' + name + '.png') + '" data-k="layer:' + name + '" data-kind="pop" draggable="false" style="position:absolute;left:' + dx + ';top:0;width:100%;height:100%;">';
   }
   function fitRect(iconName, slot) {
     const s = ICON[iconName]; const ar = s[0] / s[1];
@@ -161,17 +166,29 @@
   const CSS = `
   .omit3-stage{position:relative;background:#fff;width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;margin:0 auto;overflow:hidden;container-type:inline-size;user-select:none;}
   .omit3-wrap{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;}
-  .omit3-stage .qtext{font-family:Arial,Helvetica,sans-serif;font-size:2.5cqw;color:#333;line-height:1.15;}
+  .omit3-stage .qtext{font-family:Arial,Helvetica,sans-serif;font-size:2.5cqw;color:#333;line-height:1.15;text-align:center;}
   .omit3-stage .zone{opacity:1;transition:transform .12s;}
   .omit3-stage.ready .zone{cursor:pointer;}
   .omit3-stage.ready .zone:hover{transform:scale(1.06);}
   .omit3-stage .zone.chosen{outline:0.6cqw solid #f5b400;outline-offset:0.4cqw;border-radius:1cqw;}
   .omit3-stage .zone.dim{opacity:.35;}
   .omit3-narrator{position:absolute;pointer-events:none;}
+  @keyframes o3-slideL{from{transform:translateX(-70cqw);opacity:0}to{transform:none;opacity:1}}
+  @keyframes o3-slideR{from{transform:translateX(70cqw);opacity:0}to{transform:none;opacity:1}}
+  @keyframes o3-pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.12);opacity:1}100%{transform:none}}
+  @keyframes o3-fade{from{opacity:0}to{opacity:1}}
+  .omit3-stage .o3-enter-L{animation:o3-slideL .7s cubic-bezier(.2,.8,.3,1) backwards;}
+  .omit3-stage .o3-enter-R{animation:o3-slideR .7s cubic-bezier(.2,.8,.3,1) backwards;}
+  .omit3-stage .o3-enter-pop{animation:o3-pop .45s ease-out backwards;}
+  .omit3-stage .o3-enter-fade{animation:o3-fade .5s ease-out backwards;}
   .omit3-next{position:absolute;right:18cqw;bottom:2cqw;font:600 2.4cqw Arial,sans-serif;padding:.9cqw 2.4cqw;border-radius:1.2cqw;border:0;background:#2f6fd6;color:#fff;cursor:pointer;display:none;}
+  .omit3-why{position:absolute;left:50%;bottom:2cqw;transform:translateX(-50%);width:52cqw;display:none;background:rgba(255,255,255,.96);border:1px solid #ccc;border-radius:1.2cqw;padding:1cqw 1.2cqw;box-shadow:0 .3cqw 1.2cqw rgba(0,0,0,.12);}
+  .omit3-why label{display:block;font:1.7cqw Arial,sans-serif;color:#444;margin-bottom:.5cqw;}
+  .omit3-why textarea{width:100%;box-sizing:border-box;height:6.5cqw;font:1.9cqw Arial,sans-serif;padding:.6cqw;border:1px solid #bbb;border-radius:.6cqw;resize:none;}
   .omit3-replay{position:absolute;left:2cqw;bottom:2cqw;font:2cqw Arial,sans-serif;padding:.6cqw 1.4cqw;border-radius:1cqw;border:1px solid #bbb;background:#fff;color:#555;cursor:pointer;display:none;}
   `;
   let cssInjected = false;
+  let prevKeys = new Set();   // element keys shown on the previous page
 
   class Omit3ScenePlugin {
     static info = {
@@ -197,11 +214,30 @@
       if (!cssInjected) { const s = document.createElement('style'); s.textContent = CSS; document.head.appendChild(s); cssInjected = true; }
       const narrHtml = trial.narrator ? '<img class="omit3-narrator" src="' + asset('narrator/rest.png') + '" style="left:' + px(G.narrator[0]) + ';top:' + py(G.narrator[1]) + ';width:' + px(G.narrator[2]) + ';height:' + py(G.narrator[3]) + ';">' : '';
       display.innerHTML = '<div class="omit3-wrap"><div class="omit3-stage">' + trial.scene + narrHtml +
+        '<div class="omit3-why"><label>Grown-ups: please type what your child said (as close to their words as you can), then press Next.</label><textarea class="omit3-whytext" autocomplete="off"></textarea></div>' +
         '<button class="omit3-replay">&#9654; hear again</button><button class="omit3-next">Next &#8250;</button></div></div>';
       const narr = Narrator.attach(display.querySelector('.omit3-narrator'));
       const stage = display.querySelector('.omit3-stage');
       const nextBtn = display.querySelector('.omit3-next');
       const replayBtn = display.querySelector('.omit3-replay');
+      // entrance animations for elements that were not on the previous page
+      let enterMs = 0; const nowKeys = new Set();
+      const els = Array.from(stage.querySelectorAll('[data-k]'));
+      const newEls = els.filter((el) => { nowKeys.add(el.dataset.k); return !prevKeys.has(el.dataset.k); });
+      const allNew = newEls.length === els.length;   // whole page changed: stagger characters a little
+      let order = 0;
+      newEls.forEach((el) => {
+        const kind = el.dataset.kind; let cls, dur;
+        if (kind === 'char') { const leftFrac = parseFloat(el.style.left) / 100; cls = leftFrac < 0.42 ? 'o3-enter-L' : 'o3-enter-R'; dur = 700; }
+        else if (kind === 'pop') { cls = 'o3-enter-pop'; dur = 450; }
+        else { cls = 'o3-enter-fade'; dur = 500; }
+        let delay = 0;
+        if (kind === 'char') { delay = allNew ? 150 + 120 * (order++) : 100; }
+        else if (kind === 'pop') { delay = allNew ? 650 : 250; }     // bubbles/icons after the characters have arrived
+        el.style.animationDelay = delay + 'ms'; el.classList.add(cls);
+        enterMs = Math.max(enterMs, delay + dur);
+      });
+      prevKeys = nowKeys;
       const t0 = performance.now();
       const data = { choice: null, rt: null, attempts: 0, audio_ok: null, audio_key: trial.audio };
       let readyAt = null, finished = false, audio = null, timer = null;
@@ -210,6 +246,7 @@
         if (finished) return; finished = true;
         if (audio) { audio.pause(); audio = null; }
         if (timer) clearTimeout(timer);
+        const ta = display.querySelector('.omit3-whytext'); if (trial.why && ta) data.why_text = ta.value.trim();
         narr.stop();
         display.innerHTML = '';
         jsPsych.finishTrial(data);
@@ -257,13 +294,13 @@
             stage.classList.remove('ready');
             stage.querySelectorAll('.zone').forEach((o) => o.classList.add(o === z ? 'chosen' : 'dim'));
             narr.react();
-            const after = () => { if (trial.why) { play(trial.why_audio, () => { nextBtn.style.display = 'block'; }); } else { timer = setTimeout(finish, 600); } };
+            const after = () => { if (trial.why) { const wb = display.querySelector('.omit3-why'); wb.style.display = 'block'; play(trial.why_audio, () => { nextBtn.style.display = 'block'; display.querySelector('.omit3-whytext').focus(); }); } else { timer = setTimeout(finish, 600); } };
             if (trial.correct && trial.right_audio) play(trial.right_audio, after); else after();
           });
         });
       }
       // small delay so images paint before narration starts
-      setTimeout(() => play(trial.audio, afterNarration), 350);
+      setTimeout(() => play(trial.audio, afterNarration), 250 + enterMs);
     }
   }
 

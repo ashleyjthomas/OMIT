@@ -42,8 +42,8 @@ memory check (higher-rung content) → memory check (lower-rung) → better frie
 
 Story pages play their narration and advance on their own (~0.9 s after the audio ends); a "hear again"
 button replays, and a Next button appears only if audio fails. Choice pages make the two characters
-clickable when the narration ends; the chosen one is highlighted; on Why? pages the parent clicks Next
-after the child answers. The ball item gives corrective feedback up to 3 attempts.
+clickable when the narration ends; the chosen one is highlighted; on Why? pages a text box appears for the parent to type the child's
+answer (saved as `why_text`; the webcam recording is the backup) before clicking Next. The ball item gives corrective feedback up to 3 attempts.
 
 A narrator character (bottom-right) lip-flaps with the audio level (Web Audio analyser; falls back to
 random flapping if the browser blocks analysis) and blinks; it grins briefly after each choice.
@@ -59,7 +59,7 @@ is new and needs sign-off), practice best-friend side and ball holder.
 Recorded per choice row: `block, position, trial, item, protagonist, left, right, hi_content, lo_content,
 hi_told_to, hi_classmate, recording, choice (left/right), choice_name, chose_hi (1 = picked the classmate told the
 higher-rung content), correct (memory checks and ball), rt (ms from when clicking was enabled), attempts,
-audio_ok`, plus practice fields `best_side, chose_best`. Story rows carry the same context with `choice = null`.
+audio_ok, why_text`, plus practice fields `best_side, chose_best`. Story rows carry the same context with `choice = null`.
 
 ## Audio to record
 
