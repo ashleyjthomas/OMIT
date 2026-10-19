@@ -38,7 +38,7 @@ fullscreen → video config → video consent → payment email → preload → 
 welcome → practice (Sam; Quinn = best friend, Rowan = friend: ball → juice box with one straw → cookies) → star 1 → "Let's get started" →
 4 trials in the version's order, each: intro → two establishing pages → classmate 1 (told, then not told) → classmate 2 (told, then not told) →
 memory check (higher-rung content) → memory check (lower-rung) → better friends with? (+Why) → single ice cream cone → candy → star →
-"All done" → **stop recording** → exit survey → debrief.
+"All done" (Finish button returns to CHS) → **stop recording** → exit survey → debrief.
 
 Story pages play their narration and advance on their own (~0.9 s after the audio ends); a "hear again"
 button replays, and a Next button appears only if audio fails. Choice pages make the two characters
@@ -54,9 +54,11 @@ random flapping if the browser blocks analysis) and blinks; it grins briefly aft
 Why? prompts are controlled by `why` in `buildTimeline` (`'friend'` = after the better-friends question only, the
 default; `'all'` = after every DV and the two practice sharing items; `'none'`).
 
-## Cartoon break
+## Dance break / cartoon break
 
-After the second story's star, a video page plays `video/mid.mp4` (with `video/mid.webm` as a codec fallback) full-stage,
+After the second story's star the narrator dances centre-stage for ~12 s (8 GPT-made frames in `assets/narrator/dance_*.png`,
+`dance: true` in the protocol). A cartoon can be added as well: pass `video: { mid: BASE_URL + 'video/mid.mp4' }` (plays after the dance)
+or `video: { end: ... }` (after the fifth star). A video page plays `video/mid.mp4` (with `video/mid.webm` as a codec fallback) full-stage,
 then advances on its own; a Skip button appears after 5 s. **`video/mid.mp4` is currently an 8-second placeholder.** Put the real
 clip there (suggested: a Caminandes short from the Blender Foundation, CC-BY — https://studio.blender.org/films/ or
 https://www.caminandes.com; 30–60 s, 720p H.264, under ~20 MB) and make the webm twin with
@@ -81,6 +83,11 @@ audio_ok, why_text`, plus practice fields `best_side, chose_best`. Story rows ca
 `audio/narration_script.csv` lists every file and its text (91 lines; the encounter lines come in A and B
 variants because the classmate named changes). Record each as its own file, save as mp3 with the listed name,
 and drop them over the placeholders — nothing else changes. Keep ~0.3 s of silence at the end of each clip.
+
+## Recording with ElevenLabs
+
+`build/make_audio_elevenlabs.py` records every line in `audio/narration_script.csv` with a given voice (see the
+comment at the top for the three commands). It writes the same file names, so nothing else changes; commit and push `audio/`.
 
 ## Rebuilding
 

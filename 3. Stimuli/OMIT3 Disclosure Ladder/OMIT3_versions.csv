@@ -1,33 +1,33 @@
-version,position,trial,protagonist,classmate1,classmate2,higher_rung_content,lower_rung_content,higher_rung_told_to,higher_rung_classmate,narration_recording,sh_emotion_first,sh_sad_scene,sh_happy_scene,pf_favourite_animal,practice_best_friend_side,practice_ball_holder
-V1,1,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 1,Blake,A,sad,lunch room,playground,,left,friend
-V1,2,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 2,Orin,B,,,,,left,friend
-V1,3,PF,Jamie,Elliot,Parker,personal preference,fact (rabbit),classmate 1,Elliot,A,,,,owl,left,friend
-V1,4,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 2,Cameron,B,,,,,left,friend
-V2,1,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 1,Avery,A,,,,,right,best friend
-V2,2,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 2,Cameron,B,,,,,right,best friend
-V2,3,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 1,Blake,A,sad,playground,lunch room,,right,best friend
-V2,4,PF,Jamie,Elliot,Parker,personal preference,fact (owl),classmate 2,Parker,B,,,,rabbit,right,best friend
-V3,1,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 1,Riley,A,,,,,left,best friend
-V3,2,PF,Jamie,Elliot,Parker,personal preference,fact (owl),classmate 2,Parker,B,,,,rabbit,left,best friend
-V3,3,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 1,Avery,A,,,,,left,best friend
-V3,4,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 2,Morgan,B,happy,lunch room,playground,,left,best friend
-V4,1,PF,Jamie,Elliot,Parker,personal preference,fact (rabbit),classmate 1,Elliot,A,,,,owl,right,friend
-V4,2,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 2,Morgan,B,happy,playground,lunch room,,right,friend
-V4,3,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 1,Riley,A,,,,,right,friend
-V4,4,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 2,Orin,B,,,,,right,friend
-V5,1,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 2,Morgan,B,sad,lunch room,playground,,left,best friend
-V5,2,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 1,Avery,A,,,,,left,best friend
-V5,3,PF,Jamie,Elliot,Parker,personal preference,fact (owl),classmate 2,Parker,B,,,,rabbit,left,best friend
-V5,4,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 1,Riley,A,,,,,left,best friend
-V6,1,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 2,Orin,B,,,,,right,friend
-V6,2,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 1,Riley,A,,,,,right,friend
-V6,3,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 2,Morgan,B,sad,playground,lunch room,,right,friend
-V6,4,PF,Jamie,Elliot,Parker,personal preference,fact (rabbit),classmate 1,Elliot,A,,,,owl,right,friend
-V7,1,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 2,Cameron,B,,,,,left,friend
-V7,2,PF,Jamie,Elliot,Parker,personal preference,fact (rabbit),classmate 1,Elliot,A,,,,owl,left,friend
-V7,3,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 2,Orin,B,,,,,left,friend
-V7,4,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 1,Blake,A,happy,lunch room,playground,,left,friend
-V8,1,PF,Jamie,Elliot,Parker,personal preference,fact (owl),classmate 2,Parker,B,,,,rabbit,right,best friend
-V8,2,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 1,Blake,A,happy,playground,lunch room,,right,best friend
-V8,3,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 2,Cameron,B,,,,,right,best friend
-V8,4,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 1,Avery,A,,,,,right,best friend
+version,position,trial,protagonist,classmate1,classmate2,higher_rung_content,lower_rung_content,higher_rung_told_to,higher_rung_classmate,narration_recording,sh_emotion_first,sh_sad_scene,sh_happy_scene,pf_favourite_animal,practice_best_friend_side,practice_ball_holder,dv_item_first
+V1,1,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 1,Blake,A,sad,lunch room,playground,,left,friend,icecream
+V1,2,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 2,Orin,B,,,,,left,friend,icecream
+V1,3,PF,Jamie,Elliot,Parker,personal preference,fact (rabbit),classmate 1,Elliot,A,,,,owl,left,friend,icecream
+V1,4,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 2,Cameron,B,,,,,left,friend,icecream
+V2,1,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 1,Avery,A,,,,,right,best friend,candy
+V2,2,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 2,Cameron,B,,,,,right,best friend,candy
+V2,3,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 1,Blake,A,sad,playground,lunch room,,right,best friend,candy
+V2,4,PF,Jamie,Elliot,Parker,personal preference,fact (owl),classmate 2,Parker,B,,,,rabbit,right,best friend,candy
+V3,1,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 1,Riley,A,,,,,left,best friend,icecream
+V3,2,PF,Jamie,Elliot,Parker,personal preference,fact (owl),classmate 2,Parker,B,,,,rabbit,left,best friend,icecream
+V3,3,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 1,Avery,A,,,,,left,best friend,icecream
+V3,4,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 2,Morgan,B,happy,lunch room,playground,,left,best friend,icecream
+V4,1,PF,Jamie,Elliot,Parker,personal preference,fact (rabbit),classmate 1,Elliot,A,,,,owl,right,friend,candy
+V4,2,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 2,Morgan,B,happy,playground,lunch room,,right,friend,candy
+V4,3,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 1,Riley,A,,,,,right,friend,candy
+V4,4,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 2,Orin,B,,,,,right,friend,candy
+V5,1,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 2,Morgan,B,sad,lunch room,playground,,left,best friend,candy
+V5,2,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 1,Avery,A,,,,,left,best friend,candy
+V5,3,PF,Jamie,Elliot,Parker,personal preference,fact (owl),classmate 2,Parker,B,,,,rabbit,left,best friend,candy
+V5,4,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 1,Riley,A,,,,,left,best friend,candy
+V6,1,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 2,Orin,B,,,,,right,friend,icecream
+V6,2,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 1,Riley,A,,,,,right,friend,icecream
+V6,3,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 2,Morgan,B,sad,playground,lunch room,,right,friend,icecream
+V6,4,PF,Jamie,Elliot,Parker,personal preference,fact (rabbit),classmate 1,Elliot,A,,,,owl,right,friend,icecream
+V7,1,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 2,Cameron,B,,,,,left,friend,candy
+V7,2,PF,Jamie,Elliot,Parker,personal preference,fact (rabbit),classmate 1,Elliot,A,,,,owl,left,friend,candy
+V7,3,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 2,Orin,B,,,,,left,friend,candy
+V7,4,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 1,Blake,A,happy,lunch room,playground,,left,friend,candy
+V8,1,PF,Jamie,Elliot,Parker,personal preference,fact (owl),classmate 2,Parker,B,,,,rabbit,right,best friend,icecream
+V8,2,SH,Casey,Blake,Morgan,sad emotion,happy emotion,classmate 1,Blake,A,happy,playground,lunch room,,right,best friend,icecream
+V8,3,HF,Kendall,Riley,Cameron,happy emotion,fact (elephant),classmate 2,Cameron,B,,,,,right,best friend,icecream
+V8,4,SF,Percy,Avery,Orin,sad emotion,fact (fox),classmate 1,Avery,A,,,,,right,best friend,icecream

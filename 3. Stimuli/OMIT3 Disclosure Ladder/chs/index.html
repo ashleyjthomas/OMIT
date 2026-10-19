@@ -28,13 +28,13 @@ const jsPsych = initJsPsych({
     window.OMIT3_DONE = true;
   }
 });
-const built = OMIT3.buildTimeline(jsPsych, { baseUrl: base, version: q.get('version') || undefined, why: q.get('why') || 'friend', video: { mid: base + 'video/mid.mp4' } });
+const built = OMIT3.buildTimeline(jsPsych, { baseUrl: base, version: q.get('version') || undefined, why: q.get('why') || 'friend', dance: true, video: q.get('video') ? { mid: base + 'video/mid.mp4' } : {} });
 window.OMIT3_BUILT = built;
 const lists = OMIT3.assetLists();
 const tl = [];
 if (window.jsPsychPreload) tl.push({ type: jsPsychPreload, images: lists.images, audio: lists.audio, show_progress_bar: true, continue_after_error: true });
 tl.push({ type: jsPsychHtmlButtonResponse, stimulus: '<h2>OMIT3 test runner</h2><p>Version <b>' + built.version + '</b>. Click to start (this click also unlocks audio).</p>', choices: ['Start'] });
-tl.push(...built.timeline);
+tl.push({ timeline: built.timeline });
 jsPsych.run(tl);
 </script>
 </body>

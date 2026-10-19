@@ -9,9 +9,9 @@ ROOT = os.path.dirname(HERE)
 # key -> how the content is talked about and drawn
 CONTENTS = {
     # emotions (icon is protagonist-specific mini portrait)
-    'sad':   dict(kind='emotion', told='about feeling sad today',   est='{P} feels sad today, and {P} doesn\'t know why.',
+    'sad':   dict(kind='emotion', told='about feeling sad today',   est='At school today, {P} felt sad, and {P} didn\'t know why.',
                   mem='Which classmate did {P} tell about feeling sad today?'),
-    'happy': dict(kind='emotion', told='about feeling happy today', est='{P} feels happy today, and {P} doesn\'t know why.',
+    'happy': dict(kind='emotion', told='about feeling happy today', est='At school today, {P} felt happy, and {P} didn\'t know why.',
                   mem='Which classmate did {P} tell about feeling happy today?'),
     # facts
     'fox':      dict(kind='fact', icon='fox', told='about how foxes move without making any sound',
@@ -58,7 +58,7 @@ VERSIONS = {}
 with open(os.path.join(ROOT, '..', 'OMIT3_versions.csv')) as f:
     for r in csv.DictReader(f):
         v = VERSIONS.setdefault(r['version'], dict(order=[], hi_to={}, sh_emotion_first=None, sh_sad_scene=None,
-                                                   pf_fav=None, practice_best_side=None, practice_ball=None))
+                                                   pf_fav=None, practice_best_side=None, practice_ball=None, dv_item_first=None))
         v['order'].append(r['trial'])
         v['hi_to'][r['trial']] = 1 if r['higher_rung_told_to'] == 'classmate 1' else 2
         if r['trial'] == 'SH':
@@ -67,6 +67,7 @@ with open(os.path.join(ROOT, '..', 'OMIT3_versions.csv')) as f:
             v['pf_fav'] = r['pf_favourite_animal']
         v['practice_best_side'] = r['practice_best_friend_side']
         v['practice_ball'] = r['practice_ball_holder']
+        v['dv_item_first'] = r['dv_item_first']
 assert len(VERSIONS) == 8, VERSIONS.keys()
 
 # ---------------------------------------------------------------- narration
@@ -81,7 +82,7 @@ def enc_nottold(P, C, phrase):
 
 for t, d in TRIALS.items():
     P = d['prot']
-    N[f'{t}_intro'] = f'This is {P}. I\'m going to tell you a story about {P}.'
+    N[f'{t}_intro'] = f'This is {P}. I\'m going to tell you a story about what happened to {P} at school today.'
     contents = ['owl_fav', 'rabbit', 'rabbit_fav', 'owl'] if t == 'PF' else [d['hi'], d['lo']]
     for c in contents:
         cd = CONTENTS[c]
@@ -94,20 +95,30 @@ for t, d in TRIALS.items():
             N[f'{t}_enc{ci}_told_{c}'] = enc_told(P, C, cd['told'], first=(ci == 1))
             N[f'{t}_enc{ci}_nottold_{c}'] = enc_nottold(P, C, cd['told'])
         N[f'{t}_mem_{c}'] = cd['mem'].format(P=P)
+        for C in (d['c1'], d['c2']):   # corrective feedback after a wrong memory-check answer
+            N[f'{t}_memfix_{c}_{C.lower()}'] = f'Actually, {P} told {C} {cd["told"]}. Let\'s try again. ' + cd['mem'].format(P=P)
     N[f'{t}_dv_friend'] = f'Who do you think {P} is better friends with?'
-    N[f'{t}_dv_icecream'] = f'Who do you think {P} would want to share a single ice cream cone with?'
+    N[f'{t}_dv_icecream'] = f'Who do you think {P} would want to share a single ice cream cone with, by licking the ice cream cone?'
     N[f'{t}_dv_candy'] = f'Who do you think {P} would want to share candy with?'
 
 S, B, F = PRACTICE['prot'], PRACTICE['best'], PRACTICE['friend']
 N['pr_intro'] = f'Before we start, let\'s practice. This is {S}.'
-N['pr_friends_bestleft'] = f'{S} has two friends. This is {B}. {B} is {S}\'s best friend. And this is {F}. {F} is {S}\'s friend.'
-N['pr_friends_bestright'] = f'{S} has two friends. This is {F}. {F} is {S}\'s friend. And this is {B}. {B} is {S}\'s best friend.'
+N['pr_friend1_best'] = f'{S} has two friends. This is {B}. {B} is {S}\'s best friend.'
+N['pr_friend2_friend'] = f'And this is {F}. {F} is {S}\'s friend.'
+N['pr_friend1_friend'] = f'{S} has two friends. This is {F}. {F} is {S}\'s friend.'
+N['pr_friend2_best'] = f'And this is {B}. {B} is {S}\'s best friend.'
 N['pr_ball'] = 'Look, one of them is holding a ball. Which one is holding a ball? Click on the one holding the ball.'
 N['pr_ball_wrong'] = 'Hmm, that one isn\'t holding a ball. Can you click on the one who is holding the ball?'
 N['pr_ball_right'] = 'That\'s right! That one is holding the ball.'
-N['pr_juice'] = f'{S} has a juice box with one straw. Who do you think {S} would want to share the juice box with?'
-N['pr_cookies'] = f'{S} has some cookies. Who do you think {S} would want to share the cookies with?'
-N['why'] = 'Why do you think that? Tell your grown-up, and they will type in what you say.'
+N['pr_juice'] = f'{S} has a juice box with one straw. Who do you think {S} would want to share the juice box with:'
+N['pr_cookies'] = f'{S} has some cookies. Who do you think {S} would want to share the cookies with:'
+# option labels read after a practice question, in left-to-right order (the named character shakes)
+N['pr_best_first'] = f'{B}, {S}\'s best friend,'
+N['pr_friend_second'] = f'or {F}, {S}\'s friend?'
+N['pr_friend_first'] = f'{F}, {S}\'s friend,'
+N['pr_best_second'] = f'or {B}, {S}\'s best friend?'
+N['mem_right'] = 'That\'s right!'
+N['why'] = 'Why do you think that? If you need help typing, tell your grown-up and they can type in what you say.'
 N['fr_welcome'] = 'Hi! Today we are going to hear some stories about some kids, and I am going to ask you what you think.'
 N['fr_start'] = 'Let\'s get started!'
 N['fr_click'] = 'Now you can click on one of them.'
@@ -118,6 +129,7 @@ N['rw_2'] = 'You got another star! That\'s two stars. Three more stories to go.'
 N['rw_3'] = 'Three stars! Two more stories to go.'
 N['rw_4'] = 'Four stars! Just one more story.'
 N['vd_mid'] = 'You are halfway there! Time for a cartoon break. Then two more stories.'
+N['dance_mid'] = 'You are halfway there! Let\'s do a little dance! Then two more stories.'
 N['vd_end'] = 'And now, a cartoon just for you!'
 N['rw_5'] = 'You got all five stars! You did it! Great job!'
 

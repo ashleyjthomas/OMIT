@@ -19,7 +19,7 @@ const BASE_URL = "__BASE_URL__";
 const chsid = new URLSearchParams(window.location.search).get('response_uuid') || '';
 
 // Version V1–V8 drawn at random for each session (see OMIT3_counterbalance_spec.md).
-const built = OMIT3.buildTimeline(jsPsych, { baseUrl: BASE_URL, why: 'friend', video: { mid: BASE_URL + 'video/mid.mp4' } });   // why: 'all' | 'friend' | 'none'; video: { mid, end }
+const built = OMIT3.buildTimeline(jsPsych, { baseUrl: BASE_URL, why: 'friend', dance: true, video: {} });   // why: 'all' | 'friend' | 'none'; dance: narrator dance break mid-way; video: { mid, end } adds a cartoon (see README)
 jsPsych.data.addProperties({ study: 'OMIT3', version: built.version, chs_response_uuid: chsid });
 
 // ── FULLSCREEN ────────────────────────────────────────────────────────
@@ -141,7 +141,7 @@ timeline.push(
     instructions_page1,
     instructions_page2,
     start_rec,
-    ...built.timeline,
+    { timeline: built.timeline },   // nested, so an early exit skips the rest of the task but still reaches stop_rec / exit survey
     stop_rec,
     exit_survey,
     debrief

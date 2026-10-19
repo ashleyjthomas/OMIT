@@ -59,9 +59,9 @@
     return '<img src="' + src + '"' + cls + dat + ' data-k="' + key + '" data-kind="' + kind + '" draggable="false" style="position:absolute;left:' + px(r[0]) + ';top:' + py(r[1]) +
       ';width:' + px(r[2]) + ';height:' + py(r[3]) + ';">';
   }
-  function layer(name) {
+  function layer(name, cls) {
     const dx = name === 'balloon' ? px(0.12) : '0';
-    return '<img src="' + asset('layers/' + name + '.png') + '" data-k="layer:' + name + '" data-kind="pop" draggable="false" style="position:absolute;left:' + dx + ';top:0;width:100%;height:100%;">';
+    return '<img src="' + asset('layers/' + name + '.png') + '"' + (cls ? ' class="' + cls + '"' : '') + ' data-k="layer:' + name + '" data-kind="pop" draggable="false" style="position:absolute;left:' + dx + ';top:0;width:100%;height:100%;">';
   }
   function fitRect(iconName, slot) {
     const s = ICON[iconName]; const ar = s[0] / s[1];
@@ -72,6 +72,7 @@
   const charImg = (name, r, extra) => img(asset('characters/' + name.toLowerCase() + '.png'), r, extra);
   const iconFile = (content, prot) => D.contents[content].kind === 'emotion' ? prot.toLowerCase() + '_' + content : D.contents[content].icon;
 
+  const DANCE_SEQ = [1, 2, 3, 4, 1, 6, 7, 8, 5, 3, 7, 2];   // order of the 8 dance frames in the loop
   const STAR_PATH = 'M50 5 L61 36 L95 36 L68 56 L78 90 L50 70 L22 90 L32 56 L5 36 L39 36 Z';
   function starSvg(cls) {
     return '<svg class="o3-star ' + (cls || '') + '" viewBox="0 0 100 100"><path d="' + STAR_PATH + '" stroke-linejoin="round"/></svg>';
@@ -110,11 +111,12 @@
     },
     encounter: (P, C, content, told) => {
       let h = img(asset('bg/houses.png'), G.houseL) + img(asset('bg/houses.png'), G.houseR);
-      h += charImg(P, G.protoEnc) + charImg(C, G.mateEnc) + layer('balloon');
+      // the speech bubble and its content are "late": hidden until the narration has finished, then popped in
+      h += charImg(P, G.protoEnc) + charImg(C, G.mateEnc) + layer('balloon', 'o3-late');
       const ic = iconFile(content, P); const r = fitRect(ic, G.balloonSlot);
-      h += img(asset('icons/' + ic + '.png'), r);
+      h += img(asset('icons/' + ic + '.png'), r, { cls: 'o3-late' });
       if (!told) {
-        const n = G.noSymbol; h += img(asset('layers/nosymbol.png'), [r[0] + r[2] / 2 - n / 2 - 0.22, r[1] + r[3] / 2 - n / 2, n, n]);
+        const n = G.noSymbol; h += img(asset('layers/nosymbol.png'), [r[0] + r[2] / 2 - n / 2 - 0.22, r[1] + r[3] / 2 - n / 2, n, n], { cls: 'o3-late' });
       }
       return h;
     },
@@ -132,7 +134,7 @@
       h += charImg(left, G.figL, { cls: 'zone', choice: 'left' }) + charImg(right, G.figR, { cls: 'zone', choice: 'right' });
       return h;
     },
-    practiceTrio: (P, left, right) => charImg(P, G.prTrio.mid) + charImg(left, G.prTrio.left) + charImg(right, G.prTrio.right),
+    practiceTrio: (P, left, right) => charImg(P, G.prTrio.mid) + (left ? charImg(left, G.prTrio.left, { choice: 'left' }) : '') + (right ? charImg(right, G.prTrio.right, { choice: 'right' }) : ''),
     ball: (left, right, holder, text) => {
       let h = SC.dv(left, right, null, text);
       const f = holder === 'left' ? G.figL : G.figR;
@@ -201,6 +203,8 @@
   .omit3-stage.ready .zone:hover{transform:scale(1.06);}
   .omit3-stage .zone.chosen{outline:0.6cqw solid #f5b400;outline-offset:0.4cqw;border-radius:1cqw;}
   .omit3-stage .zone.dim{opacity:.35;}
+  @keyframes o3-shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-7deg) translateY(-2cqw)}40%{transform:rotate(6deg)}60%{transform:rotate(-5deg) translateY(-1cqw)}80%{transform:rotate(4deg)}}
+  .omit3-stage .shake{animation:o3-shake .7s ease-in-out infinite;transform-origin:50% 90%;}
   .omit3-narrator{position:absolute;pointer-events:none;}
   .o3-star path{fill:#e6e6e6;stroke:#bdbdbd;stroke-width:4;transition:fill .3s,stroke .3s;}
   .o3-slot.filled .o3-star path{fill:#f5b400;stroke:#d08f00;}
@@ -213,6 +217,7 @@
   .o3-confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
   .o3-confetti i{position:absolute;top:-4%;width:1.1cqw;height:1.6cqw;border-radius:.2cqw;opacity:.9;animation:o3-fall linear infinite;}
   @keyframes o3-fall{to{transform:translateY(110cqh) rotate(720deg)}}
+  @keyframes o3-bounce{0%,100%{transform:translateY(0) scaleX(1)}50%{transform:translateY(-3cqw) scaleX(1.03)}}
   @keyframes o3-slideL{from{transform:translateX(-70cqw);opacity:0}to{transform:none;opacity:1}}
   @keyframes o3-slideR{from{transform:translateX(70cqw);opacity:0}to{transform:none;opacity:1}}
   @keyframes o3-pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.12);opacity:1}100%{transform:none}}
@@ -236,32 +241,36 @@
       name: 'omit3-scene',
       parameters: {
         scene: { type: 'STRING', default: '' },
-        audio: { type: 'STRING', default: null },        // narration key
+        audio: { type: 'COMPLEX', default: null },       // narration key, or [{key, shake:'left'|'right'}] played in order
         choices: { type: 'BOOL', default: false },        // left/right zones in the scene
         correct: { type: 'STRING', default: null },       // 'left' | 'right' for training items
-        wrong_audio: { type: 'STRING', default: null },
+        wrong_audio: { type: 'COMPLEX', default: null },   // key or segment list, played after a wrong answer
         right_audio: { type: 'STRING', default: null },
+        praise_always: { type: 'BOOL', default: false },   // false: right_audio only after a corrected retry
         why: { type: 'BOOL', default: false },
         why_audio: { type: 'STRING', default: 'why' },
         auto_advance_ms: { type: 'INT', default: 500 },
         show_next: { type: 'BOOL', default: false },      // parent must press Next (no choices)
+        next_label: { type: 'STRING', default: null },
         min_ms: { type: 'INT', default: 0 },
         narrator: { type: 'BOOL', default: true },
         stars: { type: 'INT', default: -1 },       // filled stars to show on the shelf (-1 hides it)
         total_stars: { type: 'INT', default: 5 },
         reward: { type: 'INT', default: 0 },       // >0: this page awards star #reward
         video: { type: 'STRING', default: null },   // url: play a video full-stage, advance when it ends
+        dance: { type: 'COMPLEX', default: null },  // { frames: [urls], fps, ms }: narrator dances centre-stage, then advance
       },
     };
     constructor(jsPsych) { this.jsPsych = jsPsych; }
     trial(display, trial) {
       const jsPsych = this.jsPsych;
       if (!cssInjected) { const s = document.createElement('style'); s.textContent = CSS; document.head.appendChild(s); cssInjected = true; }
-      const narrHtml = (trial.narrator && !trial.video) ? '<img class="omit3-narrator" src="' + asset('narrator/rest.png') + '" style="left:' + px(G.narrator[0]) + ';top:' + py(G.narrator[1]) + ';width:' + px(G.narrator[2]) + ';height:' + py(G.narrator[3]) + ';">' : '';
+      const narrHtml = (trial.narrator && !trial.video && !trial.dance) ? '<img class="omit3-narrator" src="' + asset('narrator/rest.png') + '" style="left:' + px(G.narrator[0]) + ';top:' + py(G.narrator[1]) + ';width:' + px(G.narrator[2]) + ';height:' + py(G.narrator[3]) + ';">' : '';
       const shelf = trial.stars >= 0 ? shelfHtml(trial.stars, trial.total_stars) : '';
       display.innerHTML = '<div class="omit3-wrap"><div class="omit3-stage">' + trial.scene + shelf + narrHtml +
-        '<div class="omit3-why"><label>Grown-ups: please type what your child said (as close to their words as you can), then press Next.</label><textarea class="omit3-whytext" autocomplete="off"></textarea></div>' +
-        '<button class="omit3-replay">&#9654; hear again</button><button class="omit3-next">Next &#8250;</button></div></div>';
+        '<div class="omit3-why"><label>Why do you think that? Type your answer, or tell your grown-up and they can type what you say. Then press Next.</label><textarea class="omit3-whytext" autocomplete="off"></textarea></div>' +
+        '<button class="omit3-replay">&#9654; hear again</button><button class="omit3-next">Next &#8250;</button>' +
+        '</div></div>';
       const narr = Narrator.attach(display.querySelector('.omit3-narrator'));
       const stage = display.querySelector('.omit3-stage');
       const nextBtn = display.querySelector('.omit3-next');
@@ -269,7 +278,7 @@
       // entrance animations for elements that were not on the previous page
       let enterMs = 0; const nowKeys = new Set();
       const els = Array.from(stage.querySelectorAll('[data-k]'));
-      const newEls = els.filter((el) => { nowKeys.add(el.dataset.k); return !prevKeys.has(el.dataset.k); });
+      const newEls = els.filter((el) => { nowKeys.add(el.dataset.k); return !prevKeys.has(el.dataset.k) && !el.classList.contains('o3-late'); });
       const allNew = newEls.length === els.length;   // whole page changed: stagger characters a little
       let order = 0;
       newEls.forEach((el) => {
@@ -285,7 +294,7 @@
       });
       prevKeys = nowKeys;
       const t0 = performance.now();
-      const data = { choice: null, rt: null, attempts: 0, audio_ok: null, audio_key: trial.audio };
+      const data = { choice: null, rt: null, attempts: 0, audio_ok: null, audio_key: Array.isArray(trial.audio) ? trial.audio.map((a) => a.key).join('+') : trial.audio };
       let readyAt = null, finished = false, audio = null, timer = null;
 
       const finish = () => {
@@ -297,9 +306,16 @@
         display.innerHTML = '';
         jsPsych.finishTrial(data);
       };
+      const shakeOn = (side) => { stage.querySelectorAll('[data-choice="' + side + '"]').forEach((z) => z.classList.add('shake')); };
+      const shakeOff = () => { stage.querySelectorAll('.shake').forEach((z) => z.classList.remove('shake')); };
       const play = (key, onEnd) => {
         if (audio) { audio.pause(); }
         if (!key) { onEnd && onEnd(); return; }
+        if (Array.isArray(key)) {   // sequence of segments, each optionally shaking one side while it plays
+          const seq = key.slice();
+          const step = (ok) => { shakeOff(); const it = seq.shift(); if (!it) { onEnd && onEnd(ok !== false); return; } if (it.shake) shakeOn(it.shake); play(it.key, step); };
+          step(true); return;
+        }
         audio = new Audio(); audio.crossOrigin = 'anonymous'; audio.src = audioUrl(key);
         let done = false;
         const end = (ok) => { if (done) return; done = true; narr.silent(); if (data.audio_ok === null) data.audio_ok = ok; onEnd && onEnd(ok); };
@@ -309,19 +325,27 @@
         const p = audio.play();
         if (p && p.catch) p.catch(() => end(false));
       };
+      const late = Array.from(stage.querySelectorAll('.o3-late'));
+      late.forEach((el) => { el.style.visibility = 'hidden'; el.style.animation = 'none'; });
       const afterNarration = (ok) => {
         replayBtn.style.display = 'block';
+        let hold = 0;
+        if (late.length) {   // reveal the bubble now that the sentence has been said
+          late.forEach((el, i) => { el.style.visibility = ''; el.style.animation = ''; el.classList.remove('o3-enter-pop'); void el.offsetWidth; el.style.animationDelay = (i * 120) + 'ms'; el.classList.add('o3-enter-pop'); });
+          hold = 1300;
+        }
         if (trial.choices) {
           stage.classList.add('ready'); readyAt = performance.now();
         } else if (trial.show_next || !ok) {
           nextBtn.style.display = 'block';
         } else {
-          const wait = Math.max(trial.auto_advance_ms, trial.min_ms - (performance.now() - t0));
+          const wait = Math.max(trial.auto_advance_ms + hold, trial.min_ms - (performance.now() - t0));
           timer = setTimeout(finish, wait);
         }
       };
       replayBtn.addEventListener('click', () => { if (trial.audio) play(trial.audio, () => {}); });
       nextBtn.addEventListener('click', finish);
+      if (trial.next_label) nextBtn.innerHTML = trial.next_label;
 
       if (trial.choices) {
         stage.querySelectorAll('.zone').forEach((z) => {
@@ -341,9 +365,19 @@
             stage.querySelectorAll('.zone').forEach((o) => o.classList.add(o === z ? 'chosen' : 'dim'));
             narr.react();
             const after = () => { if (trial.why) { const wb = display.querySelector('.omit3-why'); wb.style.display = 'block'; play(trial.why_audio, () => { nextBtn.style.display = 'block'; display.querySelector('.omit3-whytext').focus(); }); } else { timer = setTimeout(finish, 600); } };
-            if (trial.correct && trial.right_audio) play(trial.right_audio, after); else after();
+            if (trial.correct && trial.right_audio && (trial.praise_always || data.attempts > 1)) play(trial.right_audio, after); else after();
           });
         });
+      }
+      if (trial.dance) {
+        const dz = trial.dance; const r = [3.4, 0.9, 3.2, 4.5];
+        const im = document.createElement('img'); im.draggable = false; im.src = dz.frames[0];
+        im.style.cssText = 'position:absolute;left:' + px(r[0]) + ';top:' + py(r[1]) + ';width:' + px(r[2]) + ';height:' + py(r[3]) + ';object-fit:contain;animation:o3-bounce .5s ease-in-out infinite;transform-origin:50% 100%;';
+        stage.insertBefore(im, stage.firstChild);
+        let k = 0; const iv = setInterval(() => { k = (k + 1) % dz.frames.length; im.src = dz.frames[k]; }, 1000 / (dz.fps || 5));
+        timer = setTimeout(() => { clearInterval(iv); finish(); }, dz.ms || 10000);
+        setTimeout(() => play(trial.audio, () => {}), 250);
+        return;
       }
       if (trial.video) {
         const v = document.createElement('video'); v.setAttribute('playsinline', ''); v.preload = 'auto';
@@ -382,6 +416,8 @@
     const why = whyMode === 'all', whyF = whyMode !== 'none';
     const TOTAL = 5; let stars = 0;
     const video = opts.video || {};   // { mid: url, end: url } — a cartoon break after story 2 and/or after the last star
+    let dance = opts.dance || null;    // true | { frames: [urls], fps, ms } — narrator dance break after story 2 (before the video, if both)
+    if (dance === true) dance = { frames: DANCE_SEQ.map((k) => asset('narrator/dance_' + String(k).padStart(2, '0') + '.png')), fps: 4, ms: 12000 };
     const T = [];
     const common = { version: vkey };
 
@@ -397,12 +433,18 @@
     const pL = bestLeft ? PR.best : PR.friend, pR = bestLeft ? PR.friend : PR.best;
     const ballSide = (V.practice_ball === 'friend') === bestLeft ? 'right' : 'left';
     const prData = (item) => ({ block: 'practice', item: item, left: pL, right: pR, best_side: bestLeft ? 'left' : 'right' });
-    T.push(scene({ scene: SC.intro(PR.prot), audio: 'pr_intro', data: prData('intro') }));
-    T.push(scene({ scene: SC.practiceTrio(PR.prot, pL, pR), audio: bestLeft ? 'pr_friends_bestleft' : 'pr_friends_bestright', data: prData('friends') }));
+    // Sam alone, then each friend slides in on its own page while it is introduced (left one first)
+    T.push(scene({ scene: SC.practiceTrio(PR.prot, null, null), audio: 'pr_intro', data: prData('intro') }));
+    T.push(scene({ scene: SC.practiceTrio(PR.prot, pL, null), audio: [{ key: bestLeft ? 'pr_friend1_best' : 'pr_friend1_friend', shake: 'left' }], data: prData('friend1') }));
+    T.push(scene({ scene: SC.practiceTrio(PR.prot, pL, pR), audio: [{ key: bestLeft ? 'pr_friend2_friend' : 'pr_friend2_best', shake: 'right' }], data: prData('friend2') }));
+    // question + the two options named in left-to-right order, each character shaking while it is named
+    const labels = [{ key: bestLeft ? 'pr_best_first' : 'pr_friend_first', shake: 'left' }, { key: bestLeft ? 'pr_friend_second' : 'pr_best_second', shake: 'right' }];
+    const roleL = bestLeft ? 'best friend' : 'friend', roleR = bestLeft ? 'friend' : 'best friend';
+    const optText = pL + ', ' + PR.prot + '\u2019s ' + roleL + ', or ' + pR + ', ' + PR.prot + '\u2019s ' + roleR + '?';
     T.push(scene({ scene: SC.ball(pL, pR, ballSide, 'Which one is holding a ball?'), audio: 'pr_ball', choices: true,
-      correct: ballSide, wrong_audio: 'pr_ball_wrong', right_audio: 'pr_ball_right', data: Object.assign(prData('ball'), { correct_side: ballSide }) }));
-    T.push(scene({ scene: SC.dv(pL, pR, 'juicebox', 'Who would ' + PR.prot + ' want to share a juice box with one straw with?'), audio: 'pr_juice', choices: true, why: why, data: prData('juice') }));
-    T.push(scene({ scene: SC.dv(pL, pR, 'cookies', 'Who would ' + PR.prot + ' want to share cookies with?'), audio: 'pr_cookies', choices: true, why: why, data: prData('cookies') }));
+      correct: ballSide, wrong_audio: 'pr_ball_wrong', right_audio: 'pr_ball_right', praise_always: true, data: Object.assign(prData('ball'), { correct_side: ballSide }) }));
+    T.push(scene({ scene: SC.dv(pL, pR, 'juicebox', 'Who would ' + PR.prot + ' want to share a juice box with one straw with: ' + optText), audio: [{ key: 'pr_juice' }].concat(labels), choices: true, why: why, data: prData('juice') }));
+    T.push(scene({ scene: SC.dv(pL, pR, 'cookies', 'Who would ' + PR.prot + ' want to share cookies with: ' + optText), audio: [{ key: 'pr_cookies' }].concat(labels), choices: true, why: why, data: prData('cookies') }));
     reward('practice');
     T.push(scene({ scene: SC.frame('start'), audio: 'fr_start', data: { item: 'start' } }));
 
@@ -437,18 +479,24 @@
         T.push(tr({ scene: SC.encounter(P, C, not, false), audio: t + '_enc' + ci + '_nottold_' + not }, 'enc' + ci + '_nottold', { classmate: C, content: not }));
       });
       // memory checks: higher rung first, then lower
-      T.push(tr({ scene: SC.memcheck(P, hi, d.c1, d.c2), audio: t + '_mem_' + hi, choices: true }, 'mem_hi', { content: hi, correct_side: hiTo === 1 ? 'left' : 'right' }));
-      T.push(tr({ scene: SC.memcheck(P, lo, d.c1, d.c2), audio: t + '_mem_' + lo, choices: true }, 'mem_lo', { content: lo, correct_side: hiTo === 1 ? 'right' : 'left' }));
+      const mem = (c, side, item) => {
+        const who = side === 'left' ? d.c1 : d.c2;
+        T.push(tr({ scene: SC.memcheck(P, c, d.c1, d.c2), audio: t + '_mem_' + c, choices: true, correct: side,
+          wrong_audio: [{ key: t + '_memfix_' + c + '_' + who.toLowerCase(), shake: side }], right_audio: 'mem_right' }, item, { content: c, correct_side: side }));
+      };
+      mem(hi, hiTo === 1 ? 'left' : 'right', 'mem_hi');
+      mem(lo, hiTo === 1 ? 'right' : 'left', 'mem_lo');
       // DVs
       T.push(tr({ scene: SC.dv(d.c1, d.c2, null, 'Who do you think ' + P + ' is better friends with?'), audio: t + '_dv_friend', choices: true, why: whyF }, 'friend'));
-      T.push(tr({ scene: SC.dv(d.c1, d.c2, 'icecream', null), audio: t + '_dv_icecream', choices: true, why: why }, 'icecream'));
-      T.push(tr({ scene: SC.dv(d.c1, d.c2, 'candy', null), audio: t + '_dv_candy', choices: true, why: why }, 'candy'));
+      const items = V.dv_item_first === 'candy' ? ['candy', 'icecream'] : ['icecream', 'candy'];   // constant within child, counterbalanced across versions
+      items.forEach((it) => T.push(tr({ scene: SC.dv(d.c1, d.c2, it, null), audio: t + '_dv_' + it, choices: true, why: why }, it, { dv_item_first: V.dv_item_first })));
       reward(t);
+      if (idx === 1 && dance) T.push(scene({ scene: '', dance: dance, audio: 'dance_mid', stars: stars, data: { item: 'dance' } }));
       if (idx === 1 && video.mid) T.push(scene({ scene: '', audio: 'vd_mid', data: { item: 'video_intro' } }), scene({ scene: '', video: video.mid, stars: stars, data: { item: 'video' } }));
     });
 
     if (video.end) T.push(scene({ scene: '', audio: 'vd_end', data: { item: 'video_intro' } }), scene({ scene: '', video: video.end, stars: stars, data: { item: 'video' } }));
-    T.push(scene({ scene: SC.frame('alldone'), audio: 'fr_done', show_next: true, data: { item: 'done' } }));
+    T.push(scene({ scene: SC.frame('alldone'), audio: 'fr_done', show_next: true, next_label: 'Finish &#8250;', data: { item: 'done' } }));
 
     // derived fields on every choice trial
     T.forEach((tr) => {
@@ -458,7 +506,7 @@
           data.choice_name = data.choice === 'left' ? data.left : data.right;
           if (data.hi_classmate) data.chose_hi = data.choice_name === data.hi_classmate ? 1 : 0;
           if (data.best_side) data.chose_best = data.choice === data.best_side ? 1 : 0;
-          if (data.correct_side) data.correct = data.choice === data.correct_side ? 1 : 0;
+          if (data.correct_side) { data.correct = (data.wrong_first ? 0 : (data.choice === data.correct_side ? 1 : 0)); data.final_correct = data.choice === data.correct_side ? 1 : 0; }
         }
       };
     });
@@ -475,6 +523,7 @@
     ['welcome', 'about', 'start', 'alldone'].forEach((f) => add('frames/' + f + '.png'));
     ['cloud', 'balloon', 'nosymbol'].forEach((l) => add('layers/' + l + '.png'));
     Narrator.frames.forEach((f) => add('narrator/' + f + '.png'));
+    for (let k = 1; k <= 8; k++) add('narrator/dance_' + String(k).padStart(2, '0') + '.png');
     const audio = Object.keys(D.narration).map(audioUrl);
     return { images: imgs, audio: audio };
   }
