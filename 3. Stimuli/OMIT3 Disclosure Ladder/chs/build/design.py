@@ -112,6 +112,14 @@ N['fr_welcome'] = 'Hi! Today we are going to hear some stories about some kids, 
 N['fr_start'] = 'Let\'s get started!'
 N['fr_click'] = 'Now you can click on one of them.'
 N['fr_done'] = 'All done! Thanks for playing!'
+# star rewards: one after practice, one after each story (5 total)
+N['rw_1'] = 'You got a star! Great job practicing. Now let\'s hear some stories. Every time you finish a story, you get another star.'
+N['rw_2'] = 'You got another star! That\'s two stars. Three more stories to go.'
+N['rw_3'] = 'Three stars! Two more stories to go.'
+N['rw_4'] = 'Four stars! Just one more story.'
+N['vd_mid'] = 'You are halfway there! Time for a cartoon break. Then two more stories.'
+N['vd_end'] = 'And now, a cartoon just for you!'
+N['rw_5'] = 'You got all five stars! You did it! Great job!'
 
 DESIGN = dict(contents=CONTENTS, trials=TRIALS, practice=PRACTICE, versions=VERSIONS, narration=N)
 

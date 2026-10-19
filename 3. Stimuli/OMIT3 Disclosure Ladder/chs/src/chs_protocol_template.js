@@ -19,7 +19,7 @@ const BASE_URL = "__BASE_URL__";
 const chsid = new URLSearchParams(window.location.search).get('response_uuid') || '';
 
 // Version V1–V8 drawn at random for each session (see OMIT3_counterbalance_spec.md).
-const built = OMIT3.buildTimeline(jsPsych, { baseUrl: BASE_URL, why: true });
+const built = OMIT3.buildTimeline(jsPsych, { baseUrl: BASE_URL, why: 'friend', video: { mid: BASE_URL + 'video/mid.mp4' } });   // why: 'all' | 'friend' | 'none'; video: { mid, end }
 jsPsych.data.addProperties({ study: 'OMIT3', version: built.version, chs_response_uuid: chsid });
 
 // ── FULLSCREEN ────────────────────────────────────────────────────────

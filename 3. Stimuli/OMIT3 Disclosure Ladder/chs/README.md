@@ -35,9 +35,9 @@ StopRecord), `chsSurvey` (ExitSurvey). The task's own plugin (`omit3-scene`) is 
 ## Session flow
 
 fullscreen → video config → video consent → payment email → preload → two instruction pages → **start recording** →
-welcome → practice (Sam; Quinn = best friend, Rowan = friend: ball → juice box with one straw → cookies) → "Let's get started" →
+welcome → practice (Sam; Quinn = best friend, Rowan = friend: ball → juice box with one straw → cookies) → star 1 → "Let's get started" →
 4 trials in the version's order, each: intro → two establishing pages → classmate 1 (told, then not told) → classmate 2 (told, then not told) →
-memory check (higher-rung content) → memory check (lower-rung) → better friends with? (+Why) → single ice cream cone (+Why) → candy (+Why) →
+memory check (higher-rung content) → memory check (lower-rung) → better friends with? (+Why) → single ice cream cone → candy → star →
 "All done" → **stop recording** → exit survey → debrief.
 
 Story pages play their narration and advance on their own (~0.9 s after the audio ends); a "hear again"
@@ -45,8 +45,23 @@ button replays, and a Next button appears only if audio fails. Choice pages make
 clickable when the narration ends; the chosen one is highlighted; on Why? pages a text box appears for the parent to type the child's
 answer (saved as `why_text`; the webcam recording is the backup) before clicking Next. The ball item gives corrective feedback up to 3 attempts.
 
+Progress: a shelf of five stars (top-left) fills as the child goes — one after practice and one after each
+story, each with a short reward page (big star flies to the shelf; confetti and "You did it!" on the fifth).
+
 A narrator character (bottom-right) lip-flaps with the audio level (Web Audio analyser; falls back to
 random flapping if the browser blocks analysis) and blinks; it grins briefly after each choice.
+
+Why? prompts are controlled by `why` in `buildTimeline` (`'friend'` = after the better-friends question only, the
+default; `'all'` = after every DV and the two practice sharing items; `'none'`).
+
+## Cartoon break
+
+After the second story's star, a video page plays `video/mid.mp4` (with `video/mid.webm` as a codec fallback) full-stage,
+then advances on its own; a Skip button appears after 5 s. **`video/mid.mp4` is currently an 8-second placeholder.** Put the real
+clip there (suggested: a Caminandes short from the Blender Foundation, CC-BY — https://studio.blender.org/films/ or
+https://www.caminandes.com; 30–60 s, 720p H.264, under ~20 MB) and make the webm twin with
+`ffmpeg -i video/mid.mp4 -c:v libvpx-vp9 -b:v 800k -c:a libopus video/mid.webm`. Credit the film in the debrief.
+To also play one at the very end, pass `video: { mid: ..., end: ... }` in `chs_protocol_template.js`; to drop the break, pass `video: {}`.
 
 ## Versions
 

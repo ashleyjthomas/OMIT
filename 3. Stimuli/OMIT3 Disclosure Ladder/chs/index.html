@@ -6,7 +6,7 @@
 <title>OMIT3 — Story Friends (test runner)</title>
 <!-- Standalone runner for testing the task outside CHS. Query params:
      ?version=V1..V8   force a version (default: random)
-     &why=0            skip the Why? prompts
+     &why=all|friend|none  Why? prompts after every DV, only better-friends (default), or never
      &base=<url>       asset base (default: this folder)
      &dl=1             download the data CSV at the end -->
 <script src="https://cdn.jsdelivr.net/npm/jspsych@7.3.4/dist/index.browser.min.js"></script>
@@ -28,7 +28,7 @@ const jsPsych = initJsPsych({
     window.OMIT3_DONE = true;
   }
 });
-const built = OMIT3.buildTimeline(jsPsych, { baseUrl: base, version: q.get('version') || undefined, why: q.get('why') !== '0' });
+const built = OMIT3.buildTimeline(jsPsych, { baseUrl: base, version: q.get('version') || undefined, why: q.get('why') || 'friend', video: { mid: base + 'video/mid.mp4' } });
 window.OMIT3_BUILT = built;
 const lists = OMIT3.assetLists();
 const tl = [];

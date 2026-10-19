@@ -28,6 +28,8 @@
     balloonSlot: { cx: 4.65, cy: 2.51, w: 1.00, h: 0.80 },
     noSymbol: 0.58,
     narrator: [8.30, 3.40, 1.52, 2.14],   // bottom-right corner, clear of every scene element
+    shelf: [0.22, 0.14, 0.40, 0.40],        // first small star (top-left); the rest follow at 0.46 in spacing
+    bigStar: [3.75, 1.35, 2.50, 2.50],
     figL: [2.59, 2.28, 1.54, 1.88],
     figR: [5.87, 2.28, 1.54, 1.88],
     figLmem: [2.59, 2.95, 1.54, 1.88],
@@ -69,6 +71,28 @@
   }
   const charImg = (name, r, extra) => img(asset('characters/' + name.toLowerCase() + '.png'), r, extra);
   const iconFile = (content, prot) => D.contents[content].kind === 'emotion' ? prot.toLowerCase() + '_' + content : D.contents[content].icon;
+
+  const STAR_PATH = 'M50 5 L61 36 L95 36 L68 56 L78 90 L50 70 L22 90 L32 56 L5 36 L39 36 Z';
+  function starSvg(cls) {
+    return '<svg class="o3-star ' + (cls || '') + '" viewBox="0 0 100 100"><path d="' + STAR_PATH + '" stroke-linejoin="round"/></svg>';
+  }
+  function shelfHtml(filled, total) {
+    let h = '<div class="o3-shelf">';
+    for (let i = 0; i < total; i++) {
+      const r = [G.shelf[0] + i * 0.46, G.shelf[1], G.shelf[2], G.shelf[3]];
+      h += '<div class="o3-slot' + (i < filled ? ' filled' : '') + '" data-slot="' + (i + 1) + '" style="position:absolute;left:' + px(r[0]) + ';top:' + py(r[1]) + ';width:' + px(r[2]) + ';height:' + py(r[3]) + ';">' + starSvg() + '</div>';
+    }
+    return h + '</div>';
+  }
+  function confettiHtml(n) {
+    const cols = ['#f5b400', '#2f6fd6', '#e8553e', '#39b54a', '#9b59b6', '#ff8ac2'];
+    let h = '<div class="o3-confetti">';
+    for (let i = 0; i < n; i++) {
+      const x = Math.random() * 100, d = (Math.random() * 1.5).toFixed(2), dur = (2.2 + Math.random() * 1.8).toFixed(2), rot = Math.floor(Math.random() * 360);
+      h += '<i style="left:' + x.toFixed(1) + '%;background:' + cols[i % cols.length] + ';animation-delay:' + d + 's;animation-duration:' + dur + 's;transform:rotate(' + rot + 'deg)"></i>';
+    }
+    return h + '</div>';
+  }
 
   // ---------------------------------------------------------------- scenes
   const SC = {
@@ -116,6 +140,11 @@
       return h;
     },
     frame: (name) => img(asset('frames/' + name + '.png'), [0, 0, SW, SH]),
+    reward: (n, total) => {
+      const r = G.bigStar; let h = '<div class="o3-bigstar" style="position:absolute;left:' + px(r[0]) + ';top:' + py(r[1]) + ';width:' + px(r[2]) + ';height:' + py(r[3]) + ';">' + starSvg('big') + '</div>';
+      if (n >= total) h += confettiHtml(60) + '<div class="o3-banner">You did it!</div>';
+      return h;
+    },
   };
 
 
@@ -173,6 +202,17 @@
   .omit3-stage .zone.chosen{outline:0.6cqw solid #f5b400;outline-offset:0.4cqw;border-radius:1cqw;}
   .omit3-stage .zone.dim{opacity:.35;}
   .omit3-narrator{position:absolute;pointer-events:none;}
+  .o3-star path{fill:#e6e6e6;stroke:#bdbdbd;stroke-width:4;transition:fill .3s,stroke .3s;}
+  .o3-slot.filled .o3-star path{fill:#f5b400;stroke:#d08f00;}
+  .o3-slot.just .o3-star{animation:o3-pop .5s ease-out;}
+  .o3-star.big path{fill:#f5b400;stroke:#d08f00;stroke-width:3;filter:drop-shadow(0 0 1.2cqw rgba(245,180,0,.7));}
+  .o3-bigstar{animation:o3-starin .9s cubic-bezier(.2,.8,.3,1.2) backwards;}
+  .o3-bigstar.fly{transition:all .8s cubic-bezier(.4,0,.2,1);}
+  @keyframes o3-starin{0%{transform:scale(0) rotate(-180deg);opacity:0}100%{transform:none;opacity:1}}
+  .o3-banner{position:absolute;left:0;right:0;top:72%;text-align:center;font:700 7cqw Arial,sans-serif;color:#2f6fd6;animation:o3-pop .6s ease-out .6s backwards;}
+  .o3-confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+  .o3-confetti i{position:absolute;top:-4%;width:1.1cqw;height:1.6cqw;border-radius:.2cqw;opacity:.9;animation:o3-fall linear infinite;}
+  @keyframes o3-fall{to{transform:translateY(110cqh) rotate(720deg)}}
   @keyframes o3-slideL{from{transform:translateX(-70cqw);opacity:0}to{transform:none;opacity:1}}
   @keyframes o3-slideR{from{transform:translateX(70cqw);opacity:0}to{transform:none;opacity:1}}
   @keyframes o3-pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.12);opacity:1}100%{transform:none}}
@@ -181,6 +221,7 @@
   .omit3-stage .o3-enter-R{animation:o3-slideR .7s cubic-bezier(.2,.8,.3,1) backwards;}
   .omit3-stage .o3-enter-pop{animation:o3-pop .45s ease-out backwards;}
   .omit3-stage .o3-enter-fade{animation:o3-fade .5s ease-out backwards;}
+  .omit3-stage video ~ .omit3-next{right:2cqw;opacity:.7;}
   .omit3-next{position:absolute;right:18cqw;bottom:2cqw;font:600 2.4cqw Arial,sans-serif;padding:.9cqw 2.4cqw;border-radius:1.2cqw;border:0;background:#2f6fd6;color:#fff;cursor:pointer;display:none;}
   .omit3-why{position:absolute;left:50%;bottom:2cqw;transform:translateX(-50%);width:52cqw;display:none;background:rgba(255,255,255,.96);border:1px solid #ccc;border-radius:1.2cqw;padding:1cqw 1.2cqw;box-shadow:0 .3cqw 1.2cqw rgba(0,0,0,.12);}
   .omit3-why label{display:block;font:1.7cqw Arial,sans-serif;color:#444;margin-bottom:.5cqw;}
@@ -202,18 +243,23 @@
         right_audio: { type: 'STRING', default: null },
         why: { type: 'BOOL', default: false },
         why_audio: { type: 'STRING', default: 'why' },
-        auto_advance_ms: { type: 'INT', default: 900 },
+        auto_advance_ms: { type: 'INT', default: 500 },
         show_next: { type: 'BOOL', default: false },      // parent must press Next (no choices)
         min_ms: { type: 'INT', default: 0 },
         narrator: { type: 'BOOL', default: true },
+        stars: { type: 'INT', default: -1 },       // filled stars to show on the shelf (-1 hides it)
+        total_stars: { type: 'INT', default: 5 },
+        reward: { type: 'INT', default: 0 },       // >0: this page awards star #reward
+        video: { type: 'STRING', default: null },   // url: play a video full-stage, advance when it ends
       },
     };
     constructor(jsPsych) { this.jsPsych = jsPsych; }
     trial(display, trial) {
       const jsPsych = this.jsPsych;
       if (!cssInjected) { const s = document.createElement('style'); s.textContent = CSS; document.head.appendChild(s); cssInjected = true; }
-      const narrHtml = trial.narrator ? '<img class="omit3-narrator" src="' + asset('narrator/rest.png') + '" style="left:' + px(G.narrator[0]) + ';top:' + py(G.narrator[1]) + ';width:' + px(G.narrator[2]) + ';height:' + py(G.narrator[3]) + ';">' : '';
-      display.innerHTML = '<div class="omit3-wrap"><div class="omit3-stage">' + trial.scene + narrHtml +
+      const narrHtml = (trial.narrator && !trial.video) ? '<img class="omit3-narrator" src="' + asset('narrator/rest.png') + '" style="left:' + px(G.narrator[0]) + ';top:' + py(G.narrator[1]) + ';width:' + px(G.narrator[2]) + ';height:' + py(G.narrator[3]) + ';">' : '';
+      const shelf = trial.stars >= 0 ? shelfHtml(trial.stars, trial.total_stars) : '';
+      display.innerHTML = '<div class="omit3-wrap"><div class="omit3-stage">' + trial.scene + shelf + narrHtml +
         '<div class="omit3-why"><label>Grown-ups: please type what your child said (as close to their words as you can), then press Next.</label><textarea class="omit3-whytext" autocomplete="off"></textarea></div>' +
         '<button class="omit3-replay">&#9654; hear again</button><button class="omit3-next">Next &#8250;</button></div></div>';
       const narr = Narrator.attach(display.querySelector('.omit3-narrator'));
@@ -232,8 +278,8 @@
         else if (kind === 'pop') { cls = 'o3-enter-pop'; dur = 450; }
         else { cls = 'o3-enter-fade'; dur = 500; }
         let delay = 0;
-        if (kind === 'char') { delay = allNew ? 150 + 120 * (order++) : 100; }
-        else if (kind === 'pop') { delay = allNew ? 650 : 250; }     // bubbles/icons after the characters have arrived
+        if (kind === 'char') { delay = allNew ? 120 + 100 * (order++) : 80; }
+        else if (kind === 'pop') { delay = allNew ? 500 : 200; }     // bubbles/icons after the characters have arrived
         el.style.animationDelay = delay + 'ms'; el.classList.add(cls);
         enterMs = Math.max(enterMs, delay + dur);
       });
@@ -299,6 +345,26 @@
           });
         });
       }
+      if (trial.video) {
+        const v = document.createElement('video'); v.setAttribute('playsinline', ''); v.preload = 'auto';
+        // mp4 (H.264) first, then a .webm twin of the same name as a fallback for browsers without H.264
+        v.innerHTML = '<source src="' + trial.video + '" type="video/mp4"><source src="' + trial.video.replace(/\.mp4$/, '.webm') + '" type="video/webm">';
+        v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain;';
+        stage.insertBefore(v, stage.firstChild);
+        v.addEventListener('ended', () => { timer = setTimeout(finish, 400); });
+        v.querySelectorAll('source')[1].addEventListener('error', () => { nextBtn.style.display = 'block'; });
+        const p = v.play(); if (p && p.catch) p.catch(() => { nextBtn.style.display = 'block'; });
+        nextBtn.textContent = 'Skip \u203a'; setTimeout(() => { if (!finished) nextBtn.style.display = 'block'; }, 5000);
+        data.video = trial.video;
+        return;   // no narration on video pages
+      }
+      if (trial.reward > 0) {
+        const big = stage.querySelector('.o3-bigstar'), slot = stage.querySelector('.o3-slot[data-slot="' + trial.reward + '"]');
+        if (big && slot) setTimeout(() => {
+          big.classList.add('fly'); big.style.left = slot.style.left; big.style.top = slot.style.top; big.style.width = slot.style.width; big.style.height = slot.style.height;
+          setTimeout(() => { slot.classList.add('filled', 'just'); big.style.opacity = '0'; narr.react(); }, 800);
+        }, 1400);
+      }
       // small delay so images paint before narration starts
       setTimeout(() => play(trial.audio, afterNarration), 250 + enterMs);
     }
@@ -310,11 +376,17 @@
     BASE = opts.baseUrl || '';
     const vkey = opts.version || jsPsych.randomization.sampleWithoutReplacement(Object.keys(D.versions), 1)[0];
     const V = D.versions[vkey];
-    const why = opts.why !== undefined ? opts.why : true;   // ask Why? on the three DVs
+    // Why? prompts: 'all' = after every DV (and the two practice sharing items), 'friend' = only after the
+    // better-friends question (default), 'none' = never.
+    const whyMode = opts.why === true ? 'all' : opts.why === false ? 'none' : (opts.why || 'friend');
+    const why = whyMode === 'all', whyF = whyMode !== 'none';
+    const TOTAL = 5; let stars = 0;
+    const video = opts.video || {};   // { mid: url, end: url } — a cartoon break after story 2 and/or after the last star
     const T = [];
     const common = { version: vkey };
 
-    const scene = (p) => Object.assign({ type: Omit3ScenePlugin }, p, { data: Object.assign({}, common, p.data || {}) });
+    const scene = (p) => Object.assign({ type: Omit3ScenePlugin, stars: stars, total_stars: TOTAL }, p, { data: Object.assign({}, common, p.data || {}) });
+    const reward = (label) => { stars += 1; T.push(scene({ scene: SC.reward(stars, TOTAL), audio: 'rw_' + stars, stars: stars - 1, reward: stars, show_next: stars === TOTAL, data: { item: 'reward', reward: stars, after: label } })); };
 
     // framing
     T.push(scene({ scene: SC.frame('welcome'), audio: 'fr_welcome', show_next: true, data: { item: 'welcome' } }));
@@ -331,6 +403,7 @@
       correct: ballSide, wrong_audio: 'pr_ball_wrong', right_audio: 'pr_ball_right', data: Object.assign(prData('ball'), { correct_side: ballSide }) }));
     T.push(scene({ scene: SC.dv(pL, pR, 'juicebox', 'Who would ' + PR.prot + ' want to share a juice box with one straw with?'), audio: 'pr_juice', choices: true, why: why, data: prData('juice') }));
     T.push(scene({ scene: SC.dv(pL, pR, 'cookies', 'Who would ' + PR.prot + ' want to share cookies with?'), audio: 'pr_cookies', choices: true, why: why, data: prData('cookies') }));
+    reward('practice');
     T.push(scene({ scene: SC.frame('start'), audio: 'fr_start', data: { item: 'start' } }));
 
     // four trials
@@ -367,11 +440,14 @@
       T.push(tr({ scene: SC.memcheck(P, hi, d.c1, d.c2), audio: t + '_mem_' + hi, choices: true }, 'mem_hi', { content: hi, correct_side: hiTo === 1 ? 'left' : 'right' }));
       T.push(tr({ scene: SC.memcheck(P, lo, d.c1, d.c2), audio: t + '_mem_' + lo, choices: true }, 'mem_lo', { content: lo, correct_side: hiTo === 1 ? 'right' : 'left' }));
       // DVs
-      T.push(tr({ scene: SC.dv(d.c1, d.c2, null, 'Who do you think ' + P + ' is better friends with?'), audio: t + '_dv_friend', choices: true, why: why }, 'friend'));
+      T.push(tr({ scene: SC.dv(d.c1, d.c2, null, 'Who do you think ' + P + ' is better friends with?'), audio: t + '_dv_friend', choices: true, why: whyF }, 'friend'));
       T.push(tr({ scene: SC.dv(d.c1, d.c2, 'icecream', null), audio: t + '_dv_icecream', choices: true, why: why }, 'icecream'));
       T.push(tr({ scene: SC.dv(d.c1, d.c2, 'candy', null), audio: t + '_dv_candy', choices: true, why: why }, 'candy'));
+      reward(t);
+      if (idx === 1 && video.mid) T.push(scene({ scene: '', audio: 'vd_mid', data: { item: 'video_intro' } }), scene({ scene: '', video: video.mid, stars: stars, data: { item: 'video' } }));
     });
 
+    if (video.end) T.push(scene({ scene: '', audio: 'vd_end', data: { item: 'video_intro' } }), scene({ scene: '', video: video.end, stars: stars, data: { item: 'video' } }));
     T.push(scene({ scene: SC.frame('alldone'), audio: 'fr_done', show_next: true, data: { item: 'done' } }));
 
     // derived fields on every choice trial
