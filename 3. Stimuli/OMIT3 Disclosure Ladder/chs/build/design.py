@@ -110,6 +110,7 @@ N['pr_friend2_best'] = f'And this is {B}. {B} is {S}\'s best friend.'
 N['pr_ball'] = 'Look, one of them is holding a ball. Which one is holding a ball? Click on the one holding the ball.'
 N['pr_ball_wrong'] = 'Hmm, that one isn\'t holding a ball. Can you click on the one who is holding the ball?'
 N['pr_ball_right'] = 'That\'s right! That one is holding the ball.'
+N['pr_friend_q'] = f'Who do you think {S} is better friends with:'
 N['pr_juice'] = f'{S} has a juice box with one straw. Who do you think {S} would want to share the juice box with:'
 N['pr_cookies'] = f'{S} has some cookies. Who do you think {S} would want to share the cookies with:'
 # option labels read after a practice question, in left-to-right order (the named character shakes)

@@ -444,6 +444,8 @@
     const optText = pL + ', ' + PR.prot + '\u2019s ' + roleL + ', or ' + pR + ', ' + PR.prot + '\u2019s ' + roleR + '?';
     T.push(scene({ scene: SC.ball(pL, pR, ballSide, 'Which one is holding a ball?'), audio: 'pr_ball', choices: true,
       correct: ballSide, wrong_audio: 'pr_ball_wrong', right_audio: 'pr_ball_right', praise_always: true, data: Object.assign(prData('ball'), { correct_side: ballSide }) }));
+    // better-friends wording check: with the roles just given, children should pick the best friend
+    T.push(scene({ scene: SC.dv(pL, pR, null, 'Who do you think ' + PR.prot + ' is better friends with: ' + optText), audio: [{ key: 'pr_friend_q' }].concat(labels), choices: true, why: why, data: prData('friend_q') }));
     T.push(scene({ scene: SC.dv(pL, pR, 'juicebox', 'Who would ' + PR.prot + ' want to share a juice box with one straw with: ' + optText), audio: [{ key: 'pr_juice' }].concat(labels), choices: true, why: why, data: prData('juice') }));
     T.push(scene({ scene: SC.dv(pL, pR, 'cookies', 'Who would ' + PR.prot + ' want to share cookies with: ' + optText), audio: [{ key: 'pr_cookies' }].concat(labels), choices: true, why: why, data: prData('cookies') }));
     reward('practice');

@@ -35,7 +35,7 @@ StopRecord), `chsSurvey` (ExitSurvey). The task's own plugin (`omit3-scene`) is 
 ## Session flow
 
 fullscreen → video config → video consent → payment email → preload → two instruction pages → **start recording** →
-welcome → practice (Sam; Quinn = best friend, Rowan = friend: ball → juice box with one straw → cookies) → star 1 → "Let's get started" →
+welcome → practice (Sam; Quinn = best friend, Rowan = friend: ball → "Who is Sam better friends with?" (wording check; expected: best friend) → juice box with one straw → cookies) → star 1 → "Let's get started" →
 4 trials in the version's order, each: intro → two establishing pages → classmate 1 (told, then not told) → classmate 2 (told, then not told) →
 memory check (higher-rung content) → memory check (lower-rung) → better friends with? (+Why) → single ice cream cone → candy → star →
 "All done" (Finish button returns to CHS) → **stop recording** → exit survey → debrief.

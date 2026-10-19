@@ -28,6 +28,8 @@ roles named in the narration. Three forced choices between Quinn and Rowan follo
 
 1. **Ball** — one of the two is holding a ball; "Which one is holding a ball?" Response training only
    (teaches the two-picture click); has a correct answer, scored for exclusion like a memory check.
+1b. **Better friends** — "Who do you think Sam is better friends with: Quinn, Sam's best friend, or Rowan, Sam's friend?"
+   Wording check for the primary DV: with the roles just stated, children should pick the best friend. Expected: best friend.
 2. **Juice box with one straw** — "Who would Sam want to share a juice box with one straw with? Why?"
    Manipulation check for the physical-intimacy item: addresses the reviewer worry that children do not
    read a single-portion item as intimate. Expected: best friend.
@@ -63,6 +65,17 @@ Nested:
   balanced across trial orders and across patterns P/Q). CSV column `dv_item_first`. Study 1 always asked ice cream first.
 
 Fixed across versions: classmate 1 on the left; better-friends question always first.
+
+## Primary-DV wording (for the preregistration)
+
+Study 1 asked "Who do you think is the better friend?" (confirmed by Megan Richardson, 19 Oct 2026). OMIT3 asks
+"Who do you think [protagonist] is better friends with?" This is a deliberate change. The unanchored form invites a
+reading about the classmates' conduct toward the protagonist ("who was nicer?"), whereas both classmates behave
+identically in every story and only what they were told differs; "better friends with" names the relationship as the
+object of the judgment, which is the construct the study is about (closeness inferred from disclosure), and matches the
+wording already used in the Study 1 Results ("who was better friends with the protagonist"). The practice item
+"Who do you think Sam is better friends with?" checks that children map the phrase onto the best-friend role. The
+change will be noted in Methods when OMIT3 is reported alongside Study 1.
 
 ## Variables the data must carry (per trial)
 
