@@ -20,7 +20,7 @@ SH_memfix_happy_blake.mp3,"Actually, Casey told Blake about feeling happy today.
 SH_memfix_happy_morgan.mp3,"Actually, Casey told Morgan about feeling happy today. Let's try again. Which classmate did Casey tell about feeling happy today?"
 SH_dv_friend.mp3,Who do you think Casey is better friends with?
 SH_dv_icecream.mp3,"Who do you think Casey would want to share a single ice cream cone with, by licking the ice cream cone?"
-SH_dv_candy.mp3,Who do you think Casey would want to share candy with?
+SH_dv_candy.mp3,"Who do you think Casey would want to share candy with, by sharing a few of the candies?"
 SF_intro.mp3,This is Percy. I'm going to tell you a story about what happened to Percy at school today.
 SF_est_sad.mp3,"At school today, Percy felt sad, and Percy didn't know why."
 SF_enc1_told_sad.mp3,"After school, Percy saw a classmate named Avery. Avery said, ""Hi Percy! How was school today?"" Percy told Avery about feeling sad today."
@@ -40,7 +40,7 @@ SF_memfix_fox_avery.mp3,"Actually, Percy told Avery about how foxes move without
 SF_memfix_fox_orin.mp3,"Actually, Percy told Orin about how foxes move without making any sound. Let's try again. Which classmate did Percy tell the fact about foxes?"
 SF_dv_friend.mp3,Who do you think Percy is better friends with?
 SF_dv_icecream.mp3,"Who do you think Percy would want to share a single ice cream cone with, by licking the ice cream cone?"
-SF_dv_candy.mp3,Who do you think Percy would want to share candy with?
+SF_dv_candy.mp3,"Who do you think Percy would want to share candy with, by sharing a few of the candies?"
 HF_intro.mp3,This is Kendall. I'm going to tell you a story about what happened to Kendall at school today.
 HF_est_happy.mp3,"At school today, Kendall felt happy, and Kendall didn't know why."
 HF_enc1_told_happy.mp3,"After school, Kendall saw a classmate named Riley. Riley said, ""Hi Kendall! How was school today?"" Kendall told Riley about feeling happy today."
@@ -60,16 +60,16 @@ HF_memfix_elephant_riley.mp3,"Actually, Kendall told Riley about how elephants m
 HF_memfix_elephant_cameron.mp3,"Actually, Kendall told Cameron about how elephants move mostly in the morning. Let's try again. Which classmate did Kendall tell the fact about elephants?"
 HF_dv_friend.mp3,Who do you think Kendall is better friends with?
 HF_dv_icecream.mp3,"Who do you think Kendall would want to share a single ice cream cone with, by licking the ice cream cone?"
-HF_dv_candy.mp3,Who do you think Kendall would want to share candy with?
+HF_dv_candy.mp3,"Who do you think Kendall would want to share candy with, by sharing a few of the candies?"
 PF_intro.mp3,This is Jamie. I'm going to tell you a story about what happened to Jamie at school today.
 PF_est_owl_fav.mp3,"In school today, Jamie found out that owls are their favorite animal."
-PF_enc1_told_owl_fav.mp3,"After school, Jamie saw a classmate named Elliot. Elliot said, ""Hi Jamie! How was school today?"" Jamie told Elliot that owls are their favorite animal."
-PF_enc1_nottold_owl_fav.mp3,Jamie did not tell Elliot that owls are their favorite animal.
-PF_enc2_told_owl_fav.mp3,"Then Jamie saw another classmate named Parker. Parker said, ""Hi Jamie! How was school today?"" Jamie told Parker that owls are their favorite animal."
-PF_enc2_nottold_owl_fav.mp3,Jamie did not tell Parker that owls are their favorite animal.
-PF_mem_owl_fav.mp3,Which classmate did Jamie tell that owls are their favorite animal?
-PF_memfix_owl_fav_elliot.mp3,"Actually, Jamie told Elliot that owls are their favorite animal. Let's try again. Which classmate did Jamie tell that owls are their favorite animal?"
-PF_memfix_owl_fav_parker.mp3,"Actually, Jamie told Parker that owls are their favorite animal. Let's try again. Which classmate did Jamie tell that owls are their favorite animal?"
+PF_enc1_told_owl_fav.mp3,"After school, Jamie saw a classmate named Elliot. Elliot said, ""Hi Jamie! How was school today?"" Jamie told Elliot that they found out owls are their favorite animal."
+PF_enc1_nottold_owl_fav.mp3,Jamie did not tell Elliot that they found out owls are their favorite animal.
+PF_enc2_told_owl_fav.mp3,"Then Jamie saw another classmate named Parker. Parker said, ""Hi Jamie! How was school today?"" Jamie told Parker that they found out owls are their favorite animal."
+PF_enc2_nottold_owl_fav.mp3,Jamie did not tell Parker that they found out owls are their favorite animal.
+PF_mem_owl_fav.mp3,Which classmate did Jamie tell that they found out owls are their favorite animal?
+PF_memfix_owl_fav_elliot.mp3,"Actually, Jamie told Elliot that they found out owls are their favorite animal. Let's try again. Which classmate did Jamie tell that they found out owls are their favorite animal?"
+PF_memfix_owl_fav_parker.mp3,"Actually, Jamie told Parker that they found out owls are their favorite animal. Let's try again. Which classmate did Jamie tell that they found out owls are their favorite animal?"
 PF_est_rabbit.mp3,"In school today, Jamie learned that rabbits move by hopping on their back legs."
 PF_enc1_told_rabbit.mp3,"After school, Jamie saw a classmate named Elliot. Elliot said, ""Hi Jamie! How was school today?"" Jamie told Elliot about how rabbits move by hopping on their back legs."
 PF_enc1_nottold_rabbit.mp3,Jamie did not tell Elliot about how rabbits move by hopping on their back legs.
@@ -79,13 +79,13 @@ PF_mem_rabbit.mp3,Which classmate did Jamie tell the fact about rabbits?
 PF_memfix_rabbit_elliot.mp3,"Actually, Jamie told Elliot about how rabbits move by hopping on their back legs. Let's try again. Which classmate did Jamie tell the fact about rabbits?"
 PF_memfix_rabbit_parker.mp3,"Actually, Jamie told Parker about how rabbits move by hopping on their back legs. Let's try again. Which classmate did Jamie tell the fact about rabbits?"
 PF_est_rabbit_fav.mp3,"In school today, Jamie found out that rabbits are their favorite animal."
-PF_enc1_told_rabbit_fav.mp3,"After school, Jamie saw a classmate named Elliot. Elliot said, ""Hi Jamie! How was school today?"" Jamie told Elliot that rabbits are their favorite animal."
-PF_enc1_nottold_rabbit_fav.mp3,Jamie did not tell Elliot that rabbits are their favorite animal.
-PF_enc2_told_rabbit_fav.mp3,"Then Jamie saw another classmate named Parker. Parker said, ""Hi Jamie! How was school today?"" Jamie told Parker that rabbits are their favorite animal."
-PF_enc2_nottold_rabbit_fav.mp3,Jamie did not tell Parker that rabbits are their favorite animal.
-PF_mem_rabbit_fav.mp3,Which classmate did Jamie tell that rabbits are their favorite animal?
-PF_memfix_rabbit_fav_elliot.mp3,"Actually, Jamie told Elliot that rabbits are their favorite animal. Let's try again. Which classmate did Jamie tell that rabbits are their favorite animal?"
-PF_memfix_rabbit_fav_parker.mp3,"Actually, Jamie told Parker that rabbits are their favorite animal. Let's try again. Which classmate did Jamie tell that rabbits are their favorite animal?"
+PF_enc1_told_rabbit_fav.mp3,"After school, Jamie saw a classmate named Elliot. Elliot said, ""Hi Jamie! How was school today?"" Jamie told Elliot that they found out rabbits are their favorite animal."
+PF_enc1_nottold_rabbit_fav.mp3,Jamie did not tell Elliot that they found out rabbits are their favorite animal.
+PF_enc2_told_rabbit_fav.mp3,"Then Jamie saw another classmate named Parker. Parker said, ""Hi Jamie! How was school today?"" Jamie told Parker that they found out rabbits are their favorite animal."
+PF_enc2_nottold_rabbit_fav.mp3,Jamie did not tell Parker that they found out rabbits are their favorite animal.
+PF_mem_rabbit_fav.mp3,Which classmate did Jamie tell that they found out rabbits are their favorite animal?
+PF_memfix_rabbit_fav_elliot.mp3,"Actually, Jamie told Elliot that they found out rabbits are their favorite animal. Let's try again. Which classmate did Jamie tell that they found out rabbits are their favorite animal?"
+PF_memfix_rabbit_fav_parker.mp3,"Actually, Jamie told Parker that they found out rabbits are their favorite animal. Let's try again. Which classmate did Jamie tell that they found out rabbits are their favorite animal?"
 PF_est_owl.mp3,"In school today, Jamie learned that owls can turn their heads almost all the way around."
 PF_enc1_told_owl.mp3,"After school, Jamie saw a classmate named Elliot. Elliot said, ""Hi Jamie! How was school today?"" Jamie told Elliot about how owls can turn their heads almost all the way around."
 PF_enc1_nottold_owl.mp3,Jamie did not tell Elliot about how owls can turn their heads almost all the way around.
@@ -96,7 +96,7 @@ PF_memfix_owl_elliot.mp3,"Actually, Jamie told Elliot about how owls can turn th
 PF_memfix_owl_parker.mp3,"Actually, Jamie told Parker about how owls can turn their heads almost all the way around. Let's try again. Which classmate did Jamie tell the fact about owls?"
 PF_dv_friend.mp3,Who do you think Jamie is better friends with?
 PF_dv_icecream.mp3,"Who do you think Jamie would want to share a single ice cream cone with, by licking the ice cream cone?"
-PF_dv_candy.mp3,Who do you think Jamie would want to share candy with?
+PF_dv_candy.mp3,"Who do you think Jamie would want to share candy with, by sharing a few of the candies?"
 pr_intro.mp3,"Before we start, let's practice. This is Sam."
 pr_friend1_best.mp3,Sam has two friends. This is Quinn. Quinn is Sam's best friend.
 pr_friend2_friend.mp3,And this is Rowan. Rowan is Sam's friend.

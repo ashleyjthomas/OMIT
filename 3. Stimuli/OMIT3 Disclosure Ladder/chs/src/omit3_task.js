@@ -204,7 +204,7 @@
   .omit3-stage .zone.chosen{outline:0.6cqw solid #f5b400;outline-offset:0.4cqw;border-radius:1cqw;}
   .omit3-stage .zone.dim{opacity:.35;}
   @keyframes o3-shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-7deg) translateY(-2cqw)}40%{transform:rotate(6deg)}60%{transform:rotate(-5deg) translateY(-1cqw)}80%{transform:rotate(4deg)}}
-  .omit3-stage .shake{animation:o3-shake .7s ease-in-out infinite;transform-origin:50% 90%;}
+  .omit3-stage .shake{animation:o3-shake .7s ease-in-out infinite !important;transform-origin:50% 90%;}
   .omit3-narrator{position:absolute;pointer-events:none;}
   .o3-star path{fill:#e6e6e6;stroke:#bdbdbd;stroke-width:4;transition:fill .3s,stroke .3s;}
   .o3-slot.filled .o3-star path{fill:#f5b400;stroke:#d08f00;}
@@ -306,7 +306,8 @@
         display.innerHTML = '';
         jsPsych.finishTrial(data);
       };
-      const shakeOn = (side) => { stage.querySelectorAll('[data-choice="' + side + '"]').forEach((z) => z.classList.add('shake')); };
+      // the entrance animation (o3-enter-*) would otherwise override the shake animation on a character that has just slid in
+      const shakeOn = (side) => { stage.querySelectorAll('[data-choice="' + side + '"]').forEach((z) => { z.classList.remove('o3-enter-L', 'o3-enter-R', 'o3-enter-pop', 'o3-enter-fade'); z.style.animationDelay = ''; z.classList.add('shake'); }); };
       const shakeOff = () => { stage.querySelectorAll('.shake').forEach((z) => z.classList.remove('shake')); };
       const play = (key, onEnd) => {
         if (audio) { audio.pause(); }

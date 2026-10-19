@@ -27,12 +27,12 @@ CONTENTS = {
                      est='In school today, {P} learned that owls can turn their heads almost all the way around.',
                      mem='Which classmate did {P} tell the fact about owls?'),
     # personal preferences
-    'owl_fav':    dict(kind='pref', icon='owl_fav', told='that owls are their favorite animal',
+    'owl_fav':    dict(kind='pref', icon='owl_fav', told='that they found out owls are their favorite animal',
                        est='In school today, {P} found out that owls are their favorite animal.',
-                       mem='Which classmate did {P} tell that owls are their favorite animal?'),
-    'rabbit_fav': dict(kind='pref', icon='rabbit_fav', told='that rabbits are their favorite animal',
+                       mem='Which classmate did {P} tell that they found out owls are their favorite animal?'),
+    'rabbit_fav': dict(kind='pref', icon='rabbit_fav', told='that they found out rabbits are their favorite animal',
                        est='In school today, {P} found out that rabbits are their favorite animal.',
-                       mem='Which classmate did {P} tell that rabbits are their favorite animal?'),
+                       mem='Which classmate did {P} tell that they found out rabbits are their favorite animal?'),
 }
 
 TRIALS = {
@@ -99,7 +99,7 @@ for t, d in TRIALS.items():
             N[f'{t}_memfix_{c}_{C.lower()}'] = f'Actually, {P} told {C} {cd["told"]}. Let\'s try again. ' + cd['mem'].format(P=P)
     N[f'{t}_dv_friend'] = f'Who do you think {P} is better friends with?'
     N[f'{t}_dv_icecream'] = f'Who do you think {P} would want to share a single ice cream cone with, by licking the ice cream cone?'
-    N[f'{t}_dv_candy'] = f'Who do you think {P} would want to share candy with?'
+    N[f'{t}_dv_candy'] = f'Who do you think {P} would want to share candy with, by sharing a few of the candies?'
 
 S, B, F = PRACTICE['prot'], PRACTICE['best'], PRACTICE['friend']
 N['pr_intro'] = f'Before we start, let\'s practice. This is {S}.'
