@@ -475,11 +475,11 @@
         T.push(tr({ scene: SC.establish(P, c, sceneOf[c] || 'school'), audio: key }, 'establish_' + (c === hi ? 'hi' : 'lo'),
           { content: c, scene: sceneOf[c] || 'school' }));
       });
-      // encounters: classmate 1 then classmate 2; told first, then not told
+      // encounters: classmate 1 then classmate 2; on each, the meeting + what was NOT told first, then what was told
       [[1, d.c1], [2, d.c2]].forEach(([ci, C]) => {
         const told = hiTo === ci ? hi : lo, not = hiTo === ci ? lo : hi;
+        T.push(tr({ scene: SC.encounter(P, C, not, false), audio: [{ key: t + '_meet' + ci }, { key: t + '_enc' + ci + '_nottold_' + not }] }, 'enc' + ci + '_nottold', { classmate: C, content: not }));
         T.push(tr({ scene: SC.encounter(P, C, told, true), audio: t + '_enc' + ci + '_told_' + told }, 'enc' + ci + '_told', { classmate: C, content: told }));
-        T.push(tr({ scene: SC.encounter(P, C, not, false), audio: t + '_enc' + ci + '_nottold_' + not }, 'enc' + ci + '_nottold', { classmate: C, content: not }));
       });
       // memory checks: higher rung first, then lower
       const mem = (c, side, item) => {

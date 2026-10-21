@@ -15,8 +15,8 @@ Supersedes the counterbalance section of the 8 Oct handoff. Companion file: `OMI
 "Higher-rung content" = sad (SH), the emotion (SF, HF), the preference (PF). Every forced choice is
 scored 1 when the child picks the classmate who was told the higher-rung content.
 
-Per trial: establish both contents → classmate 1 encounter (told one content, not the other) →
-classmate 2 encounter (the reverse) → memory check (which classmate was told the higher-rung
+Per trial: establish both contents → classmate 1 encounter (meets; first what was NOT told, then what was told) →
+classmate 2 encounter (the reverse contents, same not-told-then-told order) → memory check (which classmate was told the higher-rung
 content) → "Who do you think [name] is better friends with?" (+ Why?) → single ice cream cone → partitionable candy.
 No consent slide in the CHS build: CHS frames handle consent.
 
@@ -91,4 +91,4 @@ Participant: age_days, gender, version, modality, exclusion_flag.
 - Tear size: keeping as is (decided 18 Oct).
 - Ice cream wording (CHS): "Who do you think [P] would want to share a single ice cream cone with, by licking the ice cream cone?"
 - Done 18 Oct: "Jamie found out their favourite animal is…"; "a single ice cream cone" in all four trials;
-  second memory check per trial; told-then-not-told order in every encounter; practice block added.
+  second memory check per trial; not-told-then-told order in every encounter (changed 21 Oct from told-then-not-told); practice block added.

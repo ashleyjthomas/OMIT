@@ -12,7 +12,7 @@ follow `../OMIT3_counterbalance_spec.md` and `../OMIT3_versions.csv`.
 | `dist/chs_protocol.js` | **Paste this into the CHS study editor** (jsPsych study type). Self-contained: design table, scenes, custom plugin, consent, instructions, exit survey, debrief. |
 | `dist/omit3_task.bundle.js` | The task alone (design + scenes + plugin), used by `index.html`. |
 | `index.html` | Standalone test runner. Open from a web server (or GitHub Pages) with `?version=V3`, `&why=0` to skip Why?, `&dl=1` to download the CSV at the end. |
-| `assets/` | Images: `characters/`, `icons/`, `bg/`, `frames/`, `layers/` (cloud, balloon, no-symbol), `narrator/` (6 mouth/eye frames). |
+| `assets/` | Images (characters redrawn as kids on 20 Oct 2026 from a GPT sheet, shirt colour = the original alien's body colour; the Study 1 aliens are kept in `assets/characters_aliens/` and `assets/icons_aliens/` — copy them back over `characters/` and the four expression icons to revert): `characters/`, `icons/`, `bg/`, `frames/`, `layers/` (cloud, balloon, no-symbol), `narrator/` (6 mouth/eye frames). |
 | `audio/` | Narration mp3s, one per narration unit (91 files). **Currently placeholder TTS**; `audio/narration_script.csv` is the recording script. |
 | `design.json` | Generated: contents, trials, versions, narration texts. |
 | `src/` | Sources: `omit3_task.js` (scenes + plugin + timeline), `chs_protocol_template.js`, `index_template.html`. |
@@ -36,7 +36,7 @@ StopRecord), `chsSurvey` (ExitSurvey). The task's own plugin (`omit3-scene`) is 
 
 fullscreen → video config → video consent → payment email → preload → two instruction pages → **start recording** →
 welcome → practice (Sam; Quinn = best friend, Rowan = friend: ball → "Who is Sam better friends with?" (wording check; expected: best friend) → juice box with one straw → cookies) → star 1 → "Let's get started" →
-4 trials in the version's order, each: intro → two establishing pages → classmate 1 (told, then not told) → classmate 2 (told, then not told) →
+4 trials in the version's order, each: intro → two establishing pages → classmate 1 (meets; what was not told, then what was told) → classmate 2 (same) →
 memory check (higher-rung content) → memory check (lower-rung) → better friends with? (+Why) → single ice cream cone → candy → star →
 "All done" (Finish button returns to CHS) → **stop recording** → exit survey → debrief.
 

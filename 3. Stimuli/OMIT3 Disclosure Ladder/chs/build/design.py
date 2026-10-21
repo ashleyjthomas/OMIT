@@ -73,12 +73,21 @@ assert len(VERSIONS) == 8, VERSIONS.keys()
 # ---------------------------------------------------------------- narration
 N = {}   # audio key -> text
 
-def enc_told(P, C, phrase, first):
+def enc_meet(P, C, first):
     lead = f'After school, {P} saw a classmate named {C}.' if first else f'Then {P} saw another classmate named {C}.'
-    return f'{lead} {C} said, "Hi {P}! How was school today?" {P} told {C} {phrase}.'
+    return f'{lead} {C} said, "Hi {P}! How was school today?"'
 
-def enc_nottold(P, C, phrase):
-    return f'{P} did not tell {C} {phrase}.'
+def enc_told(P, C, phrase):
+    return f'{P} told {C} {phrase}.'
+
+def enc_nottold(P, C, cd):
+    # emotion: "didn't say anything about being sad"; fact: "didn't say anything about how foxes...";
+    # preference: "didn't say that they found out owls are their favorite animal"
+    if cd['kind'] == 'emotion':
+        return f"{P} didn't say anything about being {cd['told'].split()[-2]}."
+    if cd['kind'] == 'fact':
+        return f"{P} didn't say anything {cd['told']}."
+    return f"{P} didn't say {cd['told']}."
 
 for t, d in TRIALS.items():
     P = d['prot']
@@ -92,8 +101,9 @@ for t, d in TRIALS.items():
         else:
             N[f'{t}_est_{c}'] = cd['est'].format(P=P)
         for ci, C in ((1, d['c1']), (2, d['c2'])):
-            N[f'{t}_enc{ci}_told_{c}'] = enc_told(P, C, cd['told'], first=(ci == 1))
-            N[f'{t}_enc{ci}_nottold_{c}'] = enc_nottold(P, C, cd['told'])
+            N[f'{t}_meet{ci}'] = enc_meet(P, C, first=(ci == 1))
+            N[f'{t}_enc{ci}_told_{c}'] = enc_told(P, C, cd['told'])
+            N[f'{t}_enc{ci}_nottold_{c}'] = enc_nottold(P, C, cd)
         N[f'{t}_mem_{c}'] = cd['mem'].format(P=P)
         for C in (d['c1'], d['c2']):   # corrective feedback after a wrong memory-check answer
             N[f'{t}_memfix_{c}_{C.lower()}'] = f'Actually, {P} told {C} {cd["told"]}. Let\'s try again. ' + cd['mem'].format(P=P)
