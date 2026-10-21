@@ -89,6 +89,13 @@ def enc_nottold(P, C, cd):
         return f"{P} didn't say anything {cd['told']}."
     return f"{P} didn't say {cd['told']}."
 
+def nottold_to(P, C, cd):
+    if cd['kind'] == 'emotion':
+        return f"{P} didn't say anything to {C} about being {cd['told'].split()[-2]}."
+    if cd['kind'] == 'fact':
+        return f"{P} didn't tell {C} anything {cd['told']}."
+    return f"{P} didn't tell {C} {cd['told']}."
+
 for t, d in TRIALS.items():
     P = d['prot']
     N[f'{t}_intro'] = f'This is {P}. I\'m going to tell you a story about what happened to {P} at school today.'
@@ -104,11 +111,14 @@ for t, d in TRIALS.items():
             N[f'{t}_meet{ci}'] = enc_meet(P, C, first=(ci == 1))
             N[f'{t}_enc{ci}_told_{c}'] = enc_told(P, C, cd['told'])
             N[f'{t}_enc{ci}_nottold_{c}'] = enc_nottold(P, C, cd)
-        N[f'{t}_mem_{c}'] = cd['mem'].format(P=P)
-        for C in (d['c1'], d['c2']):   # corrective feedback after a wrong memory-check answer
-            N[f'{t}_memfix_{c}_{C.lower()}'] = f'Actually, {P} told {C} {cd["told"]}. Let\'s try again. ' + cd['mem'].format(P=P)
+        if True:   # yes/no checks for every content, one per classmate
+            for ci, C in ((1, d['c1']), (2, d['c2'])):
+                q = f'Just to double check: did {P} tell {C} {cd["told"]}?'
+                N[f'{t}_yn{ci}_{c}'] = q
+                N[f'{t}_ynfix{ci}_{c}_yes'] = f'Actually, {P} told {C} {cd["told"]}. Let\'s try again. {q}'
+                N[f'{t}_ynfix{ci}_{c}_no'] = f'Actually, ' + nottold_to(P, C, cd) + f' Let\'s try again. {q}'
     N[f'{t}_dv_friend'] = f'Who do you think {P} is better friends with?'
-    N[f'{t}_dv_icecream'] = f'Who do you think {P} would want to share a single ice cream cone with, by licking the ice cream cone?'
+    N[f'{t}_dv_icecream'] = f'Who do you think {P} would want to share the ice cream with, even though they\'d have to lick the same ice cream cone?'
     N[f'{t}_dv_candy'] = f'Who do you think {P} would want to share candy with, by sharing a few of the candies?'
 
 S, B, F = PRACTICE['prot'], PRACTICE['best'], PRACTICE['friend']
@@ -121,7 +131,7 @@ N['pr_ball'] = 'Look, one of them is holding a ball. Which one is holding a ball
 N['pr_ball_wrong'] = 'Hmm, that one isn\'t holding a ball. Can you click on the one who is holding the ball?'
 N['pr_ball_right'] = 'That\'s right! That one is holding the ball.'
 N['pr_friend_q'] = f'Who do you think {S} is better friends with:'
-N['pr_juice'] = f'{S} has a juice box with one straw. Who do you think {S} would want to share the juice box with:'
+N['pr_juice'] = f'{S} has a juice box with one straw. Who do you think {S} would want to share the juice with, even though they\'d have to use the same straw:'
 N['pr_cookies'] = f'{S} has some cookies. Who do you think {S} would want to share the cookies with:'
 # option labels read after a practice question, in left-to-right order (the named character shakes)
 N['pr_best_first'] = f'{B}, {S}\'s best friend,'

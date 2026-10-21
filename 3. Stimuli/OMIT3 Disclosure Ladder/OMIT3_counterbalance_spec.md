@@ -16,8 +16,8 @@ Supersedes the counterbalance section of the 8 Oct handoff. Companion file: `OMI
 scored 1 when the child picks the classmate who was told the higher-rung content.
 
 Per trial: establish both contents → classmate 1 encounter (meets; first what was NOT told, then what was told) →
-classmate 2 encounter (the reverse contents, same not-told-then-told order) → memory check (which classmate was told the higher-rung
-content) → "Who do you think [name] is better friends with?" (+ Why?) → single ice cream cone → partitionable candy.
+classmate 2 encounter (the reverse contents, same not-told-then-told order) → four yes/no comprehension checks ("Just to double check: did P tell C <content>?" — higher-rung content for
+classmate 1 then 2, then the other content for classmate 1 then 2; wrong answers corrected and re-asked; first answer scored) → "Who do you think [name] is better friends with?" (+ Why?) → single ice cream cone → partitionable candy.
 No consent slide in the CHS build: CHS frames handle consent.
 
 ## Practice block (deck slides 5–9, before trial 1)
@@ -81,7 +81,7 @@ change will be noted in Methods when OMIT3 is reported alongside Study 1.
 
 version, position, trial, dv_item_first, practice_best_friend_side, practice_ball_holder, practice_ball_correct,
 practice_straw (1 = best friend), practice_cookies (1 = best friend), higher_rung_told_to (classmate 1/2), higher_rung_classmate (name),
-narration_recording (A/B), sh_emotion_first, sh_sad_scene, pf_favourite_animal, memory_check_correct (first answer; wrong answers are corrected and re-asked),
+narration_recording (A/B), sh_emotion_first, sh_sad_scene, pf_favourite_animal, check_hi1, check_hi2, check_lo1, check_lo2 (yes/no comprehension checks; first answer scored, wrong answers corrected and re-asked),
 better_friend (1 = higher rung), icecream (1 = higher rung), candy (1 = higher rung), why_text.
 Participant: age_days, gender, version, modality, exclusion_flag.
 
@@ -89,6 +89,6 @@ Participant: age_days, gender, version, modality, exclusion_flag.
 
 - Whether "Why?" audio is recorded on CHS for better friend only, or for all three DVs.
 - Tear size: keeping as is (decided 18 Oct).
-- Ice cream wording (CHS): "Who do you think [P] would want to share a single ice cream cone with, by licking the ice cream cone?"
+- Ice cream wording (CHS): "Who do you think [P] would want to share the ice cream with, even though they'd have to lick the same ice cream cone?"; practice juice: "…share the juice with, even though they'd have to use the same straw"
 - Done 18 Oct: "Jamie found out their favourite animal is…"; "a single ice cream cone" in all four trials;
   second memory check per trial; not-told-then-told order in every encounter (changed 21 Oct from told-then-not-told); practice block added.

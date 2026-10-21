@@ -37,7 +37,7 @@ StopRecord), `chsSurvey` (ExitSurvey). The task's own plugin (`omit3-scene`) is 
 fullscreen → video config → video consent → payment email → preload → two instruction pages → **start recording** →
 welcome → practice (Sam; Quinn = best friend, Rowan = friend: ball → "Who is Sam better friends with?" (wording check; expected: best friend) → juice box with one straw → cookies) → star 1 → "Let's get started" →
 4 trials in the version's order, each: intro → two establishing pages → classmate 1 (meets; what was not told, then what was told) → classmate 2 (same) →
-memory check (higher-rung content) → memory check (lower-rung) → better friends with? (+Why) → single ice cream cone → candy → star →
+four yes/no checks ("Just to double check: did P tell C <content>?": higher-rung content for classmate 1 then 2, then the other content for classmate 1 then 2; corrected and re-asked if wrong) → better friends with? (+Why) → single ice cream cone → candy → star →
 "All done" (Finish button returns to CHS) → **stop recording** → exit survey → debrief.
 
 Story pages play their narration and advance on their own (~0.9 s after the audio ends); a "hear again"

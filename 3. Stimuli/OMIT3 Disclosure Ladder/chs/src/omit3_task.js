@@ -120,10 +120,13 @@
       }
       return h;
     },
-    memcheck: (P, content, left, right) => {
+    // yes/no check: the classmate being asked about, the content, and two big buttons
+    yesno: (P, content, who, text) => {
       const ic = iconFile(content, P);
-      return img(asset('bg/question.png'), G.qmark) + img(asset('icons/' + ic + '.png'), fitRect(ic, G.memSlot)) +
-        charImg(left, G.figLmem, { cls: 'zone', choice: 'left' }) + charImg(right, G.figRmem, { cls: 'zone', choice: 'right' });
+      return '<div class="qtext" style="position:absolute;left:' + px(G.text[0]) + ';top:' + py(0.55) + ';width:' + px(G.text[2]) + ';">' + text + '</div>' +
+        charImg(who, [4.23, 1.35, 1.54, 1.88]) + img(asset('icons/' + ic + '.png'), fitRect(ic, { cx: 6.35, cy: 2.0, w: 1.2, h: 1.0 })) +
+        '<div class="zone o3-yn o3-yes" data-choice="yes" style="left:' + px(2.4) + ';top:' + py(3.7) + ';">&#10003; Yes</div>' +
+        '<div class="zone o3-yn o3-no" data-choice="no" style="left:' + px(5.6) + ';top:' + py(3.7) + ';">&#10007; No</div>';
     },
     dv: (left, right, prop, text) => {
       let h = '';
@@ -203,6 +206,8 @@
   .omit3-stage.ready .zone:hover{transform:scale(1.06);}
   .omit3-stage .zone.chosen{outline:0.6cqw solid #f5b400;outline-offset:0.4cqw;border-radius:1cqw;}
   .omit3-stage .zone.dim{opacity:.35;}
+  .o3-yn{position:absolute;width:20cqw;height:9cqw;border-radius:2cqw;font:700 4cqw Arial,sans-serif;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 .4cqw 0 rgba(0,0,0,.18);}
+  .o3-yes{background:#39b54a;} .o3-no{background:#e8553e;}
   @keyframes o3-shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-7deg) translateY(-2cqw)}40%{transform:rotate(6deg)}60%{transform:rotate(-5deg) translateY(-1cqw)}80%{transform:rotate(4deg)}}
   .omit3-stage .shake{animation:o3-shake .7s ease-in-out infinite !important;transform-origin:50% 90%;}
   .omit3-narrator{position:absolute;pointer-events:none;}
@@ -446,7 +451,7 @@
       correct: ballSide, wrong_audio: 'pr_ball_wrong', right_audio: 'pr_ball_right', praise_always: true, data: Object.assign(prData('ball'), { correct_side: ballSide }) }));
     // better-friends wording check: with the roles just given, children should pick the best friend
     T.push(scene({ scene: SC.dv(pL, pR, null, 'Who do you think ' + PR.prot + ' is better friends with: ' + optText), audio: [{ key: 'pr_friend_q' }].concat(labels), choices: true, why: why, data: prData('friend_q') }));
-    T.push(scene({ scene: SC.dv(pL, pR, 'juicebox', 'Who would ' + PR.prot + ' want to share a juice box with one straw with: ' + optText), audio: [{ key: 'pr_juice' }].concat(labels), choices: true, why: why, data: prData('juice') }));
+    T.push(scene({ scene: SC.dv(pL, pR, 'juicebox', 'Who would ' + PR.prot + ' want to share the juice with, even though they\u2019d have to use the same straw: ' + optText), audio: [{ key: 'pr_juice' }].concat(labels), choices: true, why: why, data: prData('juice') }));
     T.push(scene({ scene: SC.dv(pL, pR, 'cookies', 'Who would ' + PR.prot + ' want to share cookies with: ' + optText), audio: [{ key: 'pr_cookies' }].concat(labels), choices: true, why: why, data: prData('cookies') }));
     reward('practice');
     T.push(scene({ scene: SC.frame('start'), audio: 'fr_start', data: { item: 'start' } }));
@@ -481,14 +486,17 @@
         T.push(tr({ scene: SC.encounter(P, C, not, false), audio: [{ key: t + '_meet' + ci }, { key: t + '_enc' + ci + '_nottold_' + not }] }, 'enc' + ci + '_nottold', { classmate: C, content: not }));
         T.push(tr({ scene: SC.encounter(P, C, told, true), audio: t + '_enc' + ci + '_told_' + told }, 'enc' + ci + '_told', { classmate: C, content: told }));
       });
-      // memory checks: higher rung first, then lower
-      const mem = (c, side, item) => {
-        const who = side === 'left' ? d.c1 : d.c2;
-        T.push(tr({ scene: SC.memcheck(P, c, d.c1, d.c2), audio: t + '_mem_' + c, choices: true, correct: side,
-          wrong_audio: [{ key: t + '_memfix_' + c + '_' + who.toLowerCase(), shake: side }], right_audio: 'mem_right' }, item, { content: c, correct_side: side }));
-      };
-      mem(hi, hiTo === 1 ? 'left' : 'right', 'mem_hi');
-      mem(lo, hiTo === 1 ? 'right' : 'left', 'mem_lo');
+      // comprehension checks: "Just to double check: did P tell C <content>?" — higher-rung content for classmate 1 then 2,
+      // then the lower-rung content for classmate 1 then 2 (one yes and one no per content)
+      [[hi, 'hi'], [lo, 'lo']].forEach(([c, lab]) => {
+        [[1, d.c1], [2, d.c2]].forEach(([ci, C]) => {
+          const toldThis = (hiTo === ci) === (c === hi);
+          const ans = toldThis ? 'yes' : 'no';
+          const qtext = 'Just to double check: did ' + P + ' tell ' + C + ' ' + D.contents[c].told + '?';
+          T.push(tr({ scene: SC.yesno(P, c, C, qtext), audio: t + '_yn' + ci + '_' + c, choices: true, correct: ans,
+            wrong_audio: t + '_ynfix' + ci + '_' + c + '_' + ans, right_audio: 'mem_right' }, 'check_' + lab + ci, { classmate: C, content: c, correct_side: ans }));
+        });
+      });
       // DVs
       T.push(tr({ scene: SC.dv(d.c1, d.c2, null, 'Who do you think ' + P + ' is better friends with?'), audio: t + '_dv_friend', choices: true, why: whyF }, 'friend'));
       const items = V.dv_item_first === 'candy' ? ['candy', 'icecream'] : ['icecream', 'candy'];   // constant within child, counterbalanced across versions
@@ -506,7 +514,7 @@
       if (!tr.choices) return;
       tr.on_finish = (data) => {
         if (data.choice) {
-          data.choice_name = data.choice === 'left' ? data.left : data.right;
+          data.choice_name = data.choice === 'left' ? data.left : data.choice === 'right' ? data.right : data.choice;
           if (data.hi_classmate) data.chose_hi = data.choice_name === data.hi_classmate ? 1 : 0;
           if (data.best_side) data.chose_best = data.choice === data.best_side ? 1 : 0;
           if (data.correct_side) { data.correct = (data.wrong_first ? 0 : (data.choice === data.correct_side ? 1 : 0)); data.final_correct = data.choice === data.correct_side ? 1 : 0; }
