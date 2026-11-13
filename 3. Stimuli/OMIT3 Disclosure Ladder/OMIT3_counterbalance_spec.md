@@ -30,11 +30,17 @@ roles named in the narration. Three forced choices between Quinn and Rowan follo
    (teaches the two-picture click); has a correct answer, scored for exclusion like a memory check.
 1b. **Better friends** — "Who do you think Sam is better friends with: Quinn, Sam's best friend, or Rowan, Sam's friend?"
    Wording check for the primary DV: with the roles just stated, children should pick the best friend. Expected: best friend.
-2. **Juice box with one straw** — "Who would Sam want to share a juice box with one straw with? Why?"
+2. **Juice box with one straw** — "Sam has a juice box with one straw. Who do you think Sam would want to
+   share the juice with, even though they'd have to use the same straw? Why?"
    Manipulation check for the physical-intimacy item: addresses the reviewer worry that children do not
    read a single-portion item as intimate. Expected: best friend.
-3. **Cookies** (divisible) — "Who would Sam want to share cookies with? Why?" Divisible comparison item;
-   no directional prediction, parallels candy in the main trials.
+3. **Cookies** (divisible) — "Sam has some cookies. Who do you think Sam would want to share the cookies
+   with, by sharing a few of the cookies? Why?" Divisible comparison item; no directional prediction,
+   parallels candy in the main trials.
+
+Each practice item is worded to parallel the main-trial item it checks — juice mirrors the single ice
+cream cone, cookies mirror the partitionable candy. A check only validates the item it mirrors, so the
+two wordings move together if either changes.
 
 Counterbalanced across versions (see CSV columns `practice_best_friend_side`, `practice_ball_holder`):
 best friend on the left in odd versions (V1, 3, 5, 7), right in even; the ball is held by the friend in
@@ -87,8 +93,21 @@ Participant: age_days, gender, version, modality, exclusion_flag.
 
 ## Still to settle before the versions are generated
 
-- Whether "Why?" audio is recorded on CHS for better friend only, or for all three DVs.
+- Whether "Why?" audio is recorded on CHS for better friend only, or for all three DVs. The clip is
+  generic (`why.mp3`, not item-specific), so this is a data-structure and session-length decision rather
+  than a recording one; `why_text` is currently a single column and would need three if all three DVs probe.
 - Tear size: keeping as is (decided 18 Oct).
-- Ice cream wording (CHS): "Who do you think [P] would want to share the ice cream with, even though they'd have to lick the same ice cream cone?"; practice juice: "…share the juice with, even though they'd have to use the same straw"
+- Riley's plus-cross motif: keeping (decided 12 Nov). Raised as possibly reading as a first-aid
+  symbol, which would sit close to the construct in a study about disclosing distress; judged not a
+  concern.
+- Done 12 Nov — **sharing-item wording settled and propagated** to the deck (speaker notes + on-slide
+  text), `build/design.py`, the rebuilt `dist/`, and `audio/narration_script.csv`. One canonical wording
+  per item across the moderated and CHS builds:
+  ice cream "…share the ice cream with, even though they'd have to lick the same ice cream cone?";
+  candy "…share candy with, by sharing a few of the candies?";
+  practice juice "…share the juice with, even though they'd have to use the same straw";
+  practice cookies "…share the cookies with, by sharing a few of the cookies".
+  The cookies divisibility clause is new, so `audio/pr_cookies.mp3` is stale (placeholder TTS, old text)
+  and must be regenerated before recording: `python3 build/make_audio.py pr_cookies`.
 - Done 18 Oct: "Jamie found out their favourite animal is…"; "a single ice cream cone" in all four trials;
   second memory check per trial; not-told-then-told order in every encounter (changed 21 Oct from told-then-not-told); practice block added.

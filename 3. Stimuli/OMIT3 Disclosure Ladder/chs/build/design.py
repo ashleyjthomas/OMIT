@@ -132,7 +132,7 @@ N['pr_ball_wrong'] = 'Hmm, that one isn\'t holding a ball. Can you click on the 
 N['pr_ball_right'] = 'That\'s right! That one is holding the ball.'
 N['pr_friend_q'] = f'Who do you think {S} is better friends with:'
 N['pr_juice'] = f'{S} has a juice box with one straw. Who do you think {S} would want to share the juice with, even though they\'d have to use the same straw:'
-N['pr_cookies'] = f'{S} has some cookies. Who do you think {S} would want to share the cookies with:'
+N['pr_cookies'] = f'{S} has some cookies. Who do you think {S} would want to share the cookies with, by sharing a few of the cookies:'
 # option labels read after a practice question, in left-to-right order (the named character shakes)
 N['pr_best_first'] = f'{B}, {S}\'s best friend,'
 N['pr_friend_second'] = f'or {F}, {S}\'s friend?'

@@ -13,7 +13,7 @@ follow `../OMIT3_counterbalance_spec.md` and `../OMIT3_versions.csv`.
 | `dist/omit3_task.bundle.js` | The task alone (design + scenes + plugin), used by `index.html`. |
 | `index.html` | Standalone test runner. Open from a web server (or GitHub Pages) with `?version=V3`, `&why=0` to skip Why?, `&dl=1` to download the CSV at the end. |
 | `assets/` | Images (characters redrawn as kids on 20 Oct 2026 from a GPT sheet, shirt colour = the original alien's body colour; the Study 1 aliens are kept in `assets/characters_aliens/` and `assets/icons_aliens/` — copy them back over `characters/` and the four expression icons to revert): `characters/`, `icons/`, `bg/`, `frames/`, `layers/` (cloud, balloon, no-symbol), `narrator/` (6 mouth/eye frames). |
-| `audio/` | Narration mp3s, one per narration unit (91 files). **Currently placeholder TTS**; `audio/narration_script.csv` is the recording script. |
+| `audio/` | Narration mp3s, one per narration unit (197 files), **recorded** with ElevenLabs voice `tapn1QwocNXk3viVSowa` (stamped in `audio/.voice`). `audio/narration_script.csv` is the script, regenerated from `build/design.py`. One clip is out of date: see Known gaps. |
 | `design.json` | Generated: contents, trials, versions, narration texts. |
 | `src/` | Sources: `omit3_task.js` (scenes + plugin + timeline), `chs_protocol_template.js`, `index_template.html`. |
 | `build/` | `design.py` (single source of truth; reads `../OMIT3_versions.csv`), `build.py`, `make_audio.py`. |
@@ -97,9 +97,21 @@ python3 build/make_audio.py       # placeholder TTS for any missing audio key (n
 node test/run_test.js V3 shots    # headless run (needs test/node_modules; see test/package.json)
 ```
 
+Narration wording lives in `build/design.py` only. After changing a line there, rebuild, regenerate the
+script, and re-record just that clip with the voice already in `audio/.voice` — naming the key keeps it
+to one line and leaves the other recordings untouched:
+
+```
+python3 build/build.py
+ELEVEN_API_KEY=sk_... ELEVEN_VOICE_ID=$(cat audio/.voice) python3 build/make_audio_elevenlabs.py <key>
+```
+
 ## Known gaps / decisions still open
 
 - Consent, purpose, payment and debrief texts are adapted from the Relationship Detective protocol and need to match the IRB amendment.
-- Narration is placeholder TTS.
+- **`audio/pr_cookies.mp3` is stale.** The practice cookies line gained a divisibility clause on
+  12 Nov so it parallels the main candy item ("…share the cookies with, by sharing a few of the
+  cookies"). `build/design.py`, `design.json`, `dist/` and `narration_script.csv` all carry the new
+  wording; the recording still says the old one. Re-record it alone, with the voice in `audio/.voice`.
 - Adult version (Qualtrics/Prolific) not built; the same `assets/` and `design.json` can drive it.
 - No server-side balancing of versions (random draw); check the version counts as data come in and, if needed, restrict `Object.keys(D.versions)` in `buildTimeline` to the under-sampled ones.
