@@ -40,7 +40,6 @@
     icecream: [4.12, 3.03, 1.76, 1.76],
     candy: [4.29, 2.57, 1.42, 1.42],
     prop: [4.12, 3.03, 1.76, 1.76],
-    ball: [0.72, 0.72],
     prTrio: { mid: [4.23, 1.85, 1.54, 1.88], left: [1.85, 2.28, 1.54, 1.88], right: [6.61, 2.28, 1.54, 1.88] },
   };
 
@@ -112,7 +111,9 @@
     encounter: (P, C, content, told) => {
       let h = img(asset('bg/houses.png'), G.houseL) + img(asset('bg/houses.png'), G.houseR);
       // the speech bubble and its content are "late": hidden until the narration has finished, then popped in
-      h += charImg(P, G.protoEnc) + charImg(C, G.mateEnc) + layer('balloon', 'o3-late');
+      // the classmate is tagged 'mate' so the greeting line can shake it (shakeOn targets
+      // [data-choice]; clicks attach only to .zone, so this never makes the figure clickable)
+      h += charImg(P, G.protoEnc) + charImg(C, G.mateEnc, { choice: 'mate' }) + layer('balloon', 'o3-late');
       const ic = iconFile(content, P); const r = fitRect(ic, G.balloonSlot);
       h += img(asset('icons/' + ic + '.png'), r, { cls: 'o3-late' });
       if (!told) {
@@ -138,12 +139,6 @@
       return h;
     },
     practiceTrio: (P, left, right) => charImg(P, G.prTrio.mid) + (left ? charImg(left, G.prTrio.left, { choice: 'left' }) : '') + (right ? charImg(right, G.prTrio.right, { choice: 'right' }) : ''),
-    ball: (left, right, holder, text) => {
-      let h = SC.dv(left, right, null, text);
-      const f = holder === 'left' ? G.figL : G.figR;
-      h += img(asset('bg/ball.png'), [f[0] - 0.25, f[1] + 1.15, G.ball[0], G.ball[1]]);
-      return h;
-    },
     frame: (name) => img(asset('frames/' + name + '.png'), [0, 0, SW, SH]),
     reward: (n, total) => {
       const r = G.bigStar; let h = '<div class="o3-bigstar" style="position:absolute;left:' + px(r[0]) + ';top:' + py(r[1]) + ';width:' + px(r[2]) + ';height:' + py(r[3]) + ';">' + starSvg('big') + '</div>';
@@ -437,7 +432,7 @@
     const PR = D.practice;
     const bestLeft = V.practice_best_side === 'left';
     const pL = bestLeft ? PR.best : PR.friend, pR = bestLeft ? PR.friend : PR.best;
-    const ballSide = (V.practice_ball === 'friend') === bestLeft ? 'right' : 'left';
+    const bestSide = bestLeft ? 'left' : 'right';
     const prData = (item) => ({ block: 'practice', item: item, left: pL, right: pR, best_side: bestLeft ? 'left' : 'right' });
     // Sam alone, then each friend slides in on its own page while it is introduced (left one first)
     T.push(scene({ scene: SC.practiceTrio(PR.prot, null, null), audio: 'pr_intro', data: prData('intro') }));
@@ -447,12 +442,15 @@
     const labels = [{ key: bestLeft ? 'pr_best_first' : 'pr_friend_first', shake: 'left' }, { key: bestLeft ? 'pr_friend_second' : 'pr_best_second', shake: 'right' }];
     const roleL = bestLeft ? 'best friend' : 'friend', roleR = bestLeft ? 'friend' : 'best friend';
     const optText = pL + ', ' + PR.prot + '\u2019s ' + roleL + ', or ' + pR + ', ' + PR.prot + '\u2019s ' + roleR + '?';
-    T.push(scene({ scene: SC.ball(pL, pR, ballSide, 'Which one is holding a ball?'), audio: 'pr_ball', choices: true,
-      correct: ballSide, wrong_audio: 'pr_ball_wrong', right_audio: 'pr_ball_right', praise_always: true, data: Object.assign(prData('ball'), { correct_side: ballSide }) }));
+    // response training: the roles were just stated, so this has a knowable correct answer and
+    // carries the wrong-answer correction loop. Named options are deliberately NOT appended here —
+    // they would restate which character is the best friend and give the answer away.
+    T.push(scene({ scene: SC.dv(pL, pR, null, 'Who is ' + PR.prot + '’s best friend?'), audio: 'pr_bestfriend', choices: true,
+      correct: bestSide, wrong_audio: 'pr_bestfriend_wrong', right_audio: 'pr_bestfriend_right', praise_always: true, data: Object.assign(prData('bestfriend'), { correct_side: bestSide }) }));
     // better-friends wording check: with the roles just given, children should pick the best friend
     T.push(scene({ scene: SC.dv(pL, pR, null, 'Who do you think ' + PR.prot + ' is better friends with: ' + optText), audio: [{ key: 'pr_friend_q' }].concat(labels), choices: true, why: why, data: prData('friend_q') }));
     T.push(scene({ scene: SC.dv(pL, pR, 'juicebox', 'Who would ' + PR.prot + ' want to share the juice with, even though they\u2019d have to use the same straw: ' + optText), audio: [{ key: 'pr_juice' }].concat(labels), choices: true, why: why, data: prData('juice') }));
-    T.push(scene({ scene: SC.dv(pL, pR, 'cookies', 'Who would ' + PR.prot + ' want to share cookies with: ' + optText), audio: [{ key: 'pr_cookies' }].concat(labels), choices: true, why: why, data: prData('cookies') }));
+    T.push(scene({ scene: SC.dv(pL, pR, 'cookies', 'Who would ' + PR.prot + ' want to share the cookies with, by sharing a few of the cookies: ' + optText), audio: [{ key: 'pr_cookies' }].concat(labels), choices: true, why: why, data: prData('cookies') }));
     reward('practice');
     T.push(scene({ scene: SC.frame('start'), audio: 'fr_start', data: { item: 'start' } }));
 
@@ -483,7 +481,7 @@
       // encounters: classmate 1 then classmate 2; on each, the meeting + what was NOT told first, then what was told
       [[1, d.c1], [2, d.c2]].forEach(([ci, C]) => {
         const told = hiTo === ci ? hi : lo, not = hiTo === ci ? lo : hi;
-        T.push(tr({ scene: SC.encounter(P, C, not, false), audio: [{ key: t + '_meet' + ci }, { key: t + '_enc' + ci + '_nottold_' + not }] }, 'enc' + ci + '_nottold', { classmate: C, content: not }));
+        T.push(tr({ scene: SC.encounter(P, C, not, false), audio: [{ key: t + '_meet' + ci, shake: 'mate' }, { key: t + '_enc' + ci + '_nottold_' + not }] }, 'enc' + ci + '_nottold', { classmate: C, content: not }));
         T.push(tr({ scene: SC.encounter(P, C, told, true), audio: t + '_enc' + ci + '_told_' + told }, 'enc' + ci + '_told', { classmate: C, content: told }));
       });
       // comprehension checks: "Just to double check: did P tell C <content>?" — higher-rung content for classmate 1 then 2,
@@ -530,7 +528,7 @@
     const add = (p) => imgs.push(asset(p));
     ['casey', 'percy', 'kendall', 'jamie', 'sam', 'blake', 'morgan', 'avery', 'orin', 'riley', 'cameron', 'elliot', 'parker', 'quinn', 'rowan'].forEach((c) => add('characters/' + c + '.png'));
     Object.keys(ICON).forEach((i) => add('icons/' + i + '.png'));
-    ['lunchroom', 'playground', 'chalkboard', 'desk', 'houses', 'question', 'icecream', 'candy', 'ball', 'juicebox', 'cookies'].forEach((b) => add('bg/' + b + '.png'));
+    ['lunchroom', 'playground', 'chalkboard', 'desk', 'houses', 'question', 'icecream', 'candy', 'juicebox', 'cookies'].forEach((b) => add('bg/' + b + '.png'));
     ['welcome', 'about', 'start', 'alldone'].forEach((f) => add('frames/' + f + '.png'));
     ['cloud', 'balloon', 'nosymbol'].forEach((l) => add('layers/' + l + '.png'));
     Narrator.frames.forEach((f) => add('narrator/' + f + '.png'));

@@ -17,6 +17,7 @@ const timeline = [];
 // Stimuli are served from the lab GitHub (raw). Change BASE_URL if hosting moves.
 const BASE_URL = "__BASE_URL__";
 const chsid = new URLSearchParams(window.location.search).get('response_uuid') || '';
+const startedAt = new Date().toISOString();
 
 // Version V1–V8 drawn at random for each session (see OMIT3_counterbalance_spec.md).
 const built = OMIT3.buildTimeline(jsPsych, { baseUrl: BASE_URL, why: 'friend', dance: true, video: {} });   // why: 'all' | 'friend' | 'none'; dance: narrator dance break mid-way; video: { mid, end } adds a cartoon (see README)
@@ -41,7 +42,7 @@ const video_consent = {
     PIContact: "athomas@g.harvard.edu",
     payment: "You will receive a $5 gift card for taking part in this study. You will be asked to provide your email for this purpose. Your email will remain strictly confidential and will only be used to issue payment.",
     procedures: `Your participation is completely voluntary; you and your child can choose not to take part. You and your child can agree to take part and later change your mind.
-The study session takes place in your browser and is recorded through Children Helping Science (Lookit), an online platform for developmental research studies. During the study, your child will hear five short stories about cartoon characters. In each story a character learns two things during the school day (for example, that they feel sad, or a fact about an animal) and later tells one thing to one classmate and the other thing to a different classmate. Your child will then be asked which classmate the character is better friends with, and which classmate the character would want to share an ice cream cone or some candy with. Your child answers by clicking on one of two pictures, and we will ask them to tell you why they chose that one.
+The study session takes place in your browser and is recorded through Children Helping Science (Lookit), an online platform for developmental research studies. During the study, your child will hear a short practice round and then four short stories about cartoon characters. In each story a character learns two things during the school day (for example, that they feel sad, or a fact about an animal) and later tells one thing to one classmate and the other thing to a different classmate. Your child will then be asked which classmate the character is better friends with, and which classmate the character would want to share an ice cream cone or some candy with. Your child answers by clicking on one of two pictures, and we will ask them to tell you why they chose that one.
 All responses are recorded in the study and uploaded to the listed researcher. Other than your consent, only in-study behavior is measured and recorded. You may be asked to complete a short exit survey; it is optional.
 We don't believe there are any risks for your child from participating in this research. You and your child are free to choose whether to be in this study. You can ask all the questions you want before you decide. If you do choose to participate, it's okay to stop at any point during the session. We cannot promise any benefits to your child due to their participation in the study. However, we hope that your child will enjoy the stories, and your child's participation may improve our understanding of how children think about friendship.
 Participation in research is completely voluntary. Your child's alternative to participating in this research study is to not participate. Your child can decide to participate, not participate, or discontinue participation at any time without penalty or loss of benefits to which your child is otherwise entitled. You and your child's decision will not be held against you.`,
@@ -57,9 +58,10 @@ const email_trial = {
         name: "email",
         required: true
     }],
-    on_finish: function(data) {
-        jsPsych.data.addProperties({ payment_email: data.response.email });
-    },
+    // NB: kept on this trial's own row, NOT via jsPsych.data.addProperties(), which
+    // would stamp the caregiver's email onto every row of the response data. The
+    // consent promises the address is used only for payment, and the de-identified
+    // data are published, so this row is dropped in the de-identification pass.
     data: { trial_type: "payment_email" }
 };
 
@@ -80,7 +82,7 @@ const instructions_page1 = {
     stimulus: `
         <div style="max-width: 600px; margin: 0 auto; line-height: 1.6;">
             <h2 style="text-align: center;">Important Instructions</h2>
-            <p>Your child is about to hear five short stories about cartoon characters and answer a few questions about each one. It takes about 10–15 minutes.</p>
+            <p>Your child is about to hear a short practice round and then four short stories about cartoon characters, answering a few questions about each one. It takes about 10–15 minutes.</p>
             <p>We want to know what your child genuinely thinks, so please <strong>stay neutral</strong> while your child makes their choices. Try to minimise distractions as much as possible.</p>
             <p>It is okay to encourage your child to make a decision — for example: <em>"Which one do you want to pick?"</em> or <em>"What do you think?"</em> — but please avoid pointing at or suggesting a particular answer.</p>
             <p>The stories are read aloud, so please make sure the device's <strong>sound is turned on</strong>.</p>
@@ -105,6 +107,88 @@ const instructions_page2 = {
     data: { trial_type: "instructions_page2" }
 };
 
+// ── GOOGLE SHEET (second sink; CHS remains the source of truth) ───────
+// Deploy scripts/apps_script.gs as a web app and paste its /exec URL here.
+// Leave '' to skip the upload — the CHS record is unaffected either way.
+const SHEETS_WEBHOOK = '';
+
+// One row per trial (4 per child); participant and practice fields repeat.
+const SHEET_COLS = [
+    'study', 'version', 'chs_response_uuid', 'started_at', 'finished_at',
+    'practice_best_side', 'practice_bestfriend_correct', 'practice_bestfriend_attempts',
+    'practice_straw_chose_best', 'practice_cookies_chose_best',
+    'position', 'trial', 'protagonist', 'left', 'right',
+    'hi_content', 'lo_content', 'hi_told_to', 'hi_classmate', 'narration_recording',
+    'dv_item_first', 'sh_emotion_first', 'sh_sad_scene', 'pf_favourite_animal',
+    'check_hi1_correct', 'check_hi2_correct', 'check_lo1_correct', 'check_lo2_correct',
+    'checks_passed_first_try',
+    'better_friend', 'better_friend_choice', 'better_friend_rt', 'why_text',
+    'icecream', 'icecream_rt', 'candy', 'candy_rt'
+];
+
+function buildSheetRows() {
+    const all = jsPsych.data.get().values();
+    const pick = (f) => all.filter(f);
+    const one = (f) => pick(f)[0] || {};
+    const pr = (item) => one((d) => d.block === 'practice' && d.item === item);
+
+    const prBest = pr('bestfriend');
+    const shared = {
+        study: 'OMIT3',
+        version: built.version,
+        chs_response_uuid: chsid,
+        started_at: startedAt,
+        finished_at: new Date().toISOString(),
+        practice_best_side: prBest.best_side,
+        practice_bestfriend_correct: prBest.correct,
+        practice_bestfriend_attempts: prBest.attempts,
+        practice_straw_chose_best: pr('juice').chose_best,
+        practice_cookies_chose_best: pr('cookies').chose_best
+    };
+
+    const trials = pick((d) => d.block === 'trial' && d.item === 'friend');
+    return trials.map((f) => {
+        const inTrial = (item) => one((d) => d.block === 'trial' && d.trial === f.trial && d.item === item);
+        const chk = ['check_hi1', 'check_hi2', 'check_lo1', 'check_lo2'].map((c) => inTrial(c).correct);
+        const ice = inTrial('icecream'), can = inTrial('candy');
+        return Object.assign({}, shared, {
+            position: f.position, trial: f.trial, protagonist: f.protagonist,
+            left: f.left, right: f.right,
+            hi_content: f.hi_content, lo_content: f.lo_content,
+            hi_told_to: f.hi_told_to, hi_classmate: f.hi_classmate,
+            narration_recording: f.recording,
+            dv_item_first: ice.dv_item_first,
+            sh_emotion_first: built.version && f.trial === 'SH' ? f.sh_emotion_first : '',
+            sh_sad_scene: f.trial === 'SH' ? f.scene : '',
+            pf_favourite_animal: f.trial === 'PF' ? f.hi_content : '',
+            check_hi1_correct: chk[0], check_hi2_correct: chk[1],
+            check_lo1_correct: chk[2], check_lo2_correct: chk[3],
+            checks_passed_first_try: chk.every((c) => c === 1) ? 1 : 0,
+            better_friend: f.chose_hi, better_friend_choice: f.choice_name,
+            better_friend_rt: f.rt, why_text: f.why_text || '',
+            icecream: ice.chose_hi, icecream_rt: ice.rt,
+            candy: can.chose_hi, candy_rt: can.rt
+        });
+    });
+}
+
+// Fired from the debrief's on_load rather than its own trial, so the protocol
+// needs no plugin beyond the ones already in use here. Fire-and-forget: the
+// caregiver is reading the debrief while it posts, and a failure is swallowed
+// so it can never strand anyone on a blank screen. CHS still has everything.
+function uploadToSheet() {
+    if (!SHEETS_WEBHOOK) return;
+    try {
+        const payload = JSON.stringify({ headers: SHEET_COLS, rows: buildSheetRows() });
+        // text/plain avoids a CORS preflight that Apps Script will not answer
+        fetch(SHEETS_WEBHOOK, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: payload
+        }).catch(function () {});
+    } catch (err) { /* never block the debrief */ }
+}
+
 // ── EXIT SURVEY ───────────────────────────────────────────────────────
 const exit_survey = {
     type: chsSurvey.ExitSurveyPlugin
@@ -124,7 +208,8 @@ const debrief = {
             <p>Thank you so much for participating! Your child's answers help us understand how children come to understand friendship.</p>
         </div>
     `,
-    choices: ["Finish"]
+    choices: ["Finish"],
+    on_load: uploadToSheet
 };
 
 // ── RECORDING ─────────────────────────────────────────────────────────

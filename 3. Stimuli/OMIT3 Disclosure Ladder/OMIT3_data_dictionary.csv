@@ -1,0 +1,38 @@
+variable,level,type,values,description
+study,participant,string,OMIT3,Study tag. Constant.
+version,participant,string,V1-V8,"Counterbalance version drawn at random per session. Defines trial order, which classmate receives the higher-rung content, which food item is asked first, and the practice layout. See OMIT3_counterbalance_spec.md."
+chs_response_uuid,participant,string,uuid,"Children Helping Science response id, from the response_uuid URL parameter. The join key back to the CHS record (demographics, webcam, exit survey)."
+started_at,participant,ISO 8601,timestamp,Set when the protocol loads.
+finished_at,participant,ISO 8601,timestamp,Set when the rows are built at debrief.
+practice_best_side,participant,string,left | right,Which side Quinn (the stated best friend) appeared on in the practice block. Counterbalanced.
+practice_bestfriend_correct,participant,integer,0 | 1,"Practice response-training item (""Who is Sam's best friend?""). 1 = correct on the FIRST attempt. Wrong answers are corrected and re-asked, so 0 means the child needed the correction."
+practice_bestfriend_attempts,participant,integer,1-3,Attempts taken on that item. Capped at 3.
+practice_straw_chose_best,participant,integer,0 | 1,"Practice manipulation check. 1 = chose the best friend for the single-straw juice box. Tests that children read a single-portion item as intimate; expected 1. This is the check for the ice cream DV."
+practice_cookies_chose_best,participant,integer,0 | 1,"Practice comparison item. 1 = chose the best friend for the divisible cookies. No directional prediction; parallels the candy DV."
+position,trial,integer,1-4,Serial position of this trial within the session. Trial order follows a Williams square balanced for first-order carryover.
+trial,trial,string,SH | SF | HF | PF,"Which contents were pitted against each other. SH = sad vs happy; SF = sad vs fact; HF = happy vs fact; PF = personal preference vs fact."
+protagonist,trial,string,Casey | Percy | Kendall | Jamie,The character who discloses. Fixed per trial.
+left,trial,string,name,Classmate shown on the left.
+right,trial,string,name,Classmate shown on the right.
+hi_content,trial,string,"sad | happy | owl_fav | rabbit_fav","The higher-rung content in this trial, i.e. the one predicted to signal greater closeness."
+lo_content,trial,string,"happy | fox | elephant | rabbit | owl",The lower-rung content.
+hi_told_to,trial,integer,1 | 2,Which classmate was told the higher-rung content (1 = left / 2 = right). Counterbalanced.
+hi_classmate,trial,string,name,Name of the classmate told the higher-rung content. Redundant with hi_told_to; kept for readability.
+narration_recording,trial,string,A | B,Which of the two mirrored narration sets played (follows hi_told_to).
+dv_item_first,trial,string,icecream | candy,Which food item was asked first. Constant within child; counterbalanced across versions.
+sh_emotion_first,trial,string,sad | happy,SH trial only. Which emotion the protagonist felt first. Blank elsewhere.
+sh_sad_scene,trial,string,lunch room | playground,SH trial only. Where the sad episode occurred; the happy episode takes the other scene. Blank elsewhere.
+pf_favourite_animal,trial,string,owl_fav | rabbit_fav,PF trial only. Which animal was the protagonist's favourite. Blank elsewhere.
+check_hi1_correct,trial,integer,0 | 1,"Yes/no comprehension check: was classmate 1 told the higher-rung content? 1 = correct on the FIRST attempt. Wrong answers are corrected and re-asked."
+check_hi2_correct,trial,integer,0 | 1,Same for classmate 2.
+check_lo1_correct,trial,integer,0 | 1,Yes/no comprehension check for the lower-rung content and classmate 1.
+check_lo2_correct,trial,integer,0 | 1,Same for classmate 2.
+checks_passed_first_try,trial,integer,0 | 1,1 if all four checks in this trial were correct first time. Convenience column for exclusion rules; the rule itself must be pre-registered.
+better_friend,trial,integer,0 | 1,"PRIMARY DV. 1 = chose the classmate told the HIGHER-rung content as the better friend. Note this is coded relative to the rung, not to a fixed side or character."
+better_friend_choice,trial,string,name,Name of the classmate chosen. Useful for checking the coding above.
+better_friend_rt,trial,integer,milliseconds,Time from the scene becoming clickable to the click.
+why_text,trial,string,free text,"Caregiver-typed answer to ""Why do you think that?"", asked after the better-friend judgment only. Empty when the probe is disabled or left blank."
+icecream,trial,integer,0 | 1,"SECONDARY DV. 1 = chose the classmate told the higher-rung content for the single ice cream cone (the item requiring physical intimacy)."
+icecream_rt,trial,integer,milliseconds,Response time for the ice cream item.
+candy,trial,integer,0 | 1,SECONDARY DV. 1 = chose the classmate told the higher-rung content for the partitionable candy (the divisible comparison item).
+candy_rt,trial,integer,milliseconds,Response time for the candy item.

@@ -108,7 +108,6 @@
    "sh_sad_scene": "lunch room",
    "pf_fav": "owl",
    "practice_best_side": "left",
-   "practice_ball": "friend",
    "dv_item_first": "icecream"
   },
   "V2": {
@@ -128,7 +127,6 @@
    "sh_sad_scene": "playground",
    "pf_fav": "rabbit",
    "practice_best_side": "right",
-   "practice_ball": "best friend",
    "dv_item_first": "candy"
   },
   "V3": {
@@ -148,7 +146,6 @@
    "sh_sad_scene": "lunch room",
    "pf_fav": "rabbit",
    "practice_best_side": "left",
-   "practice_ball": "best friend",
    "dv_item_first": "icecream"
   },
   "V4": {
@@ -168,7 +165,6 @@
    "sh_sad_scene": "playground",
    "pf_fav": "owl",
    "practice_best_side": "right",
-   "practice_ball": "friend",
    "dv_item_first": "candy"
   },
   "V5": {
@@ -188,7 +184,6 @@
    "sh_sad_scene": "lunch room",
    "pf_fav": "rabbit",
    "practice_best_side": "left",
-   "practice_ball": "best friend",
    "dv_item_first": "candy"
   },
   "V6": {
@@ -208,7 +203,6 @@
    "sh_sad_scene": "playground",
    "pf_fav": "owl",
    "practice_best_side": "right",
-   "practice_ball": "friend",
    "dv_item_first": "icecream"
   },
   "V7": {
@@ -228,7 +222,6 @@
    "sh_sad_scene": "lunch room",
    "pf_fav": "owl",
    "practice_best_side": "left",
-   "practice_ball": "friend",
    "dv_item_first": "candy"
   },
   "V8": {
@@ -248,7 +241,6 @@
    "sh_sad_scene": "playground",
    "pf_fav": "rabbit",
    "practice_best_side": "right",
-   "practice_ball": "best friend",
    "dv_item_first": "icecream"
   }
  },
@@ -394,9 +386,9 @@
   "pr_friend2_friend": "And this is Rowan. Rowan is Sam's friend.",
   "pr_friend1_friend": "Sam has two friends. This is Rowan. Rowan is Sam's friend.",
   "pr_friend2_best": "And this is Quinn. Quinn is Sam's best friend.",
-  "pr_ball": "Look, one of them is holding a ball. Which one is holding a ball? Click on the one holding the ball.",
-  "pr_ball_wrong": "Hmm, that one isn't holding a ball. Can you click on the one who is holding the ball?",
-  "pr_ball_right": "That's right! That one is holding the ball.",
+  "pr_bestfriend": "Who is Sam's best friend? Click on Sam's best friend.",
+  "pr_bestfriend_wrong": "Hmm, that is Sam's friend. Can you click on Sam's best friend?",
+  "pr_bestfriend_right": "That's right! Quinn is Sam's best friend.",
   "pr_friend_q": "Who do you think Sam is better friends with:",
   "pr_juice": "Sam has a juice box with one straw. Who do you think Sam would want to share the juice with, even though they'd have to use the same straw:",
   "pr_cookies": "Sam has some cookies. Who do you think Sam would want to share the cookies with, by sharing a few of the cookies:",

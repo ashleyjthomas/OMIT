@@ -35,23 +35,31 @@ SETTINGS = {'stability': 0.5, 'similarity_boost': 0.8, 'style': 0.25, 'use_speak
 args = [a for a in sys.argv[1:] if not a.startswith('--')]; force = '--force' in sys.argv
 stamp = os.path.join(AUDIO, '.voice'); prev = open(stamp).read().strip() if os.path.exists(stamp) else ''
 if prev != VOICE: force = True
+# the text each existing mp3 was recorded from. A clip whose line has changed since is
+# re-recorded even without --force: otherwise an edited line silently keeps its old audio.
+texts_path = os.path.join(AUDIO, '.texts.json')
+rec_text = json.load(open(texts_path)) if os.path.exists(texts_path) else {}
 lines = list(csv.DictReader(open(os.path.join(AUDIO, 'narration_script.csv'))))
 todo = [l for l in lines if (not args or l['file'][:-4] in args)]
 print(f'{len(todo)} lines, voice {VOICE}, model {MODEL}')
 failed = 0; done = 0
 for i, l in enumerate(todo, 1):
     out = os.path.join(AUDIO, l['file'])
-    if os.path.exists(out) and not force and not args:
+    key = l['file'][:-4]
+    if os.path.exists(out) and not force and not args and rec_text.get(key) == l['text']:
         continue
+    if os.path.exists(out) and rec_text.get(key) not in (None, l['text']):
+        print(f'  text changed since recording -> re-recording {l["file"]}')
     r = requests.post(f'https://api.elevenlabs.io/v1/text-to-speech/{VOICE}',
                       headers={'xi-api-key': KEY, 'accept': 'audio/mpeg', 'content-type': 'application/json'},
                       json={'text': l['text'], 'model_id': MODEL, 'voice_settings': SETTINGS,
                             'output_format': 'mp3_44100_64'}, timeout=120)
     if r.status_code != 200:
         print('FAILED', l['file'], r.status_code, r.text[:200]); failed += 1; continue
-    open(out, 'wb').write(r.content)
+    open(out, 'wb').write(r.content); rec_text[key] = l['text']
     print(f'[{i}/{len(todo)}] {l["file"]}  {len(r.content)//1024} KB'); done += 1
     time.sleep(0.3)
+json.dump(rec_text, open(texts_path, 'w'), indent=0, sort_keys=True)
 if failed == 0 and (done or not todo):
     open(stamp, 'w').write(VOICE)
 print(f'done: {done} recorded, {failed} failed, {len(todo) - done - failed} already had this voice (use --force to redo). Commit and push audio/ so CHS picks the new clips up.')

@@ -140,9 +140,9 @@ pr_friend1_best.mp3,Sam has two friends. This is Quinn. Quinn is Sam's best frie
 pr_friend2_friend.mp3,And this is Rowan. Rowan is Sam's friend.
 pr_friend1_friend.mp3,Sam has two friends. This is Rowan. Rowan is Sam's friend.
 pr_friend2_best.mp3,And this is Quinn. Quinn is Sam's best friend.
-pr_ball.mp3,"Look, one of them is holding a ball. Which one is holding a ball? Click on the one holding the ball."
-pr_ball_wrong.mp3,"Hmm, that one isn't holding a ball. Can you click on the one who is holding the ball?"
-pr_ball_right.mp3,That's right! That one is holding the ball.
+pr_bestfriend.mp3,Who is Sam's best friend? Click on Sam's best friend.
+pr_bestfriend_wrong.mp3,"Hmm, that is Sam's friend. Can you click on Sam's best friend?"
+pr_bestfriend_right.mp3,That's right! Quinn is Sam's best friend.
 pr_friend_q.mp3,Who do you think Sam is better friends with:
 pr_juice.mp3,"Sam has a juice box with one straw. Who do you think Sam would want to share the juice with, even though they'd have to use the same straw:"
 pr_cookies.mp3,"Sam has some cookies. Who do you think Sam would want to share the cookies with, by sharing a few of the cookies:"

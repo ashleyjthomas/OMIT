@@ -58,7 +58,7 @@ VERSIONS = {}
 with open(os.path.join(ROOT, '..', 'OMIT3_versions.csv')) as f:
     for r in csv.DictReader(f):
         v = VERSIONS.setdefault(r['version'], dict(order=[], hi_to={}, sh_emotion_first=None, sh_sad_scene=None,
-                                                   pf_fav=None, practice_best_side=None, practice_ball=None, dv_item_first=None))
+                                                   pf_fav=None, practice_best_side=None, dv_item_first=None))
         v['order'].append(r['trial'])
         v['hi_to'][r['trial']] = 1 if r['higher_rung_told_to'] == 'classmate 1' else 2
         if r['trial'] == 'SH':
@@ -66,7 +66,6 @@ with open(os.path.join(ROOT, '..', 'OMIT3_versions.csv')) as f:
         if r['trial'] == 'PF':
             v['pf_fav'] = r['pf_favourite_animal']
         v['practice_best_side'] = r['practice_best_friend_side']
-        v['practice_ball'] = r['practice_ball_holder']
         v['dv_item_first'] = r['dv_item_first']
 assert len(VERSIONS) == 8, VERSIONS.keys()
 
@@ -127,9 +126,9 @@ N['pr_friend1_best'] = f'{S} has two friends. This is {B}. {B} is {S}\'s best fr
 N['pr_friend2_friend'] = f'And this is {F}. {F} is {S}\'s friend.'
 N['pr_friend1_friend'] = f'{S} has two friends. This is {F}. {F} is {S}\'s friend.'
 N['pr_friend2_best'] = f'And this is {B}. {B} is {S}\'s best friend.'
-N['pr_ball'] = 'Look, one of them is holding a ball. Which one is holding a ball? Click on the one holding the ball.'
-N['pr_ball_wrong'] = 'Hmm, that one isn\'t holding a ball. Can you click on the one who is holding the ball?'
-N['pr_ball_right'] = 'That\'s right! That one is holding the ball.'
+N['pr_bestfriend'] = f'Who is {S}\'s best friend? Click on {S}\'s best friend.'
+N['pr_bestfriend_wrong'] = f'Hmm, that is {S}\'s friend. Can you click on {S}\'s best friend?'
+N['pr_bestfriend_right'] = f'That\'s right! {B} is {S}\'s best friend.'
 N['pr_friend_q'] = f'Who do you think {S} is better friends with:'
 N['pr_juice'] = f'{S} has a juice box with one straw. Who do you think {S} would want to share the juice with, even though they\'d have to use the same straw:'
 N['pr_cookies'] = f'{S} has some cookies. Who do you think {S} would want to share the cookies with, by sharing a few of the cookies:'
