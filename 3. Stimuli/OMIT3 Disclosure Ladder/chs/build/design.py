@@ -112,7 +112,7 @@ for t, d in TRIALS.items():
             N[f'{t}_enc{ci}_nottold_{c}'] = enc_nottold(P, C, cd)
         if True:   # yes/no checks for every content, one per classmate
             for ci, C in ((1, d['c1']), (2, d['c2'])):
-                q = f'Just to double check: did {P} tell {C} {cd["told"]}?'
+                q = f'Did {P} tell {C} {cd["told"]}?'
                 N[f'{t}_yn{ci}_{c}'] = q
                 N[f'{t}_ynfix{ci}_{c}_yes'] = f'Actually, {P} told {C} {cd["told"]}. Let\'s try again. {q}'
                 N[f'{t}_ynfix{ci}_{c}_no'] = f'Actually, ' + nottold_to(P, C, cd) + f' Let\'s try again. {q}'
@@ -145,8 +145,10 @@ N['pr_bestfriend'] = f'Who is {S}\'s best friend? Click on {S}\'s best friend.'
 N['pr_bestfriend_wrong'] = f'Hmm, that is {S}\'s friend. Can you click on {S}\'s best friend?'
 N['pr_bestfriend_right'] = f'That\'s right! {B} is {S}\'s best friend.'
 N['pr_friend_q'] = f'Who do you think {S} is better friends with:'
-N['pr_juice'] = f'{S} has a juice box with one straw. Who do you think {S} would want to share the juice with, even though they\'d have to use the same straw:'
-N['pr_cookies'] = f'{S} has some cookies. Who do you think {S} would want to share the cookies with, by sharing a few of the cookies:'
+# the two practice sharing items are the test items, word for word, with Sam in place of the
+# protagonist and ending in ':' because the two named options are read straight after
+N['pr_icecream'] = f'Who do you think {S} would want to share the ice cream with, even though they\'d have to lick the same ice cream cone:'
+N['pr_candy'] = f'Who do you think {S} would want to share candy with, by sharing a few of the candies:'
 # option labels read after a practice question, in left-to-right order (the named character shakes)
 N['pr_best_first'] = f'{B}, {S}\'s best friend,'
 N['pr_friend_second'] = f'or {F}, {S}\'s friend?'

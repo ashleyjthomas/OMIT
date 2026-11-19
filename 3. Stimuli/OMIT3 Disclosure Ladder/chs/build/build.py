@@ -1,13 +1,18 @@
 """Assemble dist/: omit3_task.bundle.js (design + icon sizes + task), chs_protocol.js, index.html."""
-import json, os, sys, glob
+import json, os, sys, glob, csv
 from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
-from design import DESIGN
+from design import DESIGN, N
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_URL = sys.argv[1] if len(sys.argv) > 1 else 'https://raw.githubusercontent.com/ashleyjthomas/OMIT3-CHS/main/'
 
 json.dump(DESIGN, open(os.path.join(ROOT, 'design.json'), 'w'), indent=1)
+# the recording script, which make_audio_elevenlabs.py reads to decide what needs re-recording.
+# It is written here so an edited line in design.py can never leave a stale line behind in it.
+with open(os.path.join(ROOT, 'audio/narration_script.csv'), 'w', newline='') as f:
+    w = csv.writer(f); w.writerow(['file', 'text'])
+    for key, text in N.items(): w.writerow([key + '.mp3', text])
 icons = {os.path.basename(f)[:-4]: list(Image.open(f).size) for f in sorted(glob.glob(os.path.join(ROOT, 'assets/icons/*.png')))}
 
 task = open(os.path.join(ROOT, 'src/omit3_task.js')).read()

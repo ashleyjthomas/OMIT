@@ -538,8 +538,15 @@
       correct: bestSide, wrong_audio: 'pr_bestfriend_wrong', right_audio: 'pr_bestfriend_right', praise_always: true, data: Object.assign(prData('bestfriend'), { correct_side: bestSide }) }));
     // better-friends wording check: with the roles just given, children should pick the best friend
     T.push(scene({ scene: SC.dv(pL, pR, null, 'Who do you think ' + PR.prot + ' is better friends with: ' + optText), audio: [{ key: 'pr_friend_q' }].concat(labels), choices: true, why: why, data: prData('friend_q') }));
-    T.push(scene({ scene: SC.dv(pL, pR, 'juicebox', 'Who would ' + PR.prot + ' want to share the juice with, even though they\u2019d have to use the same straw: ' + optText), audio: [{ key: 'pr_juice' }].concat(labels), choices: true, why: why, data: prData('juice') }));
-    T.push(scene({ scene: SC.dv(pL, pR, 'cookies', 'Who would ' + PR.prot + ' want to share the cookies with, by sharing a few of the cookies: ' + optText), audio: [{ key: 'pr_cookies' }].concat(labels), choices: true, why: why, data: prData('cookies') }));
+    // the two practice sharing items are the test items themselves \u2014 same props, same wording, and
+    // in the same order this version uses for the real ones, so the warm-up rehearses the real task
+    const PRQ = {
+      icecream: 'Who do you think ' + PR.prot + ' would want to share the ice cream with, even though they\u2019d have to lick the same ice cream cone: ',
+      candy: 'Who do you think ' + PR.prot + ' would want to share candy with, by sharing a few of the candies: ',
+    };
+    const prItems = V.dv_item_first === 'candy' ? ['candy', 'icecream'] : ['icecream', 'candy'];
+    prItems.forEach((it) => T.push(scene({ scene: SC.dv(pL, pR, it, PRQ[it] + optText), audio: [{ key: 'pr_' + it }].concat(labels),
+      choices: true, why: why, data: Object.assign(prData(it), { dv_item_first: V.dv_item_first }) })));
     reward('practice');
     T.push(scene({ scene: SC.frame('start'), audio: 'fr_start', data: { item: 'start' } }));
 
@@ -582,9 +589,11 @@
         [[1, d.c1], [2, d.c2]].forEach(([ci, C]) => {
           const toldThis = (hiTo === ci) === (c === hi);
           const ans = toldThis ? 'yes' : 'no';
-          const qtext = 'Just to double check: did ' + P + ' tell ' + C + ' ' + D.contents[c].told + '?';
+          const qtext = 'Did ' + P + ' tell ' + C + ' ' + D.contents[c].told + '?';
+          // praise_always: "That's right!" after every correct answer, not only after a corrected
+          // retry — otherwise a child who gets them all right first time never hears it
           T.push(tr({ scene: SC.yesno(P, c, C, qtext), audio: t + '_yn' + ci + '_' + c, choices: true, correct: ans,
-            wrong_audio: t + '_ynfix' + ci + '_' + c + '_' + ans, right_audio: 'mem_right' }, 'check_' + lab + ci, { classmate: C, content: c, correct_side: ans }));
+            wrong_audio: t + '_ynfix' + ci + '_' + c + '_' + ans, right_audio: 'mem_right', praise_always: true }, 'check_' + lab + ci, { classmate: C, content: c, correct_side: ans }));
         });
       });
       // recap: "So, to remind you. P did tell C1 X, but didn't tell C1 Y. And P did tell C2 Y, but
@@ -635,7 +644,8 @@
     const add = (p) => imgs.push(asset(p));
     ['casey', 'percy', 'kendall', 'jamie', 'sam', 'blake', 'morgan', 'avery', 'orin', 'riley', 'cameron', 'elliot', 'parker', 'quinn', 'rowan'].forEach((c) => add('characters/' + c + '.png'));
     Object.keys(ICON).forEach((i) => add('icons/' + i + '.png'));
-    ['lunchroom', 'playground', 'chalkboard', 'desk', 'houses', 'question', 'icecream', 'candy', 'juicebox', 'cookies'].forEach((b) => add('bg/' + b + '.png'));
+    // juicebox.png and cookies.png are still in assets/, unused since the practice items became the test items
+    ['lunchroom', 'playground', 'chalkboard', 'desk', 'houses', 'question', 'icecream', 'candy'].forEach((b) => add('bg/' + b + '.png'));
     ['welcome', 'about', 'start', 'alldone'].forEach((f) => add('frames/' + f + '.png'));
     ['cloud', 'balloon', 'nosymbol'].forEach((l) => add('layers/' + l + '.png'));
     if (useNarr) {

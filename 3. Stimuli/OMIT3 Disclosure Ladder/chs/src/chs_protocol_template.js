@@ -16,12 +16,31 @@ const timeline = [];
 // ── STUDY PARAMETERS ──────────────────────────────────────────────────
 // Stimuli are served from the lab GitHub (raw). Change BASE_URL if hosting moves.
 const BASE_URL = "__BASE_URL__";
+// CHS does not put the response id in the page URL, so chsid comes out empty on a real session.
+// session_id is ours: it is stamped on every jsPsych row (so it is inside the CHS response record)
+// and written to the sheet, which makes the two joinable whether or not CHS ever hands us its uuid.
 const chsid = new URLSearchParams(window.location.search).get('response_uuid') || '';
+const sessionId = 'S' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
 const startedAt = new Date().toISOString();
+
+// the CHS uuid, looked for again at upload time rather than at load: if a CHS plugin has left it
+// anywhere by then we use it, and otherwise the row still carries session_id.
+function chsResponseId() {
+    try {
+        if (chsid) return chsid;
+        const g = window.chs || window.CHS || {};
+        const r = g.response || (g.session || {});
+        const cands = [g.responseUuid, g.response_uuid, r.uuid, r.id, window.response_uuid];
+        for (let i = 0; i < cands.length; i++) if (typeof cands[i] === 'string' && cands[i]) return cands[i];
+        const row = jsPsych.data.get().values().filter(function (d) { return d.response_uuid || d.responseUuid; })[0];
+        if (row) return row.response_uuid || row.responseUuid;
+    } catch (err) { /* fall through to '' */ }
+    return '';
+}
 
 // Version V1–V8 drawn at random for each session (see OMIT3_counterbalance_spec.md).
 const built = OMIT3.buildTimeline(jsPsych, { baseUrl: BASE_URL, why: 'friend', narrator: false, dance: false, remind: true, video: {} });   // why: 'all' | 'friend' | 'none'; narrator: corner character + its lip-flap (off — the Web Audio lip sync glitches); dance: its mid-way dance break, requires the narrator; remind: recap page after each trial's comprehension checks, showing what each classmate was and was not told; video: { mid, end } adds a cartoon (see README)
-jsPsych.data.addProperties({ study: 'OMIT3', version: built.version, chs_response_uuid: chsid });
+jsPsych.data.addProperties({ study: 'OMIT3', version: built.version, chs_response_uuid: chsid, session_id: sessionId });
 
 // ── FULLSCREEN ────────────────────────────────────────────────────────
 const enter_fullscreen = {
@@ -116,14 +135,15 @@ const SHEETS_WEBHOOK = 'https://script.google.com/macros/s/AKfycbwQxu0gdSVWrYJg6
 const SHEET_COLS = [
     'study', 'version', 'chs_response_uuid', 'started_at', 'finished_at',
     'practice_best_side', 'practice_bestfriend_correct', 'practice_bestfriend_attempts',
-    'practice_straw_chose_best', 'practice_cookies_chose_best',
+    'practice_icecream_chose_best', 'practice_candy_chose_best',
     'position', 'trial', 'protagonist', 'left', 'right',
     'hi_content', 'lo_content', 'hi_told_to', 'hi_classmate', 'narration_recording',
     'dv_item_first', 'sh_emotion_first', 'sh_sad_scene', 'pf_favourite_animal',
     'check_hi1_correct', 'check_hi2_correct', 'check_lo1_correct', 'check_lo2_correct',
     'checks_passed_first_try',
     'better_friend', 'better_friend_choice', 'better_friend_rt', 'why_text',
-    'icecream', 'icecream_rt', 'candy', 'candy_rt'
+    'icecream', 'icecream_rt', 'candy', 'candy_rt',
+    'session_id'   // appended last so existing sheet columns keep their positions
 ];
 
 function buildSheetRows() {
@@ -136,14 +156,15 @@ function buildSheetRows() {
     const shared = {
         study: 'OMIT3',
         version: built.version,
-        chs_response_uuid: chsid,
+        chs_response_uuid: chsResponseId(),
+        session_id: sessionId,
         started_at: startedAt,
         finished_at: new Date().toISOString(),
         practice_best_side: prBest.best_side,
         practice_bestfriend_correct: prBest.correct,
         practice_bestfriend_attempts: prBest.attempts,
-        practice_straw_chose_best: pr('juice').chose_best,
-        practice_cookies_chose_best: pr('cookies').chose_best
+        practice_icecream_chose_best: pr('icecream').chose_best,
+        practice_candy_chose_best: pr('candy').chose_best
     };
 
     const trials = pick((d) => d.block === 'trial' && d.item === 'friend');
@@ -202,7 +223,7 @@ const debrief = {
             <h2>Thank You — Here Is What We Were Studying</h2>
             <p>Adults treat what people tell each other as a clue to how close they are: we share our feelings, and especially our sad feelings, with the people we are closest to. In this study we asked whether children already use this clue.</p>
             <p>In each story, a character learned two things during the day — a feeling (sad or happy), a personal preference (a favorite animal), or a fact about an animal — and told one thing to one classmate and the other to a different classmate. We then asked your child which classmate the character is better friends with, and which classmate the character would want to share an ice cream cone or some candy with.</p>
-            <p>We are interested in whether children think a character is closer to the classmate who was told a feeling than to the one who was told a fact; whether this is specific to sad feelings or extends to happy ones; and whether telling someone a personal preference, which is personal but not emotional, works the same way. The practice round, in which Sam shared a juice box with one straw and some cookies, helps us check that children see sharing a single ice cream cone as something you do with someone close.</p>
+            <p>We are interested in whether children think a character is closer to the classmate who was told a feeling than to the one who was told a fact; whether this is specific to sad feelings or extends to happy ones; and whether telling someone a personal preference, which is personal but not emotional, works the same way. The practice round, in which Sam shared the same two things with a best friend and a friend, helps us check that children see sharing a single ice cream cone as something you do with someone close.</p>
             <p>There are many reasons a child might give any particular answer — the most recent story they heard, which picture they liked best, or how they were feeling in the moment. This is why we look at patterns across many children and many stories. There were no right or wrong answers.</p>
             <p>You will receive a <strong>$5 Amazon gift card</strong> for taking part, sent within two weeks to the email address you provided.</p>
             <p>Thank you so much for participating! Your child's answers help us understand how children come to understand friendship.</p>
