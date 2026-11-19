@@ -124,9 +124,11 @@ for t, d in TRIALS.items():
             told1, not1 = (hi_c, lo_c) if hi_to == 1 else (lo_c, hi_c)
             told2, not2 = (not1, told1)
             C1, C2 = d['c1'], d['c2']
-            N[f'{t}_recap_{hi_c}_{tag}'] = (
+            # one segment per classmate, so that classmate's row can shake while its line plays
+            N[f'{t}_recap_{hi_c}_{tag}_1'] = (
                 f'So, to remind you. {P} did tell {C1} {CONTENTS[told1]["told"]}, '
-                f'but {P} didn\'t tell {C1} {CONTENTS[not1]["told"]}. '
+                f'but {P} didn\'t tell {C1} {CONTENTS[not1]["told"]}.')
+            N[f'{t}_recap_{hi_c}_{tag}_2'] = (
                 f'And {P} did tell {C2} {CONTENTS[told2]["told"]}, '
                 f'but {P} didn\'t tell {C2} {CONTENTS[not2]["told"]}.')
     N[f'{t}_dv_friend'] = f'Who do you think {P} is better friends with?'
