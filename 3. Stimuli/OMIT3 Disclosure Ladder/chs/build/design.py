@@ -116,6 +116,19 @@ for t, d in TRIALS.items():
                 N[f'{t}_yn{ci}_{c}'] = q
                 N[f'{t}_ynfix{ci}_{c}_yes'] = f'Actually, {P} told {C} {cd["told"]}. Let\'s try again. {q}'
                 N[f'{t}_ynfix{ci}_{c}_no'] = f'Actually, ' + nottold_to(P, C, cd) + f' Let\'s try again. {q}'
+    # recap after the comprehension checks: both classmates, what each was and was not told.
+    # One line per (higher-rung content, which classmate got it) -> 2 for SH/SF/HF, 4 for PF.
+    pairs = [('owl_fav', 'rabbit'), ('rabbit_fav', 'owl')] if t == 'PF' else [(d['hi'], d['lo'])]
+    for hi_c, lo_c in pairs:
+        for hi_to, tag in ((1, 'A'), (2, 'B')):
+            told1, not1 = (hi_c, lo_c) if hi_to == 1 else (lo_c, hi_c)
+            told2, not2 = (not1, told1)
+            C1, C2 = d['c1'], d['c2']
+            N[f'{t}_recap_{hi_c}_{tag}'] = (
+                f'So, to remind you. {P} did tell {C1} {CONTENTS[told1]["told"]}, '
+                f'but {P} didn\'t tell {C1} {CONTENTS[not1]["told"]}. '
+                f'And {P} did tell {C2} {CONTENTS[told2]["told"]}, '
+                f'but {P} didn\'t tell {C2} {CONTENTS[not2]["told"]}.')
     N[f'{t}_dv_friend'] = f'Who do you think {P} is better friends with?'
     N[f'{t}_dv_icecream'] = f'Who do you think {P} would want to share the ice cream with, even though they\'d have to lick the same ice cream cone?'
     N[f'{t}_dv_candy'] = f'Who do you think {P} would want to share candy with, by sharing a few of the candies?'

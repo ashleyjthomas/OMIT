@@ -28,9 +28,10 @@ const jsPsych = initJsPsych({
     window.OMIT3_DONE = true;
   }
 });
-const built = OMIT3.buildTimeline(jsPsych, { baseUrl: base, version: q.get('version') || undefined, why: q.get('why') || 'friend', dance: true, video: q.get('video') ? { mid: base + 'video/mid.mp4' } : {} });
+const narrator = q.get('narrator') === '1';   // off by default, matching the CHS protocol; ?narrator=1 brings the corner character and its dance break back
+const built = OMIT3.buildTimeline(jsPsych, { baseUrl: base, version: q.get('version') || undefined, why: q.get('why') || 'friend', narrator: narrator, dance: narrator, remind: q.get('remind') !== '0', video: q.get('video') ? { mid: base + 'video/mid.mp4' } : {} });
 window.OMIT3_BUILT = built;
-const lists = OMIT3.assetLists();
+const lists = OMIT3.assetLists({ narrator: narrator });
 const tl = [];
 if (window.jsPsychPreload) tl.push({ type: jsPsychPreload, images: lists.images, audio: lists.audio, show_progress_bar: true, continue_after_error: true });
 tl.push({ type: jsPsychHtmlButtonResponse, stimulus: '<h2>OMIT3 test runner</h2><p>Version <b>' + built.version + '</b>. Click to start (this click also unlocks audio).</p>', choices: ['Start'] });

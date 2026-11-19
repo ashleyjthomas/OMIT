@@ -20,7 +20,7 @@ const chsid = new URLSearchParams(window.location.search).get('response_uuid') |
 const startedAt = new Date().toISOString();
 
 // Version V1–V8 drawn at random for each session (see OMIT3_counterbalance_spec.md).
-const built = OMIT3.buildTimeline(jsPsych, { baseUrl: BASE_URL, why: 'friend', dance: true, video: {} });   // why: 'all' | 'friend' | 'none'; dance: narrator dance break mid-way; video: { mid, end } adds a cartoon (see README)
+const built = OMIT3.buildTimeline(jsPsych, { baseUrl: BASE_URL, why: 'friend', narrator: false, dance: false, remind: true, video: {} });   // why: 'all' | 'friend' | 'none'; narrator: corner character + its lip-flap (off — the Web Audio lip sync glitches); dance: its mid-way dance break, requires the narrator; remind: recap page after each trial's comprehension checks, showing what each classmate was and was not told; video: { mid, end } adds a cartoon (see README)
 jsPsych.data.addProperties({ study: 'OMIT3', version: built.version, chs_response_uuid: chsid });
 
 // ── FULLSCREEN ────────────────────────────────────────────────────────
@@ -66,7 +66,7 @@ const email_trial = {
 };
 
 // ── PRELOAD ───────────────────────────────────────────────────────────
-const lists = OMIT3.assetLists();
+const lists = OMIT3.assetLists({ narrator: false });
 const preload = {
     type: jsPsychPreload,
     images: lists.images,

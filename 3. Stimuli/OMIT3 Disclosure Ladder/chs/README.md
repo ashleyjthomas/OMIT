@@ -50,6 +50,19 @@ story, each with a short reward page (big star flies to the shelf; confetti and 
 
 A narrator character (bottom-right) lip-flaps with the audio level (Web Audio analyser; falls back to
 random flapping if the browser blocks analysis) and blinks; it grins briefly after each choice.
+**It is off (`narrator: false` in the protocol), because the lip sync glitched.** The fallback is the likely
+cause: when the browser refuses the analyser (CORS on the audio, or autoplay policy) the mouth flaps at
+random instead of with the speech. `narrator: true` brings it back; it also controls the dance break below,
+and `assetLists({ narrator: false })` keeps its 14 frames out of the preload.
+
+After the four comprehension checks, and before the DVs, each trial shows a **recap page**: one row per
+classmate — the protagonist, the classmate, then what they were told (green tick) and what they were not
+told (red cross) — while the narration says "So, to remind you. P did tell C1 X, but P didn't tell C1 Y.
+And P did tell C2 Y, but P didn't tell C2 X." It auto-advances when the line ends (14–25 s depending on
+the trial; roughly 75 s added per child across the four trials). Emotion icons are whole figures that
+shrink to an illegible speck at card size — the tear disappears — so those are framed on the head via
+`.o3-face`; animal icons fit whole. Turn it off with `remind: false` in `buildTimeline` (or `?remind=0`
+on the test page). The lines live in `design.py` as `<trial>_recap_<hi content>_<A|B>`.
 
 Why? prompts are controlled by `why` in `buildTimeline` (`'friend'` = after the better-friends question only, the
 default; `'all'` = after every DV and the two practice sharing items; `'none'`).
@@ -57,7 +70,8 @@ default; `'all'` = after every DV and the two practice sharing items; `'none'`).
 ## Dance break / cartoon break
 
 After the second story's star the narrator dances centre-stage for ~12 s (8 GPT-made frames in `assets/narrator/dance_*.png`,
-`dance: true` in the protocol). A cartoon can be added as well: pass `video: { mid: BASE_URL + 'video/mid.mp4' }` (plays after the dance)
+`dance: true` in the protocol). **Both are off now** — the dance is the narrator, so it needs `narrator: true` as well; with
+both off there is no mid-way break at all and story 3 follows the third star. A cartoon can be added as well: pass `video: { mid: BASE_URL + 'video/mid.mp4' }` (plays after the dance)
 or `video: { end: ... }` (after the fifth star). A video page plays `video/mid.mp4` (with `video/mid.webm` as a codec fallback) full-stage,
 then advances on its own; a Skip button appears after 5 s. **`video/mid.mp4` is currently an 8-second placeholder.** Put the real
 clip there (suggested: a Caminandes short from the Blender Foundation, CC-BY — https://studio.blender.org/films/ or

@@ -41,6 +41,10 @@
     candy: [4.29, 2.57, 1.42, 1.42],
     prop: [4.12, 3.03, 1.76, 1.76],
     prTrio: { mid: [4.23, 1.85, 1.54, 1.88], left: [1.85, 2.28, 1.54, 1.88], right: [6.61, 2.28, 1.54, 1.88] },
+    // recap page after the comprehension checks: one row per classmate — the protagonist, the classmate,
+    // then what they were told (green tick) and what they were not told (red cross)
+    recap: { rowTop: [0.95, 3.15], protX: 0.34, mateX: 1.78, figW: 1.32, figH: 1.61, figDy: 0.05,
+             cardX: [3.25, 6.18], cardW: 2.80, cardH: 1.70 },
   };
 
   let BASE = '';
@@ -69,6 +73,17 @@
     return [slot.cx - w / 2, slot.cy - h / 2, w, h];
   }
   const charImg = (name, r, extra) => img(asset('characters/' + name.toLowerCase() + '.png'), r, extra);
+  // reminder bubble: the same icon the child saw in the encounter balloon, parked over that classmate's
+  // head while the question is asked. Inert (pointer-events:none in CSS) so it can never register a choice.
+  // One card on the recap page: the content, plus a green tick (was told) or red cross (was not).
+  // c is { icon, face }. The emotion icons are whole figures that shrink to an illegible speck at this
+  // size — the tear disappears — so those are framed on the head (.o3-face); animal icons fit whole.
+  function recapCard(c, r, told) {
+    return '<div class="o3-card" data-k="card:' + c.icon + (told ? ':y' : ':n') + '@' + r[0].toFixed(2) + ',' + r[1].toFixed(2) + '" data-kind="pop" style="left:' + px(r[0]) +
+      ';top:' + py(r[1]) + ';width:' + px(r[2]) + ';height:' + py(r[3]) + ';">' +
+      '<span class="o3-cardic"><img class="' + (c.face ? 'o3-face' : '') + '" src="' + asset('icons/' + c.icon + '.png') + '" draggable="false"></span>' +
+      '<span class="o3-mark ' + (told ? 'o3-mk-y">&#10003;' : 'o3-mk-n">&#10007;') + '</span></div>';
+  }
   const iconFile = (content, prot) => D.contents[content].kind === 'emotion' ? prot.toLowerCase() + '_' + content : D.contents[content].icon;
 
   const DANCE_SEQ = [1, 2, 3, 4, 1, 6, 7, 8, 5, 3, 7, 2];   // order of the 8 dance frames in the loop
@@ -138,6 +153,17 @@
       h += charImg(left, G.figL, { cls: 'zone', choice: 'left' }) + charImg(right, G.figR, { cls: 'zone', choice: 'right' });
       return h;
     },
+    // rows: [{ mate, told: {icon, face}, not: {icon, face} }, ...] — one per classmate, in c1/c2 order
+    recap: (P, rows) => {
+      const R = G.recap;
+      return rows.map((row, i) => {
+        const top = R.rowTop[i];
+        return charImg(P, [R.protX, top + R.figDy, R.figW, R.figH]) +
+          charImg(row.mate, [R.mateX, top + R.figDy, R.figW, R.figH]) +
+          recapCard(row.told, [R.cardX[0], top, R.cardW, R.cardH], true) +
+          recapCard(row.not, [R.cardX[1], top, R.cardW, R.cardH], false);
+      }).join('');
+    },
     practiceTrio: (P, left, right) => charImg(P, G.prTrio.mid) + (left ? charImg(left, G.prTrio.left, { choice: 'left' }) : '') + (right ? charImg(right, G.prTrio.right, { choice: 'right' }) : ''),
     frame: (name) => img(asset('frames/' + name + '.png'), [0, 0, SW, SH]),
     reward: (n, total) => {
@@ -206,6 +232,13 @@
   @keyframes o3-shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-7deg) translateY(-2cqw)}40%{transform:rotate(6deg)}60%{transform:rotate(-5deg) translateY(-1cqw)}80%{transform:rotate(4deg)}}
   .omit3-stage .shake{animation:o3-shake .7s ease-in-out infinite !important;transform-origin:50% 90%;}
   .omit3-narrator{position:absolute;pointer-events:none;}
+  .o3-card{position:absolute;pointer-events:none;background:#fff;border:0.4cqw solid #9cb7d8;border-radius:1.4cqw;box-shadow:0 .3cqw .7cqw rgba(70,95,130,.16);display:flex;align-items:center;gap:0.8cqw;padding:0.8cqw;box-sizing:border-box;}
+  .o3-cardic{flex:1 1 auto;height:100%;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .o3-cardic img{max-width:100%;max-height:100%;}
+  /* emotion icons are whole figures: blow the image up and slide it so the head alone fills the cell */
+  .o3-cardic img.o3-face{position:absolute;height:258%;width:auto;max-width:none;max-height:none;top:-8%;left:50%;transform:translateX(-50%);}
+  .o3-mark{flex:0 0 auto;width:4cqw;height:4cqw;border-radius:50%;color:#fff;font:700 2.6cqw/1 Arial,sans-serif;display:flex;align-items:center;justify-content:center;}
+  .o3-mk-y{background:#39b54a;} .o3-mk-n{background:#e8553e;}
   .o3-star path{fill:#e6e6e6;stroke:#bdbdbd;stroke-width:4;transition:fill .3s,stroke .3s;}
   .o3-slot.filled .o3-star path{fill:#f5b400;stroke:#d08f00;}
   .o3-slot.just .o3-star{animation:o3-pop .5s ease-out;}
@@ -417,12 +450,17 @@
     const why = whyMode === 'all', whyF = whyMode !== 'none';
     const TOTAL = 5; let stars = 0;
     const video = opts.video || {};   // { mid: url, end: url } — a cartoon break after story 2 and/or after the last star
-    let dance = opts.dance || null;    // true | { frames: [urls], fps, ms } — narrator dance break after story 2 (before the video, if both)
+    // narrator: false removes the corner character everywhere, and with it the dance break (which is
+    // that same character). The lip-flap depends on a Web Audio analyser reading the narration; when
+    // the browser refuses it (CORS, autoplay policy) the mouth flaps at random, so this is the off switch.
+    const useNarr = opts.narrator !== false;
+    const useRemind = opts.remind !== false;   // recap page after each trial's comprehension checks
+    let dance = useNarr ? (opts.dance || null) : null;   // true | { frames: [urls], fps, ms } — dance break after story 2 (before the video, if both)
     if (dance === true) dance = { frames: DANCE_SEQ.map((k) => asset('narrator/dance_' + String(k).padStart(2, '0') + '.png')), fps: 4, ms: 12000 };
     const T = [];
     const common = { version: vkey };
 
-    const scene = (p) => Object.assign({ type: Omit3ScenePlugin, stars: stars, total_stars: TOTAL }, p, { data: Object.assign({}, common, p.data || {}) });
+    const scene = (p) => Object.assign({ type: Omit3ScenePlugin, stars: stars, total_stars: TOTAL, narrator: useNarr }, p, { data: Object.assign({}, common, p.data || {}) });
     const reward = (label) => { stars += 1; T.push(scene({ scene: SC.reward(stars, TOTAL), audio: 'rw_' + stars, stars: stars - 1, reward: stars, show_next: stars === TOTAL, data: { item: 'reward', reward: stars, after: label } })); };
 
     // framing
@@ -495,6 +533,16 @@
             wrong_audio: t + '_ynfix' + ci + '_' + c + '_' + ans, right_audio: 'mem_right' }, 'check_' + lab + ci, { classmate: C, content: c, correct_side: ans }));
         });
       });
+      // recap: "So, to remind you. P did tell C1 X, but didn't tell C1 Y. And P did tell C2 Y, but
+      // didn't tell C2 X." — both classmates on one page, with the protagonist and all four cards,
+      // so the DVs that follow do not rest on memory alone.
+      if (useRemind) {
+        const cardOf = (c) => ({ icon: iconFile(c, P), face: D.contents[c].kind === 'emotion' });
+        const rows = [[1, d.c1], [2, d.c2]].map(([ci, C]) => ({
+          mate: C, told: cardOf(hiTo === ci ? hi : lo), not: cardOf(hiTo === ci ? lo : hi),
+        }));
+        T.push(tr({ scene: SC.recap(P, rows), audio: t + '_recap_' + hi + '_' + (hiTo === 1 ? 'A' : 'B'), min_ms: 1200 }, 'recap'));
+      }
       // DVs
       T.push(tr({ scene: SC.dv(d.c1, d.c2, null, 'Who do you think ' + P + ' is better friends with?'), audio: t + '_dv_friend', choices: true, why: whyF }, 'friend'));
       const items = V.dv_item_first === 'candy' ? ['candy', 'icecream'] : ['icecream', 'candy'];   // constant within child, counterbalanced across versions
@@ -523,7 +571,8 @@
   }
 
   // asset lists for preloading
-  function assetLists() {
+  function assetLists(opts) {
+    const useNarr = !(opts && opts.narrator === false);
     const imgs = [];
     const add = (p) => imgs.push(asset(p));
     ['casey', 'percy', 'kendall', 'jamie', 'sam', 'blake', 'morgan', 'avery', 'orin', 'riley', 'cameron', 'elliot', 'parker', 'quinn', 'rowan'].forEach((c) => add('characters/' + c + '.png'));
@@ -531,8 +580,10 @@
     ['lunchroom', 'playground', 'chalkboard', 'desk', 'houses', 'question', 'icecream', 'candy', 'juicebox', 'cookies'].forEach((b) => add('bg/' + b + '.png'));
     ['welcome', 'about', 'start', 'alldone'].forEach((f) => add('frames/' + f + '.png'));
     ['cloud', 'balloon', 'nosymbol'].forEach((l) => add('layers/' + l + '.png'));
-    Narrator.frames.forEach((f) => add('narrator/' + f + '.png'));
-    for (let k = 1; k <= 8; k++) add('narrator/dance_' + String(k).padStart(2, '0') + '.png');
+    if (useNarr) {
+      Narrator.frames.forEach((f) => add('narrator/' + f + '.png'));
+      for (let k = 1; k <= 8; k++) add('narrator/dance_' + String(k).padStart(2, '0') + '.png');
+    }
     const audio = Object.keys(D.narration).map(audioUrl);
     return { images: imgs, audio: audio };
   }
