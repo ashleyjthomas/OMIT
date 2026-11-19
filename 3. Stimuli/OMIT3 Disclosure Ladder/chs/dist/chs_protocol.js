@@ -510,8 +510,11 @@ window.OMIT3_ICON_SIZES = {"casey_happy": [401, 491], "casey_sad": [401, 491], "
       if (t === 'PF') { hi = V.pf_fav === 'owl' ? 'owl_fav' : 'rabbit_fav'; lo = V.pf_fav === 'owl' ? 'rabbit' : 'owl'; }
       const hiTo = V.hi_to[t];                       // 1 or 2
       const hiName = hiTo === 1 ? d.c1 : d.c2;
+      // sh_* ride on every trial row: the sheet reads them off the better-friend trial, and the
+      // establishing page's own `scene` field is not on that trial (it would otherwise come out undefined)
       const base = { block: 'trial', position: idx + 1, trial: t, protagonist: P, left: d.c1, right: d.c2,
-        hi_content: hi, lo_content: lo, hi_told_to: hiTo, hi_classmate: hiName, recording: hiTo === 1 ? 'A' : 'B' };
+        hi_content: hi, lo_content: lo, hi_told_to: hiTo, hi_classmate: hiName, recording: hiTo === 1 ? 'A' : 'B',
+        sh_emotion_first: t === 'SH' ? V.sh_emotion_first : '', sh_sad_scene: t === 'SH' ? V.sh_sad_scene : '' };
       const tr = (p, item, extra) => scene(Object.assign(p, { data: Object.assign({ item: item }, base, extra || {}) }));
 
       T.push(tr({ scene: SC.intro(P), audio: t + '_intro' }, 'intro'));
@@ -752,8 +755,8 @@ function buildSheetRows() {
             hi_told_to: f.hi_told_to, hi_classmate: f.hi_classmate,
             narration_recording: f.recording,
             dv_item_first: ice.dv_item_first,
-            sh_emotion_first: built.version && f.trial === 'SH' ? f.sh_emotion_first : '',
-            sh_sad_scene: f.trial === 'SH' ? f.scene : '',
+            sh_emotion_first: f.sh_emotion_first || '',
+            sh_sad_scene: f.sh_sad_scene || '',
             pf_favourite_animal: f.trial === 'PF' ? f.hi_content : '',
             check_hi1_correct: chk[0], check_hi2_correct: chk[1],
             check_lo1_correct: chk[2], check_lo2_correct: chk[3],
