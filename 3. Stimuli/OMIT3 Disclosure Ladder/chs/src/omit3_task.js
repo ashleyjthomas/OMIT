@@ -156,8 +156,11 @@
       const R = G.recap;
       return rows.map((row, i) => {
         const top = R.rowTop[i];
-        return charImg(P, [R.protX, top + R.figDy, R.figW, R.figH]) +
-          charImg(row.mate, [R.mateX, top + R.figDy, R.figW, R.figH]) +
+        // data-choice tags the row so the narration can shake it while that classmate's line plays
+        // (shakeOn targets [data-choice]; clicks attach only to .zone, so these stay unclickable)
+        const side = 'row' + (i + 1);
+        return charImg(P, [R.protX, top + R.figDy, R.figW, R.figH], { choice: side }) +
+          charImg(row.mate, [R.mateX, top + R.figDy, R.figW, R.figH], { choice: side }) +
           recapCard(row.told, [R.cardX[0], top, R.cardW, R.cardH], true) +
           recapCard(row.not, [R.cardX[1], top, R.cardW, R.cardH], false);
       }).join('');
@@ -542,7 +545,9 @@
         const rows = [[1, d.c1], [2, d.c2]].map(([ci, C]) => ({
           mate: C, told: cardOf(hiTo === ci ? hi : lo), not: cardOf(hiTo === ci ? lo : hi),
         }));
-        T.push(tr({ scene: SC.recap(P, rows), audio: t + '_recap_' + hi + '_' + (hiTo === 1 ? 'A' : 'B'), min_ms: 1200 }, 'recap'));
+        const rk = t + '_recap_' + hi + '_' + (hiTo === 1 ? 'A' : 'B');
+        T.push(tr({ scene: SC.recap(P, rows), min_ms: 1200,
+          audio: [{ key: rk + '_1', shake: 'row1' }, { key: rk + '_2', shake: 'row2' }] }, 'recap'));
       }
       // DVs
       T.push(tr({ scene: SC.dv(d.c1, d.c2, null, 'Who do you think ' + P + ' is better friends with?'), audio: t + '_dv_friend', choices: true, why: whyF }, 'friend'));
