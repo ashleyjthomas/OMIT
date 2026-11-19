@@ -110,7 +110,7 @@ const instructions_page2 = {
 // ── GOOGLE SHEET (second sink; CHS remains the source of truth) ───────
 // Deploy scripts/apps_script.gs as a web app and paste its /exec URL here.
 // Leave '' to skip the upload — the CHS record is unaffected either way.
-const SHEETS_WEBHOOK = '';
+const SHEETS_WEBHOOK = 'https://script.google.com/macros/s/AKfycbwQxu0gdSVWrYJg6BPnKVfez_7BbRhaG-6HNo8p_Wa9wBYotc-NkhzCOsvyjh36zXeK/exec';
 
 // One row per trial (4 per child); participant and practice fields repeat.
 const SHEET_COLS = [

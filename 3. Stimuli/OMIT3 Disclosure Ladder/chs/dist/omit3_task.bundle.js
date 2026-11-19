@@ -75,8 +75,6 @@ window.OMIT3_ICON_SIZES = {"casey_happy": [401, 491], "casey_sad": [401, 491], "
     return [slot.cx - w / 2, slot.cy - h / 2, w, h];
   }
   const charImg = (name, r, extra) => img(asset('characters/' + name.toLowerCase() + '.png'), r, extra);
-  // reminder bubble: the same icon the child saw in the encounter balloon, parked over that classmate's
-  // head while the question is asked. Inert (pointer-events:none in CSS) so it can never register a choice.
   // One card on the recap page: the content, plus a green tick (was told) or red cross (was not).
   // c is { icon, face }. The emotion icons are whole figures that shrink to an illegible speck at this
   // size — the tear disappears — so those are framed on the head (.o3-face); animal icons fit whole.
