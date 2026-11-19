@@ -594,7 +594,7 @@ window.OMIT3_ICON_SIZES = {"casey_happy": [401, 491], "casey_sad": [401, 491], "
         T.push(tr({ scene: SC.encounter(P, C, not, false), audio: [{ key: t + '_meet' + ci, shake: 'mate' }, { key: t + '_enc' + ci + '_nottold_' + not }] }, 'enc' + ci + '_nottold', { classmate: C, content: not }));
         T.push(tr({ scene: SC.encounter(P, C, told, true), audio: t + '_enc' + ci + '_told_' + told }, 'enc' + ci + '_told', { classmate: C, content: told }));
       });
-      // comprehension checks: "Just to double check: did P tell C <content>?" — higher-rung content for classmate 1 then 2,
+      // comprehension checks: "Did P tell C <content>?" — higher-rung content for classmate 1 then 2,
       // then the lower-rung content for classmate 1 then 2 (one yes and one no per content)
       [[hi, 'hi'], [lo, 'lo']].forEach(([c, lab]) => {
         [[1, d.c1], [2, d.c2]].forEach(([ci, C]) => {
