@@ -29,7 +29,7 @@ const jsPsych = initJsPsych({
   }
 });
 const narrator = q.get('narrator') === '1';   // off by default, matching the CHS protocol; ?narrator=1 brings the corner character and its dance break back
-const built = OMIT3.buildTimeline(jsPsych, { baseUrl: base, version: q.get('version') || undefined, why: q.get('why') || 'friend', narrator: narrator, dance: narrator, remind: q.get('remind') !== '0', video: q.get('video') ? { mid: base + 'video/mid.mp4' } : {} });
+const built = OMIT3.buildTimeline(jsPsych, { baseUrl: base, version: q.get('version') || undefined, why: q.get('why') || 'friend', narrator: narrator, dance: narrator, remind: q.get('remind') !== '0', shots: q.get('shots') !== '0', video: q.get('video') ? { mid: base + 'video/mid.mp4' } : {} });
 window.OMIT3_BUILT = built;
 const lists = OMIT3.assetLists({ narrator: narrator });
 const tl = [];

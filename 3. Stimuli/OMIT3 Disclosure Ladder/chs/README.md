@@ -11,7 +11,7 @@ follow `../OMIT3_counterbalance_spec.md` and `../OMIT3_versions.csv`.
 |---|---|
 | `dist/chs_protocol.js` | **Paste this into the CHS study editor** (jsPsych study type). Self-contained: design table, scenes, custom plugin, consent, instructions, exit survey, debrief. |
 | `dist/omit3_task.bundle.js` | The task alone (design + scenes + plugin), used by `index.html`. |
-| `index.html` | Standalone test runner. Open from a web server (or GitHub Pages) with `?version=V3`, `&why=0` to skip Why?, `&dl=1` to download the CSV at the end. |
+| `index.html` | Standalone test runner. Open from a web server (or GitHub Pages) with `?version=V3`, `&why=0` to skip Why?, `&remind=0` to skip the recap pages, `&shots=0` to skip the DV-page stills, `&dl=1` to download the CSV at the end. |
 | `assets/` | Images (characters redrawn as kids on 20 Oct 2026 from a GPT sheet, shirt colour = the original alien's body colour; the Study 1 aliens are kept in `assets/characters_aliens/` and `assets/icons_aliens/` — copy them back over `characters/` and the four expression icons to revert): `characters/`, `icons/`, `bg/`, `frames/`, `layers/` (cloud, balloon, no-symbol), `narrator/` (6 mouth/eye frames). |
 | `audio/` | Narration mp3s, one per narration unit (197 files), **recorded** with ElevenLabs voice `tapn1QwocNXk3viVSowa` (stamped in `audio/.voice`). `audio/narration_script.csv` is the script, regenerated from `build/design.py`. One clip is out of date: see Known gaps. |
 | `design.json` | Generated: contents, trials, versions, narration texts. |
@@ -63,6 +63,18 @@ the trial; roughly 75 s added per child across the four trials). Emotion icons a
 shrink to an illegible speck at card size — the tear disappears — so those are framed on the head via
 `.o3-face`; animal icons fit whole. Turn it off with `remind: false` in `buildTimeline` (or `?remind=0`
 on the test page). The lines live in `design.py` as `<trial>_recap_<hi content>_<A|B>`.
+
+Each DV page (better friends / ice cream / candy) carries, above the question, a **still of each
+encounter** — the moment the protagonist told that classmate the thing — side by side with a black
+line between, in classmate 1 / classmate 2 order. The stills are the encounter scene itself, cropped
+to `G.dvp.crop` and drawn inside a box of the same shape, so they are the page zoomed rather than
+redrawn; two things are changed for legibility at that size: the houses are dropped (they crop to
+fragments of wall and window) and an emotion is shown as a close-up of the face, since the
+whole-figure icon loses its tear when small. The two characters below stay the only clickable
+things, in the same left/right roles as in practice, so what the child does is unchanged. The
+geometry is identical on all three DV pages, so the stills do not move or re-animate between them.
+Turn them off with `shots: false` in `buildTimeline` (or `?shots=0` on the test page), which restores
+the plain two-character page; left unset, they follow `remind`.
 
 Why? prompts are controlled by `why` in `buildTimeline` (`'friend'` = after the better-friends question only, the
 default; `'all'` = after every DV and the two practice sharing items; `'none'`).

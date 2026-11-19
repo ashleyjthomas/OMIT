@@ -56,6 +56,18 @@ window.OMIT3_ICON_SIZES = {"casey_happy": [401, 491], "casey_sad": [401, 491], "
     // then what they were told (green tick) and what they were not told (red cross)
     recap: { rowTop: [0.95, 3.15], protX: 0.34, mateX: 1.78, figW: 1.32, figH: 1.61, figDy: 0.05,
              cardX: [3.25, 6.18], cardW: 2.80, cardH: 1.70 },
+    // DV pages (better friends / ice cream / candy): above the question, a cropped still of each
+    // classmate's encounter — the moment the protagonist told them the thing — side by side with a
+    // black line between. `crop` is the slice of the encounter scene each panel shows (x, y, w, h in
+    // stage inches); the panel has the same shape, so the still is the scene zoomed, not squashed.
+    // The characters move down and in a little to make room; everything stays clear of the Why? box.
+    dvp: {
+      crop: [2.70, 2.00, 5.40, 2.55],
+      textTop: 0.58, top: 0.96, w: 3.516, h: 1.66, x: [1.384, 5.050],
+      line: [4.950, 0.90, 0.10, 1.78],
+      figL: [2.778, 2.74, 1.163, 1.42], figR: [6.058, 2.74, 1.163, 1.42],
+      icecream: [4.325, 2.78, 1.35, 1.35], candy: [4.420, 2.86, 1.16, 1.16], prop: [4.325, 2.78, 1.35, 1.35],
+    },
   };
 
   let BASE = '';
@@ -132,18 +144,39 @@ window.OMIT3_ICON_SIZES = {"casey_happy": [401, 491], "casey_sad": [401, 491], "
       h += img(asset('icons/' + iconFile(content, P) + '.png'), fitRect(iconFile(content, P), G.cloudSlot));
       return h;
     },
-    encounter: (P, C, content, told) => {
-      let h = img(asset('bg/houses.png'), G.houseL) + img(asset('bg/houses.png'), G.houseR);
+    // still: the scene as a finished picture — the speech bubble already showing, nothing tagged for
+    // shaking, the houses dropped (at still scale they are fragments of wall and window), and an
+    // emotion shown as a close-up of the face, since the whole-figure icon loses its tear when small.
+    // Used for the DV-page stills, where the scene is a reminder, not a page being played.
+    encounter: (P, C, content, told, still) => {
+      const late = still ? '' : 'o3-late';
+      let h = still ? '' : img(asset('bg/houses.png'), G.houseL) + img(asset('bg/houses.png'), G.houseR);
       // the speech bubble and its content are "late": hidden until the narration has finished, then popped in
       // the classmate is tagged 'mate' so the greeting line can shake it (shakeOn targets
       // [data-choice]; clicks attach only to .zone, so this never makes the figure clickable)
-      h += charImg(P, G.protoEnc) + charImg(C, G.mateEnc, { choice: 'mate' }) + layer('balloon', 'o3-late');
+      h += charImg(P, G.protoEnc) + charImg(C, G.mateEnc, still ? {} : { choice: 'mate' }) + layer('balloon', late);
       const ic = iconFile(content, P); const r = fitRect(ic, G.balloonSlot);
-      h += img(asset('icons/' + ic + '.png'), r, { cls: 'o3-late' });
+      if (still && D.contents[content].kind === 'emotion') {
+        h += '<span class="o3-bubface" style="left:' + px(r[0]) + ';top:' + py(r[1]) + ';width:' + px(r[2]) + ';height:' + py(r[3]) +
+          ';"><img src="' + asset('icons/' + ic + '.png') + '" draggable="false"></span>';
+      } else h += img(asset('icons/' + ic + '.png'), r, { cls: late });
       if (!told) {
-        const n = G.noSymbol; h += img(asset('layers/nosymbol.png'), [r[0] + r[2] / 2 - n / 2 - 0.22, r[1] + r[3] / 2 - n / 2, n, n], { cls: 'o3-late' });
+        const n = G.noSymbol; h += img(asset('layers/nosymbol.png'), [r[0] + r[2] / 2 - n / 2 - 0.22, r[1] + r[3] / 2 - n / 2, n, n], { cls: late });
       }
       return h;
+    },
+    // One DV-page still: the encounter scene, cropped to G.dvp.crop, inside a box of the same shape.
+    // Scene elements are positioned in % of the stage, so an inner box sized SW x SH relative to the
+    // crop and shifted by the crop's origin reproduces that slice of the page exactly, at panel scale.
+    // The inner elements lose their data-k: the still is one picture that fades in, not a scene
+    // replaying its own entrance animations inside the frame.
+    shot: (P, mate, content, r) => {
+      const c = G.dvp.crop;
+      const inner = SC.encounter(P, mate, content, true, true).replace(/ data-k="[^"]*"/g, '');
+      return '<div class="o3-panel" data-k="shot:' + mate + ':' + content + '" data-kind="fade" style="left:' + px(r[0]) +
+        ';top:' + py(r[1]) + ';width:' + px(r[2]) + ';height:' + py(r[3]) + ';">' +
+        '<div class="o3-shot" style="left:' + (-100 * c[0] / c[2]).toFixed(3) + '%;top:' + (-100 * c[1] / c[3]).toFixed(3) +
+        '%;width:' + (100 * SW / c[2]).toFixed(3) + '%;height:' + (100 * SH / c[3]).toFixed(3) + '%;">' + inner + '</div></div>';
     },
     // yes/no check: the classmate being asked about, the content, and two big buttons
     yesno: (P, content, who, text) => {
@@ -153,13 +186,22 @@ window.OMIT3_ICON_SIZES = {"casey_happy": [401, 491], "casey_sad": [401, 491], "
         '<div class="zone o3-yn o3-yes" data-choice="yes" style="left:' + px(2.4) + ';top:' + py(3.7) + ';">&#10003; Yes</div>' +
         '<div class="zone o3-yn o3-no" data-choice="no" style="left:' + px(5.6) + ';top:' + py(3.7) + ';">&#10007; No</div>';
     },
-    dv: (left, right, prop, text) => {
+    // shots: [{ mate, content }, ...] in c1/c2 order — stills of what each classmate was told, shown
+    // above the question so the child is not choosing from memory. Practice passes none and keeps the
+    // original layout (there is no earlier scene to show, and its question text runs to three lines).
+    dv: (left, right, prop, text, shots) => {
+      const Q = shots ? G.dvp : G;
       let h = '';
-      if (text) h += '<div class="qtext" style="position:absolute;left:' + px(G.text[0]) + ';top:' + py(G.text[1]) + ';width:' + px(G.text[2]) + ';">' + text + '</div>';
-      if (prop === 'icecream') h += img(asset('bg/icecream.png'), G.icecream);
-      else if (prop === 'candy') h += img(asset('bg/candy.png'), G.candy);
-      else if (prop) h += img(asset('bg/' + prop + '.png'), G.prop);
-      h += charImg(left, G.figL, { cls: 'zone', choice: 'left' }) + charImg(right, G.figR, { cls: 'zone', choice: 'right' });
+      if (text) h += '<div class="qtext" style="position:absolute;left:' + px(G.text[0]) + ';top:' + py(shots ? G.dvp.textTop : G.text[1]) + ';width:' + px(G.text[2]) + ';">' + text + '</div>';
+      if (shots) {
+        const L = G.dvp.line;
+        h += '<div class="o3-dvline" data-k="dvline" data-kind="fade" style="left:' + px(L[0]) + ';top:' + py(L[1]) + ';width:' + px(L[2]) + ';height:' + py(L[3]) + ';"></div>';
+        shots.forEach((s, i) => { h += SC.shot(s.prot, s.mate, s.content, [G.dvp.x[i], G.dvp.top, G.dvp.w, G.dvp.h]); });
+      }
+      if (prop === 'icecream') h += img(asset('bg/icecream.png'), Q.icecream);
+      else if (prop === 'candy') h += img(asset('bg/candy.png'), Q.candy);
+      else if (prop) h += img(asset('bg/' + prop + '.png'), Q.prop);
+      h += charImg(left, Q.figL, { cls: 'zone', choice: 'left' }) + charImg(right, Q.figR, { cls: 'zone', choice: 'right' });
       return h;
     },
     // rows: [{ mate, told: {icon, face}, not: {icon, face} }, ...] — one per classmate, in c1/c2 order
@@ -251,6 +293,12 @@ window.OMIT3_ICON_SIZES = {"casey_happy": [401, 491], "casey_sad": [401, 491], "
   .o3-cardic img.o3-face{position:absolute;height:258%;width:auto;max-width:none;max-height:none;top:-8%;left:50%;transform:translateX(-50%);}
   .o3-mark{flex:0 0 auto;width:4cqw;height:4cqw;border-radius:50%;color:#fff;font:700 2.6cqw/1 Arial,sans-serif;display:flex;align-items:center;justify-content:center;}
   .o3-mk-y{background:#39b54a;} .o3-mk-n{background:#e8553e;}
+  /* DV-page stills: a window onto the earlier encounter scene, the two split by a black line */
+  .o3-panel{position:absolute;overflow:hidden;background:#f3f6fa;border-radius:1.2cqw;pointer-events:none;}
+  .o3-shot{position:absolute;}
+  .o3-shot .o3-bubface{position:absolute;overflow:hidden;}
+  .o3-shot .o3-bubface img{position:absolute;height:300%;width:auto;max-width:none;left:50%;top:-10%;transform:translateX(-50%);}
+  .o3-dvline{position:absolute;background:#111;border-radius:0.2cqw;}
   .o3-star path{fill:#e6e6e6;stroke:#bdbdbd;stroke-width:4;transition:fill .3s,stroke .3s;}
   .o3-slot.filled .o3-star path{fill:#f5b400;stroke:#d08f00;}
   .o3-slot.just .o3-star{animation:o3-pop .5s ease-out;}
@@ -467,6 +515,8 @@ window.OMIT3_ICON_SIZES = {"casey_happy": [401, 491], "casey_sad": [401, 491], "
     // the browser refuses it (CORS, autoplay policy) the mouth flaps at random, so this is the off switch.
     const useNarr = opts.narrator !== false;
     const useRemind = opts.remind !== false;   // recap page after each trial's comprehension checks
+    // stills of the two encounters on each DV page; follows `remind` unless set on its own
+    const useShots = opts.shots === undefined ? useRemind : opts.shots !== false;
     let dance = useNarr ? (opts.dance || null) : null;   // true | { frames: [urls], fps, ms } — dance break after story 2 (before the video, if both)
     if (dance === true) dance = { frames: DANCE_SEQ.map((k) => asset('narrator/dance_' + String(k).padStart(2, '0') + '.png')), fps: 4, ms: 12000 };
     const T = [];
@@ -560,10 +610,12 @@ window.OMIT3_ICON_SIZES = {"casey_happy": [401, 491], "casey_sad": [401, 491], "
         T.push(tr({ scene: SC.recap(P, rows), min_ms: 1200,
           audio: [{ key: rk + '_1', shake: 'row1' }, { key: rk + '_2', shake: 'row2' }] }, 'recap'));
       }
-      // DVs
-      T.push(tr({ scene: SC.dv(d.c1, d.c2, null, 'Who do you think ' + P + ' is better friends with?'), audio: t + '_dv_friend', choices: true, why: whyF }, 'friend'));
+      // DVs. Each carries a still of what each classmate was told (see SC.shot), so the choice does
+      // not rest on memory; `shots: false` drops them and restores the plain two-character page.
+      const shots = useShots ? [[1, d.c1], [2, d.c2]].map(([ci, C]) => ({ prot: P, mate: C, content: hiTo === ci ? hi : lo })) : null;
+      T.push(tr({ scene: SC.dv(d.c1, d.c2, null, 'Who do you think ' + P + ' is better friends with?', shots), audio: t + '_dv_friend', choices: true, why: whyF }, 'friend'));
       const items = V.dv_item_first === 'candy' ? ['candy', 'icecream'] : ['icecream', 'candy'];   // constant within child, counterbalanced across versions
-      items.forEach((it) => T.push(tr({ scene: SC.dv(d.c1, d.c2, it, null), audio: t + '_dv_' + it, choices: true, why: why }, it, { dv_item_first: V.dv_item_first })));
+      items.forEach((it) => T.push(tr({ scene: SC.dv(d.c1, d.c2, it, null, shots), audio: t + '_dv_' + it, choices: true, why: why }, it, { dv_item_first: V.dv_item_first })));
       reward(t);
       if (idx === 1 && dance) T.push(scene({ scene: '', dance: dance, audio: 'dance_mid', stars: stars, data: { item: 'dance' } }));
       if (idx === 1 && video.mid) T.push(scene({ scene: '', audio: 'vd_mid', data: { item: 'video_intro' } }), scene({ scene: '', video: video.mid, stars: stars, data: { item: 'video' } }));
